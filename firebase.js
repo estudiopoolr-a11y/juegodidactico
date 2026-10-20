@@ -10,8 +10,10 @@ const firebaseConfig = {
   appId: "1:570215721083:web:6e2adfd68e2ec450259ade"
 };
 
+console.log("Inicializando Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+console.log("Firebase inicializado correctamente.");
 
 const ROUND_RULES = [
   { name: 'Estándar', coopBonus: 8, betrayGain: 25, betrayLoss: -15, bothBetray: 2, tax: 0, multiplier: 1 },
@@ -34,17 +36,26 @@ const VICTORY_THRESHOLD = 1000;
 const GameDB = {
   async createGame(gameCode) {
     const gameRef = doc(db, 'games', gameCode);
+    const gameDoc = await getDoc(gameRef);
+    if (gameDoc.exists()) throw new Error('El código de juego ya existe.');
     await setDoc(gameRef, { gameCode, round: 0, phase: -1, timeLeft: 0, running: false, players: {}, votes: {}, pairs: [], poolScore: 0, createdAt: serverTimestamp() });
   },
 
   subscribeToGame(gameCode, callback) {
-    return onSnapshot(doc(db, 'games', gameCode), (docSnap) => callback(docSnap.exists() ? docSnap.data() : null));
+    return onSnapshot(doc(db, 'games', gameCode), (docSnap) => {
+        if (!docSnap.exists()) { console.log("Juego no encontrado"); callback(null); return; }
+        callback(docSnap.data());
+    }, (error) => { console.error("Error subscribing:", error); });
   },
 
   async joinGame(gameCode, playerCode, playerName) {
     const gameRef = doc(db, 'games', gameCode);
     const gameDoc = await getDoc(gameRef);
-    if (!gameDoc.exists()) throw new Error('Juego no encontrado.');
+    if (!gameDoc.exists()) throw new Error('El juego no encontrado.');
+    const game = gameDoc.data();
+    if (game.players[playerCode] && game.players[playerCode].name !== playerName) {
+      throw new Error(`El código ${playerCode} ya está ocupado.`);
+    }
     await updateDoc(gameRef, { [`players.${playerCode}`]: { code: playerCode, name: playerName, score: 0, vote: null, partnerId: null, isConnected: true } });
   },
 
