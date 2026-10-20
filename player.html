@@ -16,6 +16,7 @@
   .chat-input-area { display: flex; }
   .chat-input { flex-grow: 1; padding: 5px; }
   .chat-send-btn { padding: 5px 10px; margin-left: 5px; width: auto; }
+  .player-info { margin-bottom: 10px; border-bottom: 1px dotted #ccc; padding-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -23,41 +24,49 @@
   <h1>El Protocolo</h1>
 
   <div id="connectScreen">
-    <p>Código del juego:</p>
-    <input type="text" id="gameCodeInput" placeholder="Ej: JUEGO-123" />
-    <p>Tu código (01-30):</p>
-    <input type="text" id="playerCodeInput" placeholder="01" maxlength="2" />
-    <p>Tu nombre:</p>
-    <input type="text" id="playerNameInput" placeholder="Nombre" />
+    <p>Ingresa el código del juego (proporcionado por el instructor):</p>
+    <input type="text" id="gameCodeInput" placeholder="Ej: JUEGO-123" maxlength="20" />
+    <input type="text" id="playerNameInput" placeholder="Tu nombre" maxlength="20" />
     <button class="btn" id="joinBtn">Conectar</button>
     <p id="errorMsg" style="color: red;"></p>
   </div>
 
   <div id="gameScreen" class="hidden">
-    <p>Jugador: <span id="playerCodeDisplay"></span> (<span id="playerNameDisplay"></span>)</p>
+    <div class="player-info">
+      <p>Juego: <span id="gameCodeDisplay"></span></p>
+      <p>Tu código asignado: <span id="playerCodeDisplay"></span></p>
+      <p>Tu nombre: <span id="playerNameDisplay"></span></p>
+    </div>
+
     <div class="timer" id="timer">00:00</div>
-    <p id="roundInfo"></p>
-    <p id="phaseInfo"></p>
-    <p id="partnerInfo"></p>
+
+    <div id="phaseContent">
+      <p id="roundInfo"></p>
+      <p id="phaseInfo"></p>
+      <p id="partnerInfo"></p>
+    </div>
 
     <div id="chatSection" class="hidden">
-      <h3>Chat con pareja</h3>
+      <h3>Chat con tu pareja</h3>
       <div class="chat-box" id="chatBox"></div>
       <div class="chat-input-area">
-        <input type="text" id="chatInput" class="chat-input" placeholder="Mensaje..." />
+        <input type="text" id="chatInput" class="chat-input" placeholder="Escribe tu mensaje..." />
         <button class="btn chat-send-btn" id="sendChatBtn">Enviar</button>
       </div>
     </div>
 
     <div id="actions"></div>
-    <p>Tu puntaje: <span id="scoreDisplay">0</span></p>
-    <p>Pool colectivo: <span id="poolDisplay">0</span> / 1000</p>
+    
+    <div id="scoreInfo" style="margin-top: 20px; border-top: 1px dotted #ccc; padding-top: 10px;">
+      <p>Tu puntaje: <span id="scoreDisplay">0</span></p>
+      <p>Pool colectivo: <span id="poolDisplay">0</span> / 1000</p>
+    </div>
   </div>
 
   <div id="resultScreen" class="hidden">
     <h2>Resultados Finales</h2>
-    <p>Puntaje: <span id="finalScore">0</span></p>
-    <p>Pool: <span id="finalPool">0</span> / 1000</p>
+    <p>Tu puntaje: <span id="finalScore">0</span></p>
+    <p>Pool colectivo: <span id="finalPool">0</span> / 1000</p>
     <p>Ganador: <span id="winner">-</span></p>
   </div>
 </div>
@@ -69,95 +78,127 @@
   let currentPlayerCode = null;
   let currentPartnerCode = null;
 
-  document.getElementById('joinBtn').onclick = async () => {
+  const connectScreen = document.getElementById('connectScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const resultScreen = document.getElementById('resultScreen');
+  const joinBtn = document.getElementById('joinBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const chatSection = document.getElementById('chatSection');
+  const chatBox = document.getElementById('chatBox');
+  const chatInput = document.getElementById('chatInput');
+  const sendChatBtn = document.getElementById('sendChatBtn');
+
+  joinBtn.addEventListener('click', async () => {
     const gameCode = document.getElementById('gameCodeInput').value.trim();
-    const playerCode = document.getElementById('playerCodeInput').value.trim();
     const playerName = document.getElementById('playerNameInput').value.trim();
 
-    if (!gameCode || !playerCode || !playerName) {
-      document.getElementById('errorMsg').textContent = 'Completa todos los campos';
-      return;
-    }
+    if (!gameCode) { errorMsg.textContent = 'Ingresa el código del juego'; return; }
+    if (!playerName) { errorMsg.textContent = 'Ingresa tu nombre'; return; }
 
     try {
-      await GameDB.joinGame(gameCode, playerCode, playerName);
-      currentGameCode = gameCode;
-      currentPlayerCode = playerCode;
+      // JOIN GAME: La función asigna el código automáticamente
+      const assignedCode = await GameDB.joinGame(gameCode, playerName);
 
-      document.getElementById('connectScreen').classList.add('hidden');
-      document.getElementById('gameScreen').classList.remove('hidden');
-      document.getElementById('playerCodeDisplay').textContent = playerCode;
+      currentGameCode = gameCode;
+      currentPlayerCode = assignedCode;
+
+      connectScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+
+      document.getElementById('gameCodeDisplay').textContent = gameCode;
+      document.getElementById('playerCodeDisplay').textContent = assignedCode;
       document.getElementById('playerNameDisplay').textContent = playerName;
 
-      GameDB.subscribeToGame(gameCode, (game) => {
-        if (!game) return;
-        document.getElementById('timer').textContent = `${Math.floor(game.timeLeft/60).toString().padStart(2,'0')}:${(game.timeLeft%60).toString().padStart(2,'0')}`;
-        document.getElementById('roundInfo').textContent = `Ronda: ${game.round}/5`;
-        
-        const phases = ['NEGOCIACIÓN', 'VOTACIÓN', 'AUDITORÍA', 'RESULTADOS'];
-        document.getElementById('phaseInfo').textContent = `Fase: ${phases[game.phase] || 'Esperando'}`;
-
-        // Pareja y chat
-        if (game.phase === 0 && game.pairs) {
-          const myPair = game.pairs.find(p => p.p1 === currentPlayerCode || p.p2 === currentPlayerCode);
-          if (myPair) {
-            currentPartnerCode = (myPair.p1 === currentPlayerCode) ? myPair.p2 : myPair.p1;
-            const partner = game.players[currentPartnerCode];
-            document.getElementById('partnerInfo').textContent = partner ? `Pareja: ${partner.name} (${partner.code})` : 'Buscando...';
-            document.getElementById('chatSection').classList.remove('hidden');
-          }
-        } else {
-          document.getElementById('partnerInfo').textContent = '';
-          document.getElementById('chatSection').classList.add('hidden');
-        }
-
-        // Acciones
-        const act = document.getElementById('actions');
-        if (game.phase === 1 && game.running) {
-          act.innerHTML = `<button class="btn" id="coopBtn">COOPERAR</button><button class="btn" id="betBtn">DESERTAR</button>`;
-          document.getElementById('coopBtn').onclick = () => GameDB.submitVote(currentGameCode, currentPlayerCode, 'coop');
-          document.getElementById('betBtn').onclick = () => GameDB.submitVote(currentGameCode, currentPlayerCode, 'bet');
-        } else {
-          act.innerHTML = '<p>Esperando fase de votación...</p>';
-        }
-
-        if (game.players && game.players[currentPlayerCode]) {
-          document.getElementById('scoreDisplay').textContent = game.players[currentPlayerCode].score || 0;
-        }
-        document.getElementById('poolDisplay').textContent = game.poolScore || 0;
-
-        if (!game.running && game.round >= 5) {
-          document.getElementById('gameScreen').classList.add('hidden');
-          document.getElementById('resultScreen').classList.remove('hidden');
-          document.getElementById('finalScore').textContent = game.players[currentPlayerCode]?.score || 0;
-          document.getElementById('finalPool').textContent = game.poolScore || 0;
-          document.getElementById('winner').textContent = (game.poolScore >= 1000) ? 'TODOS' : 'Ninguno';
-        }
+      GameDB.subscribeToGame(gameCode, (gameData) => {
+        updateGameView(gameData);
       });
 
-      GameDB.subscribeToChat(gameCode, currentPlayerCode, (msgs) => {
-        const box = document.getElementById('chatBox');
-        box.innerHTML = '';
-        msgs.forEach(m => {
+      GameDB.subscribeToChat(gameCode, currentPlayerCode, (messages) => {
+        chatBox.innerHTML = '';
+        messages.forEach(msg => {
           const p = document.createElement('p');
-          p.textContent = `${m.from}: ${m.message}`;
-          box.appendChild(p);
+          p.textContent = `${msg.from}: ${msg.message}`;
+          chatBox.appendChild(p);
         });
-        box.scrollTop = box.scrollHeight;
+        chatBox.scrollTop = chatBox.scrollHeight;
       });
 
-    } catch (e) {
-      document.getElementById('errorMsg').textContent = e.message;
+    } catch (error) {
+      errorMsg.textContent = error.message;
     }
-  };
+  });
 
-  document.getElementById('sendChatBtn').onclick = async () => {
-    const txt = document.getElementById('chatInput').value.trim();
-    if (txt && currentGameCode && currentPlayerCode && currentPartnerCode) {
-      await GameDB.sendChatMessage(currentGameCode, currentPlayerCode, currentPartnerCode, txt);
-      document.getElementById('chatInput').value = '';
+  function updateGameView(gameData) {
+    if (!gameData) return;
+
+    const minutes = Math.floor(gameData.timeLeft / 60);
+    const seconds = gameData.timeLeft % 60;
+    document.getElementById('timer').textContent = 
+      String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+    document.getElementById('roundInfo').textContent = `Ronda: ${gameData.round}/5`;
+    
+    const phases = ['NEGOCIACIÓN', 'VOTACIÓN', 'AUDITORÍA', 'RESULTADOS'];
+    document.getElementById('phaseInfo').textContent = 
+      gameData.phase !== undefined ? phases[gameData.phase] : 'Esperando...';
+
+    const partnerInfoElement = document.getElementById('partnerInfo');
+    if (gameData.phase === 0 && gameData.pairs) {
+      const myPair = gameData.pairs.find(p => p.p1 === currentPlayerCode || p.p2 === currentPlayerCode);
+      if (myPair) {
+        currentPartnerCode = (myPair.p1 === currentPlayerCode) ? myPair.p2 : myPair.p1;
+        const partner = gameData.players[currentPartnerCode];
+        if (partner) {
+          partnerInfoElement.textContent = `Tu pareja: ${partner.name} (Código: ${partner.code})`;
+          chatSection.classList.remove('hidden');
+        } else {
+          partnerInfoElement.textContent = `Buscando pareja...`;
+          chatSection.classList.add('hidden');
+        }
+      }
+    } else {
+      partnerInfoElement.textContent = '';
+      chatSection.classList.add('hidden');
     }
-  };
+
+    const actionsDiv = document.getElementById('actions');
+    if (gameData.phase === 1 && gameData.running) {
+      actionsDiv.innerHTML = `<button class="btn" onclick="doVote('coop')">COOPERAR</button><button class="btn" onclick="doVote('bet')">DESERTAR</button>`;
+    } else {
+      actionsDiv.innerHTML = '<p>Esperando...</p>';
+    }
+
+    if (gameData.players && gameData.players[currentPlayerCode]) {
+      document.getElementById('scoreDisplay').textContent = gameData.players[currentPlayerCode].score;
+    }
+    document.getElementById('poolDisplay').textContent = gameData.poolScore || 0;
+
+    if (!gameData.running && gameData.round >= 5) {
+      showResults(gameData);
+    }
+  }
+
+  window.doVote = function(vote) {
+    if (currentGameCode && currentPlayerCode) {
+      GameDB.submitVote(currentGameCode, currentPlayerCode, vote);
+    }
+  }
+
+  sendChatBtn.onclick = async () => {
+    const message = chatInput.value.trim();
+    if (message && currentGameCode && currentPlayerCode && currentPartnerCode) {
+      await GameDB.sendChatMessage(currentGameCode, currentPlayerCode, currentPartnerCode, message);
+      chatInput.value = '';
+    }
+  }
+
+  function showResults(gameData) {
+    gameScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+    document.getElementById('finalScore').textContent = gameData.players[currentPlayerCode]?.score || 0;
+    document.getElementById('finalPool').textContent = gameData.poolScore || 0;
+    document.getElementById('winner').textContent = ((gameData.poolScore || 0) >= 1000) ? 'TODOS' : 'Ninguno';
+  }
 </script>
 </body>
 </html>

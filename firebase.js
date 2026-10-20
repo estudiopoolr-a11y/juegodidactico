@@ -10,10 +10,8 @@ const firebaseConfig = {
   appId: "1:570215721083:web:6e2adfd68e2ec450259ade"
 };
 
-console.log("Inicializando Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-console.log("Firebase inicializado correctamente.");
 
 const ROUND_RULES = [
   { name: 'Estándar', coopBonus: 8, betrayGain: 25, betrayLoss: -15, bothBetray: 2, tax: 0, multiplier: 1 },
@@ -43,20 +41,42 @@ const GameDB = {
 
   subscribeToGame(gameCode, callback) {
     return onSnapshot(doc(db, 'games', gameCode), (docSnap) => {
-        if (!docSnap.exists()) { console.log("Juego no encontrado"); callback(null); return; }
+        if (!docSnap.exists()) { callback(null); return; }
         callback(docSnap.data());
     }, (error) => { console.error("Error subscribing:", error); });
   },
 
-  async joinGame(gameCode, playerCode, playerName) {
+  async joinGame(gameCode, playerName) {
     const gameRef = doc(db, 'games', gameCode);
     const gameDoc = await getDoc(gameRef);
-    if (!gameDoc.exists()) throw new Error('El juego no encontrado.');
+    if (!gameDoc.exists()) throw new Error('Juego no encontrado. Pídele el código al instructor.');
+    
     const game = gameDoc.data();
-    if (game.players[playerCode] && game.players[playerCode].name !== playerName) {
-      throw new Error(`El código ${playerCode} ya está ocupado.`);
+    const existingPlayers = game.players || {};
+    
+    let assignedCode = null;
+    for (let i = 1; i <= 30; i++) {
+      const codeStr = String(i).padStart(2, '0');
+      if (!existingPlayers[codeStr]) {
+        assignedCode = codeStr;
+        break;
+      }
     }
-    await updateDoc(gameRef, { [`players.${playerCode}`]: { code: playerCode, name: playerName, score: 0, vote: null, partnerId: null, isConnected: true } });
+    
+    if (!assignedCode) throw new Error('La sala está llena (máximo 30 jugadores).');
+
+    await updateDoc(gameRef, { 
+      [`players.${assignedCode}`]: { 
+        code: assignedCode, 
+        name: playerName, 
+        score: 0, 
+        vote: null, 
+        partnerId: null, 
+        isConnected: true 
+      } 
+    });
+    
+    return assignedCode;
   },
 
   async startGame(gameCode) {
@@ -83,7 +103,7 @@ const GameDB = {
   async formPairs(gameCode) {
     const gameRef = doc(db, 'games', gameCode);
     const game = (await getDoc(gameRef)).data();
-    const pCodes = Object.keys(game.players);
+    const pCodes = Object.keys(game.players || {});
     const shuffled = [...pCodes].sort(() => Math.random() - 0.5);
     const pairs = [];
     const updates = {};
