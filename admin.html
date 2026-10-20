@@ -13,10 +13,6 @@
   table { width: 100%; border-collapse: collapse; margin-top: 20px; }
   th, td { border: 1px solid #555; padding: 8px; text-align: left; }
   th { background: #333; }
-  .status { font-size: 18px; margin: 10px 0; }
-  .chat-log { background: #1a1a1a; padding: 10px; height: 150px; overflow-y: scroll; margin-top: 20px; font-size: 12px; border: 1px solid #444; }
-  .chat-entry { margin-bottom: 5px; color: #bbb; }
-  .chat-entry.from-player { color: #88f; }
 </style>
 </head>
 <body>
@@ -24,116 +20,76 @@
 
 <div id="createSection">
   <h2>1. Crear un nuevo juego</h2>
-  <input type="text" id="newGameCodeInput" placeholder="Código del juego (ej: JUEGO-123)" style="padding: 10px; font-size: 16px; width: 300px;" />
+  <input type="text" id="newGameCodeInput" placeholder="Código (ej: JUEGO-123)" style="padding: 10px; font-size: 16px; width: 300px;" />
   <button class="btn" id="createBtn">Crear Juego</button>
-  <div id="gameCodeDisplay" class="game-code" style="display:none;"></div>
 </div>
 
 <div id="controlSection" style="display:none; margin-top: 30px;">
   <h2>2. Control del Juego: <span id="currentAdminGameCode"></span></h2>
-  <div class="status" id="status">Esperando...</div>
+  <div id="status" style="font-size: 18px; margin: 10px 0;">Esperando...</div>
   
   <button class="btn" id="startBtn">Iniciar Juego</button>
   <button class="btn" id="nextPhaseBtn" disabled>Siguiente Fase</button>
-  <button class="btn" id="resetBtn">Reiniciar Juego</button>
   
-  <div class="status">Pool colectivo: <span id="poolScore">0</span> / 1000</div>
+  <div style="font-size: 18px; margin: 10px 0;">Pool colectivo: <span id="poolScore">0</span> / 1000</div>
   
-  <h3>Jugadores Conectados (<span id="playerCount">0</span>/30)</h3>
-  <table id="playersTable">
+  <h3>Jugadores Conectados (<span id="playerCount">0</span>)</h3>
+  <table>
     <thead><tr><th>Código</th><th>Nombre</th><th>Puntos</th><th>Voto</th><th>Pareja</th></tr></thead>
     <tbody id="playersList"></tbody>
   </table>
 
   <h3>Registro de Chat</h3>
-  <div id="chatLog" class="chat-log"></div>
+  <div id="chatLog" style="background:#111; padding:10px; height:150px; overflow-y:scroll; border:1px solid #444;"></div>
 </div>
 
 <script type="module">
   import { GameDB } from './firebase.js';
 
   let currentGameCode = null;
-  let unsubscribeGame = null;
-  let unsubscribeChat = null;
-  let currentGameData = null; // Guardamos el estado aquí
 
-  const createSection = document.getElementById('createSection');
-  const controlSection = document.getElementById('controlSection');
-  const newGameCodeInput = document.getElementById('newGameCodeInput');
-  const gameCodeDisplay = document.getElementById('gameCodeDisplay');
-  const currentAdminGameCode = document.getElementById('currentAdminGameCode');
-  const statusDiv = document.getElementById('status');
-  const startBtn = document.getElementById('startBtn');
-  const nextPhaseBtn = document.getElementById('nextPhaseBtn');
-  const poolScoreSpan = document.getElementById('poolScore');
-  const playersList = document.getElementById('playersList');
-  const playerCountSpan = document.getElementById('playerCount');
-  const chatLogDiv = document.getElementById('chatLog');
+  document.getElementById('createBtn').onclick = async () => {
+    const code = document.getElementById('newGameCodeInput').value.trim();
+    if (!code) return alert('Ingresa un código');
+    await GameDB.createGame(code);
+    currentGameCode = code;
+    document.getElementById('createSection').style.display = 'none';
+    document.getElementById('controlSection').style.display = 'block';
+    document.getElementById('currentAdminGameCode').textContent = code;
 
-  async function createGame() {
-    const gameCode = newGameCodeInput.value.trim();
-    if (!gameCode) { alert('Ingresa un código de juego'); return; }
-    try {
-      await GameDB.createGame(gameCode);
-      setupGameControls(gameCode);
-      alert('Juego creado.');
-    } catch (error) { alert('Error: ' + error.message); }
-  }
+    GameDB.subscribeToGame(code, (game) => {
+      if (!game) return;
+      const phases = ['NEGOCIACIÓN', 'VOTACIÓN', 'AUDITORÍA', 'RESULTADOS'];
+      document.getElementById('status').textContent = `Ronda: ${game.round}/5 | Fase: ${phases[game.phase] || 'Listo'} | Estado: ${game.running ? 'Corriendo' : 'Detenido'}`;
+      document.getElementById('poolScore').textContent = game.poolScore || 0;
+      
+      let rows = '';
+      const pKeys = Object.keys(game.players || {});
+      document.getElementById('playerCount').textContent = pKeys.length;
+      pKeys.forEach(k => {
+        const p = game.players[k];
+        rows += `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.score}</td><td>${p.vote || '-'}</td><td>${p.partnerId || '-'}</td></tr>`;
+      });
+      document.getElementById('playersList').innerHTML = rows;
 
-  function setupGameControls(gameCode) {
-    currentGameCode = gameCode;
-    createSection.style.display = 'none';
-    controlSection.style.display = 'block';
-    gameCodeDisplay.textContent = ` URL del juego: ${window.location.origin}/player.html`;
-    gameCodeDisplay.style.display = 'block';
-    currentAdminGameCode.textContent = gameCode;
-
-    unsubscribeGame = GameDB.subscribeToGame(gameCode, (gameData) => {
-      currentGameData = gameData;
-      updateAdminView(gameData);
+      document.getElementById('startBtn').disabled = game.running;
+      document.getElementById('nextPhaseBtn').disabled = !game.running;
     });
-    
-    unsubscribeChat = GameDB.subscribeToAllChat(gameCode, (messages) => {
-        chatLogDiv.innerHTML = '';
-        messages.forEach(msg => {
-            const p = document.createElement('p');
-            p.className = `chat-entry ${msg.from.startsWith('J') ? 'from-player' : ''}`;
-            p.textContent = `${msg.from} ${msg.to ? `-> ${msg.to}` : ''}: ${msg.message}`;
-            chatLogDiv.appendChild(p);
-        });
-        chatLogDiv.scrollTop = chatLogDiv.scrollHeight;
+
+    GameDB.subscribeToAllChat(code, (msgs) => {
+      const log = document.getElementById('chatLog');
+      log.innerHTML = '';
+      msgs.forEach(m => {
+        const p = document.createElement('div');
+        p.textContent = `[${m.from} -> ${m.to}]: ${m.message}`;
+        log.appendChild(p);
+      });
+      log.scrollTop = log.scrollHeight;
     });
-  }
+  };
 
-  function updateAdminView(gameData) {
-    if (!gameData) return;
-    const phases = ['NEGOCIACIÓN', 'VOTACIÓN', 'AUDITORÍA', 'RESULTADOS'];
-    statusDiv.textContent = `Ronda: ${gameData.round}/5 | Fase: ${phases[gameData.phase] || 'Esperando'} | Tiempo: ${gameData.timeLeft}s | Ejecutando: ${gameData.running ? 'SÍ' : 'NO'}`;
-    poolScoreSpan.textContent = gameData.poolScore || 0;
-    
-    let rows = '';
-    let count = 0;
-    Object.keys(gameData.players || {}).sort().forEach(code => {
-      count++;
-      const p = gameData.players[code];
-      const partner = gameData.pairs ? gameData.pairs.find(pair => pair.p1 === code || pair.p2 === code)?.[(pair.p1 === code ? 'p2' : 'p1')] || '-' : '-';
-      rows += `<tr><td>${code}</td><td>${p.name}</td><td>${p.score}</td><td>${p.vote || '-'}</td><td>${partner}</td></tr>`;
-    });
-    playersList.innerHTML = rows;
-    playerCountSpan.textContent = count;
-    startBtn.disabled = gameData.running;
-    nextPhaseBtn.disabled = !gameData.running;
-  }
-
-  window.createGame = createGame;
-  window.startGame = async () => { if (currentGameCode) await GameDB.startGame(currentGameCode, Object.keys(currentGameData.players || {}).length); };
-  window.nextPhase = async () => { if (currentGameCode) await GameDB.nextPhase(currentGameCode); };
-  window.resetGame = async () => { if (currentGameCode && confirm('¿Reiniciar?')) await GameDB.createGame(currentGameCode); };
-
-  document.getElementById('createBtn').onclick = createGame;
-  startBtn.onclick = window.startGame;
-  nextPhaseBtn.onclick = window.nextPhase;
-  document.getElementById('resetBtn').onclick = window.resetGame;
+  document.getElementById('startBtn').onclick = () => GameDB.startGame(currentGameCode);
+  document.getElementById('nextPhaseBtn').onclick = () => GameDB.nextPhase(currentGameCode);
 </script>
 </body>
 </html>
