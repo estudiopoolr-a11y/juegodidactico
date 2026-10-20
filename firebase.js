@@ -34,22 +34,23 @@ const VICTORY_THRESHOLD = 1000;
 const GameDB = {
   async createGame(gameCode) {
     const gameRef = doc(db, 'games', gameCode);
-    const gameDoc = await getDoc(gameRef);
-    if (gameDoc.exists()) throw new Error('El código de juego ya existe.');
-    await setDoc(gameRef, { gameCode, round: 0, phase: -1, timeLeft: 0, running: false, players: {}, votes: {}, pairs: [], poolScore: 0, createdAt: serverTimestamp() });
+    await setDoc(gameRef, { 
+        gameCode, round: 0, phase: -1, timeLeft: 0, running: false, 
+        players: {}, votes: {}, pairs: [], poolScore: 0, createdAt: serverTimestamp() 
+    });
   },
 
   subscribeToGame(gameCode, callback) {
     return onSnapshot(doc(db, 'games', gameCode), (docSnap) => {
         if (!docSnap.exists()) { callback(null); return; }
         callback(docSnap.data());
-    }, (error) => { console.error("Error subscribing:", error); });
+    });
   },
 
   async joinGame(gameCode, playerName) {
     const gameRef = doc(db, 'games', gameCode);
     const gameDoc = await getDoc(gameRef);
-    if (!gameDoc.exists()) throw new Error('Juego no encontrado. Pídele el código al instructor.');
+    if (!gameDoc.exists()) throw new Error('Juego no encontrado.');
     
     const game = gameDoc.data();
     const existingPlayers = game.players || {};
@@ -62,20 +63,19 @@ const GameDB = {
         break;
       }
     }
-    
-    if (!assignedCode) throw new Error('La sala está llena (máximo 30 jugadores).');
+    if (!assignedCode) throw new Error('Sala llena.');
 
-    await updateDoc(gameRef, { 
-      [`players.${assignedCode}`]: { 
-        code: assignedCode, 
-        name: playerName, 
-        score: 0, 
-        vote: null, 
-        partnerId: null, 
-        isConnected: true 
-      } 
-    });
-    
+    // Objeto limpio y seguro
+    const newPlayer = {
+      code: assignedCode,
+      name: playerName,
+      score: 0,
+      vote: null,
+      partnerId: null,
+      isConnected: true
+    };
+
+    await updateDoc(gameRef, { [`players.${assignedCode}`]: newPlayer });
     return assignedCode;
   },
 
@@ -126,7 +126,8 @@ const GameDB = {
   },
 
   subscribeToChat(gameCode, playerCode, callback) {
-    return onSnapshot(query(collection(db, 'games', gameCode, 'chat'), orderBy('timestamp', 'asc')), (snap) => {
+    const q = query(collection(db, 'games', gameCode, 'chat'), orderBy('timestamp', 'asc'));
+    return onSnapshot(q, (snap) => {
       const msgs = [];
       snap.forEach(d => { const m = d.data(); if (m.from === playerCode || m.to === playerCode) msgs.push(m); });
       callback(msgs);
@@ -134,9 +135,8 @@ const GameDB = {
   },
 
   subscribeToAllChat(gameCode, callback) {
-    return onSnapshot(query(collection(db, 'games', gameCode, 'chat'), orderBy('timestamp', 'asc')), (snap) => {
-      const msgs = []; snap.forEach(d => msgs.push(d.data())); callback(msgs);
-    });
+    const q = query(collection(db, 'games', gameCode, 'chat'), orderBy('timestamp', 'asc'));
+    return onSnapshot(q, (snap) => { const msgs = []; snap.forEach(d => msgs.push(d.data())); callback(msgs); });
   }
 };
 
