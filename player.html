@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocolo de Austeridad - Estudiante</title>
+<style>
+  body { font-family: monospace; background: #f0f0f0; padding: 20px; max-width: 500px; margin: 0 auto; } 
+  .container { background: #fff; padding: 20px; border: 1px solid #ccc; } 
+  input { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; } 
+  .btn { width: 100%; padding: 15px; margin: 10px 0; background: #e0e0e0; border: 1px solid #999; font-size: 18px; cursor: pointer; } 
+  .btn:hover { background: #d0d0d0; } 
+  .btn:disabled { background: #ccc; cursor: not-allowed; } 
+  .timer { font-size: 32px; font-weight: bold; text-align: center; margin: 20px 0; } 
+  .hidden { display: none; }
+  .chat-box { border: 1px solid #ccc; height: 100px; overflow-y: scroll; padding: 5px; margin-bottom: 10px; background: #f9f9f9; }
+  .chat-input-area { display: flex; }
+  .chat-input { flex-grow: 1; padding: 5px; }
+  .chat-send-btn { padding: 5px 10px; margin-left: 5px; }
+  .player-info { margin-bottom: 10px; border-bottom: 1px dotted #ccc; padding-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>El Protocolo de Austeridad</h1>
+  
+  <!-- Pantalla de conexión -->
+  <div id="connectScreen">
+    <p>Ingresa el código del juego (proporcionado por el instructor):</p>
+    <input type="text" id="gameCodeInput" placeholder="Ej: JUEGO-123" maxlength="20" />
+    <input type="text" id="playerCodeInput" placeholder="Tu código (01-30)" maxlength="2" />
+    <input type="text" id="playerNameInput" placeholder="Tu nombre" maxlength="20" />
+    <button class="btn" id="joinBtn">Conectar</button>
+    <p id="errorMsg" style="color: red;"></p>
+  </div>
+
+  <!-- Pantalla del juego -->
+  <div id="gameScreen" class="hidden">
+    <div class="player-info">
+      <p>Juego: <span id="gameCodeDisplay"></span></p>
+      <p>Tu código: <span id="playerCodeDisplay"></span></p>
+      <p>Tu nombre: <span id="playerNameDisplay"></span></p>
+    </div>
+    
+    <div class="timer" id="timer">00:00</div>
+    
+    <div id="phaseContent">
+      <p id="roundInfo"></p>
+      <p id="phaseInfo"></p>
+      <p id="partnerInfo"></p>
+    </div>
+    
+    <div id="chatSection" class="hidden">
+      <h3>Chat con tu pareja</h3>
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Escribe tu mensaje..." />
+        <button class="btn chat-send-btn" onclick="sendChatMessage()">Enviar</button>
+      </div>
+    </div>
+
+    <div id="actions"></div>
+    
+    <div id="scoreInfo" style="margin-top: 20px; border-top: 1px dotted #ccc; padding-top: 10px;">
+      <p>Tu puntaje: <span id="scoreDisplay">0</span></p>
+      <p>Pool colectivo: <span id="poolDisplay">0</span> / 1000</p>
+    </div>
+  </div>
+
+  <!-- Pantalla de resultados -->
+  <div id="resultScreen" class="hidden">
+    <h2>Resultados Finales</h2>
+    <p>Tu puntaje: <span id="finalScore">0</span></p>
+    <p>Pool colectivo: <span id="finalPool">0</span> / 1000</p>
+    <p>Ganador: <span id="winner">-</span></p>
+    <div id="mathProof" style="background: #f8f8f8; padding: 15px; margin-top: 20px; font-size: 14px;">
+      <strong>Demostración matemática:</strong><br>
+      Máximo teórico: 1050 pts<br>
+      Umbral de victoria: 1000 pts<br>
+      Diferencia: 50 pts (IMPOSIBLE)<br><br>
+      Cada traición cuesta 6 pts al colectivo.<br>
+      Con 30 jugadores, la coordinación es el desafío real.
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { GameDB, db } from './firebase.js';
+  import { doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+  let currentGameCode = null;
+  let currentPlayerCode = null;
+  let currentPlayerName = null;
+  let unsubscribe = null;
+  let currentPartnerCode = null;
+
+  const connectScreen = document.getElementById('connectScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const resultScreen = document.getElementById('resultScreen');
+  const joinBtn = document.getElementById('joinBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const chatSection = document.getElementById('chatSection');
+  const chatBox = document.getElementById('chatBox');
+  const chatInput = document.getElementById('chatInput');
+
+  joinBtn.addEventListener('click', async () => {
+    const gameCode = document.getElementById('gameCodeInput').value.trim();
+    const playerCode = document.getElementById('playerCodeInput').value.trim();
+    const playerName = document.getElementById('playerNameInput').value.trim();
+
+    if (!gameCode) { errorMsg.textContent = 'Ingresa el código del juego'; return; }
+    if (!playerCode) { errorMsg.textContent = 'Ingresa tu código (01-30)'; return; }
+    if (!/^(0[1-9]|[12][0-9]|30)$/.test(playerCode)) { errorMsg.textContent = 'Código de jugador inválido (01-30)'; return; }
+    if (!playerName) { errorMsg.textContent = 'Ingresa tu nombre'; return; }
+
+    try {
+      await GameDB.joinGame(gameCode, playerCode, playerName);
+      
+      currentGameCode = gameCode;
+      currentPlayerCode = playerCode;
+      currentPlayerName = playerName;
+      
+      connectScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      
+      document.getElementById('gameCodeDisplay').textContent = gameCode;
+      document.getElementById('playerCodeDisplay').textContent = playerCode;
+      document.getElementById('playerNameDisplay').textContent = playerName;
+      
+      // Suscribirse a cambios del juego
+      unsubscribe = GameDB.subscribeToGame(gameCode, (gameData) => {
+        updateGameView(gameData);
+      });
+      
+      // Suscribirse a mensajes de chat
+      GameDB.subscribeToChat(gameCode, currentPlayerCode, (messages) => {
+        chatBox.innerHTML = ''; // Limpiar
+        messages.forEach(msg => {
+          const p = document.createElement('p');
+          p.textContent = `${msg.from}: ${msg.message}`; // Ya incluye el from
+          chatBox.appendChild(p);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight; // Scroll al final
+      });
+      
+    } catch (error) {
+      errorMsg.textContent = error.message;
+    }
+  });
+
+  function updateGameView(gameData) {
+    if (!gameData) return;
+
+    // Actualizar timer
+    const minutes = Math.floor(gameData.timeLeft / 60);
+    const seconds = gameData.timeLeft % 60;
+    document.getElementById('timer').textContent = 
+      String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+    // Actualizar ronda y fase
+    document.getElementById('roundInfo').textContent = `Ronda: ${gameData.round}/5`;
+    
+    const phases = ['NEGOCIACIÓN', 'VOTACIÓN', 'AUDITORÍA', 'RESULTADOS'];
+    document.getElementById('phaseInfo').textContent = 
+      gameData.phase !== undefined ? phases[gameData.phase] : 'Esperando...';
+
+    // Información del compañero de juego
+    const partnerInfoElement = document.getElementById('partnerInfo');
+    if (gameData.phase === 0 && gameData.pairs) { // Fase de negociación
+      const myPair = gameData.pairs.find(p => p.p1 === currentPlayerCode || p.p2 === currentPlayerCode);
+      if (myPair) {
+        currentPartnerCode = (myPair.p1 === currentPlayerCode) ? myPair.p2 : myPair.p1;
+        const partner = gameData.players[currentPartnerCode];
+        if (partner) {
+          partnerInfoElement.textContent = `Tu pareja: ${partner.name} (Código: ${partner.code})`;
+          chatSection.classList.remove('hidden');
+        } else {
+          partnerInfoElement.textContent = `Buscando pareja...`;
+          chatSection.classList.add('hidden');
+        }
+      } else {
+        partnerInfoElement.textContent = `Buscando pareja...`;
+        chatSection.classList.add('hidden');
+      }
+    } else {
+      partnerInfoElement.textContent = '';
+      chatSection.classList.add('hidden');
+    }
+
+    // Mostrar acciones de votación
+    const actionsDiv = document.getElementById('actions');
+    if (gameData.phase === 1 && gameData.running) {
+      actionsDiv.innerHTML = `
+        <button class="btn" onclick="vote('coop')">COOPERAR</button>
+        <button class="btn" onclick="vote('bet')">DESERTAR</button>
+      `;
+    } else if (gameData.phase === 2 && gameData.running) {
+      actionsDiv.innerHTML = '<p>Auditoría en curso...</p>';
+    } else if (gameData.phase === 3 && gameData.running) {
+      actionsDiv.innerHTML = '<p>Resultados...</p>';
+    } else {
+      actionsDiv.innerHTML = '<p>Esperando al instructor...</p>';
+    }
+
+    // Actualizar puntajes
+    if (gameData.players && gameData.players[currentPlayerCode]) {
+      document.getElementById('scoreDisplay').textContent = gameData.players[currentPlayerCode].score;
+    }
+    document.getElementById('poolDisplay').textContent = gameData.poolScore || 0;
+
+    // Verificar si el juego terminó
+    if (!gameData.running && gameData.round >= 5) {
+      showResults(gameData);
+    }
+  }
+
+  function vote(vote) {
+    if (currentGameCode && currentPlayerCode) {
+      GameDB.submitVote(currentGameCode, currentPlayerCode, vote);
+    }
+  }
+
+  async function sendChatMessage() {
+    const message = chatInput.value.trim();
+    if (message && currentGameCode && currentPlayerCode && currentPartnerCode) {
+      await GameDB.sendChatMessage(currentGameCode, currentPlayerCode, currentPartnerCode, message);
+      chatInput.value = '';
+    }
+  }
+
+  function showResults(gameData) {
+    gameScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+    
+    if (gameData.players && gameData.players[currentPlayerCode]) {
+      document.getElementById('finalScore').textContent = gameData.players[currentPlayerCode].score;
+    }
+    document.getElementById('finalPool').textContent = gameData.poolScore || 0;
+    
+    const won = (gameData.poolScore || 0) >= 1000;
+    document.getElementById('winner').textContent = won ? 'TODOS' : 'Ninguno';
+  }
+</script>
+</body>
+</html>

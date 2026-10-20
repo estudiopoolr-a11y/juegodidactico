@@ -1,0 +1,20 @@
+{
+  "name": "protocolo-austeridad",
+  "version": "1.0.0",
+  "description": "Juego cognitivo para 30 jugadores con WebSocket en tiempo real",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.3",
+    "ws": "^8.22.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
