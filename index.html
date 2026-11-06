@@ -3,43 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EL PROTOCOLO — Mesa de Personajes 3D</title>
+<title>EL PROTOCOLO — Mesa de Mandos con Avatares</title>
 <style>
-:root{--bg:#050508;--card:rgba(12,16,28,0.95);--accent:#00f2ff;--glow:rgba(0,242,255,0.3);--sec:#ff00ea;--danger:#ff3c5f;--text:#e8e8f0}
+:root{--bg:#050508;--card:rgba(12,16,28,0.96);--accent:#00f2ff;--glow:rgba(0,242,255,0.3);--sec:#ff00ea;--danger:#ff3c5f;--text:#e8e8f0}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Courier New',monospace;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 100%);color:var(--text);overflow:hidden;width:100vw;height:100vh}
+body{font-family:'Courier New',monospace;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 60%, #050508 100%);color:var(--text);overflow:hidden;width:100vw;height:100vh}
 #canvas3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
 /* CAPA DE UI */
 #ui-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;justify-content:center;align-items:center}
 #ui-layer>*{pointer-events:auto}
-.screen{width:min(95vw, 500px);display:flex;flex-direction:column;animation:fadeUp .6s ease}
+.screen{width:min(95vw, 520px);display:flex;flex-direction:column;animation:fadeUp .6s ease}
 .hidden{display:none!important}
 @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
 /* PANELES */
-.panel{background:var(--card);border:2px solid rgba(0,242,255,0.2);border-radius:24px;padding:30px;backdrop-filter:blur(20px);box-shadow:0 0 80px rgba(0,242,255,0.1),0 20px 80px rgba(0,0,0,0.8)}
-h1{text-align:center;font-size:28px;color:var(--accent);text-shadow:0 0 20px var(--glow);margin-bottom:6px;letter-spacing:4px}
-.sub{text-align:center;font-size:12px;color:#667;letter-spacing:3px;margin-bottom:20px}
+.panel{background:var(--card);border:2px solid rgba(0,242,255,0.25);border-radius:24px;padding:26px;backdrop-filter:blur(20px);box-shadow:0 0 80px rgba(0,242,255,0.12),0 20px 80px rgba(0,0,0,0.8)}
+h1{text-align:center;font-size:26px;color:var(--accent);text-shadow:0 0 20px var(--glow);margin-bottom:4px;letter-spacing:4px}
+.sub{text-align:center;font-size:11px;color:#667;letter-spacing:3px;margin-bottom:18px}
+
+/* AVATAR DE LA MESA */
+.avatar-box {
+    width: 80px; height: 80px; margin: 0 auto 12px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(0,242,255,0.2) 0%, transparent 70%);
+    border: 2px solid var(--accent); display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 0 20px var(--glow); transition: 0.3s;
+}
+.svg-avatar { width: 50px; height: 50px; fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.angry-avatar { stroke: var(--danger) !important; filter: drop-shadow(0 0 8px var(--danger)); }
+.happy-avatar { stroke: #00ff88 !important; filter: drop-shadow(0 0 8px #00ff88); }
 
 /* CHAT GRANDE */
-#chat-container{height:180px;background:rgba(0,0,0,0.5);border-radius:16px;padding:15px;overflow-y:auto;margin-bottom:15px;border:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:10px}
-.chat-bubble{max-width:92%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6;animation:fadeUp .3s ease}
+#chat-container{height:150px;background:rgba(0,0,0,0.5);border-radius:16px;padding:14px;overflow-y:auto;margin-bottom:12px;border:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:8px}
+.chat-bubble{max-width:92%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;animation:fadeUp .3s ease}
 .bubble-ia{background:rgba(255,0,234,0.1);color:#f0d0ff;align-self:flex-start;border-left:4px solid var(--sec);border-bottom-left-radius:2px}
 .bubble-user{background:rgba(0,242,255,0.15);color:var(--accent);align-self:flex-end;border-bottom-right-radius:2px;font-weight:700}
-.bubble-sys{background:rgba(255,204,0,0.1);color:#ffcc00;align-self:center;text-align:center;font-size:12px;border:1px solid rgba(255,204,0,0.2)}
+.bubble-sys{background:rgba(255,204,0,0.1);color:#ffcc00;align-self:center;text-align:center;font-size:11px;border:1px solid rgba(255,204,0,0.2)}
 
 /* BOTONES */
-.grid-q{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}
-.btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;transition:.2s}
+.grid-q{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;transition:.2s}
 .btn-neon{background:linear-gradient(135deg,var(--accent),#0066ff);color:#000;box-shadow:0 6px 25px var(--glow)}
 .btn-neon:hover{transform:translateY(-2px);box-shadow:0 10px 35px var(--glow)}
-.btn-dark{background:rgba(255,255,255,0.05);color:#ccc;border:1px solid rgba(255,255,255,0.1)}
+.btn-dark{background:rgba(255,255,255,0.05);color:#ccc;border:1px solid rgba(255,255,255,0.1);font-size:11px;padding:10px}
 .btn-dark:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,242,255,0.05)}
 
 /* VOTOS */
-.grid-v{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.vc{padding:20px;border-radius:18px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,0.08);transition:.25s}
+.grid-v{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vc{padding:18px;border-radius:16px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,0.08);transition:.25s}
 .vc-coop{background:rgba(0,242,255,0.08);color:var(--accent)}
 .vc-coop:hover{border-color:var(--accent);background:rgba(0,242,255,0.15);box-shadow:0 0 30px var(--glow)}
 .vc-betray{background:rgba(255,60,95,0.08);color:var(--danger)}
@@ -52,8 +63,8 @@ h1{text-align:center;font-size:28px;color:var(--accent);text-shadow:0 0 20px var
 .wait-bar{width:280px;height:4px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden}
 .wait-fill{height:100%;background:var(--accent);width:0%;transition:width linear}
 
-.badge{background:rgba(0,242,255,0.1);padding:6px 12px;border-radius:100px;font-size:11px;font-weight:bold;color:var(--accent);border:1px solid rgba(0,242,255,0.2)}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.badge{background:rgba(0,242,255,0.1);padding:5px 10px;border-radius:100px;font-size:10px;font-weight:bold;color:var(--accent);border:1px solid rgba(0,242,255,0.2)}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -67,13 +78,13 @@ h1{text-align:center;font-size:28px;color:var(--accent);text-shadow:0 0 20px var
             <div class="top-bar"><span class="badge">PROTOCOL // 3D</span></div>
             <h1>EL PROTOCOLO</h1>
             <p class="sub">MESA DE LOS MANDOS</p>
-            <p style="text-align:center;font-size:13px;color:#889;line-height:1.6;margin-bottom:25px">
-                5 Mandos te esperan sentados a la mesa.<br>
-                Sobrevive a 5 rondas de alta tensión.<br>
-                Alcanza <b style="color:var(--accent)">300 puntos</b> para ser promovido.
+            <p style="text-align:center;font-size:12px;color:#889;line-height:1.6;margin-bottom:20px">
+                5 Mandos te esperan sentados en la mesa circular.<br>
+                Cada ronda la cámara enfoca a un personaje distinto.<br>
+                Alcanza <b style="color:var(--accent)">300 puntos</b> para sobrevivir.
             </p>
-            <input id="p-name" placeholder="ID DE AGENTE..." style="width:100%;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.4);color:#fff;text-align:center;margin-bottom:15px;font-family:inherit;font-size:14px;outline:none;letter-spacing:2px">
-            <button class="btn btn-neon" onclick="Game.init()">Iniciar Protocolo</button>
+            <input id="p-name" placeholder="ID DE AGENTE..." style="width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.4);color:#fff;text-align:center;margin-bottom:14px;font-family:inherit;font-size:13px;outline:none;letter-spacing:2px">
+            <button class="btn btn-neon" onclick="Game.init()">Sentarse a la Mesa</button>
         </div>
     </div>
 
@@ -84,27 +95,41 @@ h1{text-align:center;font-size:28px;color:var(--accent);text-shadow:0 0 20px var
                 <span class="badge">RONDA <span id="st-r">1</span>/5</span>
                 <span class="badge" style="color:var(--accent)">SCORE: <span id="st-s">0</span></span>
             </div>
-            <p style="text-align:center;font-size:12px;color:var(--sec);font-weight:bold;letter-spacing:2px;margin-bottom:10px" id="ia-title">MANDO: AUDITOR_GRIS</p>
+            
+            <p style="text-align:center;font-size:11px;color:var(--sec);font-weight:bold;letter-spacing:2px;margin-bottom:6px" id="ia-title">MANDO: AUDITOR_GRIS</p>
+            
+            <!-- AVATAR HOLOGRÁFICO DEL MANDO -->
+            <div class="avatar-box" id="avatar-container">
+                <svg viewBox="0 0 100 100" class="svg-avatar" id="avatar-svg">
+                    <circle cx="50" cy="50" r="40" />
+                    <circle cx="35" cy="40" r="6" fill="currentColor" />
+                    <circle cx="65" cy="40" r="6" fill="currentColor" />
+                    <path d="M30 65 Q50 75 70 65" id="avatar-mouth" />
+                </svg>
+            </div>
+
             <div id="chat-container"></div>
+            
             <div id="nego-layer">
-                <p style="font-size:11px;color:#556;text-align:center;margin-bottom:10px;font-weight:bold">► INTERROGAR:</p>
+                <p style="font-size:10px;color:#556;text-align:center;margin-bottom:8px;font-weight:bold">► INTERROGAR AL MANDO:</p>
                 <div class="grid-q">
                     <button class="btn btn-dark" onclick="Game.ask('Beneficio')">¿Qué gano?</button>
-                    <button class="btn btn-dark" onclick="Game.ask('Confianza')">¿Por qué fiarme?</button>
-                    <button class="btn btn-dark" onclick="Game.ask('Truco')">¿Cuál es el truco?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Confianza')">¿Por qué confiar?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Truco')">¿Cuál es la trampa?</button>
                     <button class="btn btn-dark" onclick="Game.ask('Traicion')">¿Y si traiciono?</button>
                 </div>
                 <button class="btn btn-neon" onclick="Game.toVote()">Proceder a la Decisión →</button>
             </div>
+            
             <div id="vote-layer" class="hidden">
                 <div class="grid-v">
                     <div class="vc vc-coop" onclick="Game.vote('coop')">
-                        <div style="font-weight:800;font-size:14px">COOPERAR</div>
-                        <div style="font-size:10px;opacity:.7;margin-top:5px">+60 pts Mutuo</div>
+                        <div style="font-weight:800;font-size:13px">COOPERAR</div>
+                        <div style="font-size:10px;opacity:.7;margin-top:4px">+60 pts Mutuo</div>
                     </div>
                     <div class="vc vc-betray" onclick="Game.vote('betray')">
-                        <div style="font-weight:800;font-size:14px">DESERTAR</div>
-                        <div style="font-size:10px;opacity:.7;margin-top:5px">+75 pts Solo</div>
+                        <div style="font-weight:800;font-size:13px">DESERTAR</div>
+                        <div style="font-size:10px;opacity:.7;margin-top:4px">+75 pts Solo</div>
                     </div>
                 </div>
             </div>
@@ -116,15 +141,15 @@ h1{text-align:center;font-size:28px;color:var(--accent);text-shadow:0 0 20px var
         <div class="panel">
             <h1 id="res-title">EVALUACIÓN</h1>
             <p class="sub">PROTOCOLO FINALIZADO</p>
-            <div style="text-align:center;font-size:48px;font-weight:900;color:var(--accent);margin:20px 0" id="res-score">0</div>
+            <div style="text-align:center;font-size:44px;font-weight:900;color:var(--accent);margin:18px 0" id="res-score">0</div>
             <div id="res-detail"></div>
-            <button class="btn btn-neon" style="margin-top:25px" onclick="location.reload()">Reiniciar</button>
+            <button class="btn btn-neon" style="margin-top:20px" onclick="location.reload()">Reiniciar Protocolo</button>
         </div>
     </div>
 </div>
 
 <script>
-// --- MOTOR 3D (WebGL Fallback & Scene) ---
+// --- MOTOR 3D & CÁMARA ---
 const C3D = {
     canvas: null, gl: null, time: 0, cam: {x:0, y:2, z:5, tx:0, ty:2, tz:5},
     init() {
@@ -134,10 +159,8 @@ const C3D = {
             if(!this.gl) throw "no-gl";
             this.resize();
             window.onresize = () => this.resize();
-            // Start simple render loop for background depth
             requestAnimationFrame(t => this.render(t));
         } catch(e) {
-            console.warn("WebGL no disponible. Usando fallback CSS.");
             this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%)";
         }
     },
@@ -158,9 +181,7 @@ const C3D = {
         this.time = ts * 0.001;
         this.cam.x = this.lerp(this.cam.x, this.cam.tx, 0.05);
         this.cam.z = this.lerp(this.cam.z, this.cam.tz, 0.05);
-        // (En una versión real aquí iría el renderizado de geometrías; 
-        // por ahora movemos el fondo dinámicamente para simular profundidad)
-        const g = Math.sin(this.time * 0.2) * 10;
+        const g = Math.sin(this.time * 0.3) * 12;
         this.canvas.style.filter = `hue-rotate(${g}deg)`;
         requestAnimationFrame(t => this.render(t));
     }
@@ -180,7 +201,7 @@ const Game = {
     st: { name: "", round: 1, score: 0, hist: [], results: [] },
     init() {
         const n = document.getElementById('p-name').value.trim();
-        if(!n) return alert("Ingresa un ID.");
+        if(!n) return alert("Ingresa un ID de Agente.");
         this.st.name = n;
         document.getElementById('scr-welcome').classList.add('hidden');
         document.getElementById('scr-play').classList.remove('hidden');
@@ -190,12 +211,29 @@ const Game = {
     startRound() {
         const ia = IAS[this.st.round-1];
         document.getElementById('st-r').textContent = this.st.round;
-        document.getElementById('ia-title').textContent = "MANDO: " + ia.id;
+        document.getElementById('ia-title').textContent = `MANDO ${this.st.round}/5: ${ia.id}`;
         document.getElementById('chat-container').innerHTML = '';
         document.getElementById('nego-layer').classList.remove('hidden');
         document.getElementById('vote-layer').classList.add('hidden');
+        
+        // Reset avatar to neutral
+        this.setAvatarMood('neutral');
         C3D.moveTo(this.st.round-1);
         this.addMsg(ia.id, ia.intro, 'ia');
+    },
+    setAvatarMood(mood) {
+        const svg = document.getElementById('avatar-svg');
+        const mouth = document.getElementById('avatar-mouth');
+        svg.classList.remove('angry-avatar', 'happy-avatar');
+        if(mood === 'angry') {
+            svg.classList.add('angry-avatar');
+            mouth.setAttribute('d', 'M30 72 Q50 58 70 72'); // Boca triste/enojada
+        } else if(mood === 'happy') {
+            svg.classList.add('happy-avatar');
+            mouth.setAttribute('d', 'M30 60 Q50 78 70 60'); // Sonrisa
+        } else {
+            mouth.setAttribute('d', 'M30 65 Q50 65 70 65'); // Neutral recta
+        }
     },
     addMsg(w, m, t) {
         const c = document.getElementById('chat-container');
@@ -216,15 +254,17 @@ const Game = {
         const ia = IAS[this.st.round-1];
         const iaV = ia.logic(this.st.hist);
         let pts = 0;
-        if(v==='coop' && iaV==='coop') pts = 60;
-        else if(v==='betray' && iaV==='coop') pts = 75;
-        else if(v==='coop' && iaV==='betray') pts = 0;
-        else pts = 15;
+        
+        if(v==='coop' && iaV==='coop') { pts = 60; this.setAvatarMood('happy'); }
+        else if(v==='betray' && iaV==='coop') { pts = 75; this.setAvatarMood('angry'); }
+        else if(v==='coop' && iaV==='betray') { pts = 0; this.setAvatarMood('angry'); }
+        else { pts = 15; this.setAvatarMood('angry'); }
         
         this.st.score += pts;
         this.st.hist.push(v);
         this.st.results.push({r:this.st.round, v, iaV, pts});
         document.getElementById('st-s').textContent = this.st.score;
+        
         this.showWait(() => {
             if(this.st.round < 5) { this.st.round++; this.startRound(); }
             else this.showResult();
@@ -232,18 +272,18 @@ const Game = {
     },
     showWait(cb) {
         const w = document.createElement('div'); w.className = 'wait-overlay';
-        w.innerHTML = `<div class="wait-title">PROCESANDO...</div><div class="wait-bar"><div class="wait-fill" id="wf"></div></div>`;
+        w.innerHTML = `<div class="wait-title">ROTANDO CÁMARA...</div><div class="wait-bar"><div class="wait-fill" id="wf"></div></div>`;
         document.body.appendChild(w);
         const f = document.getElementById('wf');
         setTimeout(() => f.style.width = '100%', 50);
-        setTimeout(() => { w.remove(); cb(); }, 1500);
+        setTimeout(() => { w.remove(); cb(); }, 1600);
     },
     showResult() {
         document.getElementById('scr-play').classList.add('hidden');
         document.getElementById('scr-result').classList.remove('hidden');
         document.getElementById('res-score').textContent = this.st.score;
         const won = this.st.score >= 300;
-        document.getElementById('res-title').textContent = won ? "¡PROMOVIDO!" : "FALLIDO";
+        document.getElementById('res-title').textContent = won ? "¡PROMOVIDO!" : "RECHAZADO";
         document.getElementById('res-title').style.color = won ? '#00ff88' : '#ff3c5f';
     }
 };
