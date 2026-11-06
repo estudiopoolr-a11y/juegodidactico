@@ -126,6 +126,7 @@ Escucha sus monólogos. Interroga antes de votar.
 <script>
 /* ===========================================================
    WebGL 3D ENGINE — Mesa con 5 personajes Low-Poly
+   Diagnóstico rápido: WebGL se inicializa con try/catch para evitar pantalla negra
    =========================================================== */
 const C3D={
   canvas:null,gl:null,time:0,camAngle:0,shapes:[],particles:null,particleCount:0,
@@ -134,20 +135,23 @@ const C3D={
 
   init(){
     this.canvas=document.getElementById('canvas3d');
-    this.gl=this.canvas.getContext('webgl',{antialias:true,alpha:true});
-    if(!this.gl)return;
-    this.resize();
-    window.addEventListener('resize',()=>this.resize());
-    const gl=this.gl;
-    // Main shader
-    const vs=`attribute vec3 aP;attribute vec3 aN;uniform mat4 uMVP;uniform mat4 uModel;varying vec3 vN;varying vec3 vWP;void main(){vec4 wp=uModel*vec4(aP,1.0);vWP=wp.xyz;vN=mat3(uModel)*aN;gl_Position=uMVP*vec4(aP,1.0);}`;
-    const fs=`precision mediump float;varying vec3 vN;varying vec3 vWP;uniform vec3 uCol;uniform float uGlow;void main(){vec3 N=normalize(vN);vec3 L=normalize(vec3(0.5,1.0,0.8));float d=max(dot(N,L),0.0);float r=1.0-max(dot(N,vec3(0,0,1)),0.0);r=pow(r,3.0);vec3 c=uCol*(0.15+d*0.6)+uCol*r*uGlow;c+=vec3(0.02,0.02,0.04);gl_FragColor=vec4(c,0.95);}`;
-    this.prog=this.cmp(vs,fs);
-    this.buildTable();
-    this.buildShapes();
-    this.buildParticles();
-    this.buildGrid();
-    requestAnimationFrame(t=>this.render(t));
+    try {
+        this.gl=this.canvas.getContext('webgl',{antialias:true,alpha:true});
+        if(!this.gl)throw new Error("No WebGL");
+        this.resize();
+        window.addEventListener('resize',()=>this.resize());
+        const gl=this.gl;
+        const vs=`attribute vec3 aP;attribute vec3 aN;uniform mat4 uMVP;uniform mat4 uModel;varying vec3 vN;varying vec3 vWP;void main(){vec4 wp=uModel*vec4(aP,1.0);vWP=wp.xyz;vN=mat3(uModel)*aN;gl_Position=uMVP*vec4(aP,1.0);}`;
+        const fs=`precision mediump float;varying vec3 vN;varying vec3 vWP;uniform vec3 uCol;uniform float uGlow;void main(){vec3 N=normalize(vN);vec3 L=normalize(vec3(0.5,1.0,0.8));float d=max(dot(N,L),0.0);float r=1.0-max(dot(N,vec3(0,0,1)),0.0);r=pow(r,3.0);vec3 c=uCol*(0.15+d*0.6)+uCol*r*uGlow;c+=vec3(0.02,0.02,0.04);gl_FragColor=vec4(c,0.95);}`;
+        this.prog=this.cmp(vs,fs);
+        this.buildTable();
+        this.buildShapes();
+        this.buildParticles();
+        this.buildGrid();
+        requestAnimationFrame(t=>this.render(t));
+    } catch(e) {
+        console.error("3D Falla, pero el juego sigue:", e);
+    }
   },
   cs(s,t){const g=this.gl,sh=g.createShader(t);g.shaderSource(sh,s);g.compileShader(sh);if(!g.getShaderParameter(sh,g.COMPILE_STATUS))console.error(g.getShaderInfoLog(sh));return sh;},
   cmp(vs,fs){const g=this.gl,p=g.createProgram();g.attachShader(p,this.cs(vs,g.VERTEX_SHADER));g.attachShader(p,this.cs(fs,g.FRAGMENT_SHADER));g.linkProgram(p);g.useProgram(p);return p;},
