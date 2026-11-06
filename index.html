@@ -92,7 +92,7 @@ input#p-name { width: 100%; padding: 16px; border-radius: 12px; border: 1px soli
         <p style="font-size:11px; color:#778; margin-bottom:20px;">PSYCHOLOGICAL EDITION — 10 RONDAS</p>
         <p style="color:#aaa; line-height:1.6; font-size:12px;">Los 10 Mandos te observan. Descifra sus intenciones antes de emitir tu voto.<br>Alcanza <b style="color:var(--accent)">600 pts</b> para ascender.</p>
         <input id="p-name" placeholder="ID DE AGENTE...">
-        <button class="btn btn-neon" onclick="Game.startIntro()">Iniciar Protocolo</button>
+        <button class="btn btn-neon" onclick="Game.init()">Iniciar Protocolo</button>
     </div>
 </div>
 
@@ -202,7 +202,7 @@ const Game = {
     init() {
         const n = document.getElementById('p-name').value.trim();
         if(!n) return alert("Ingresa ID de Agente.");
-        this.st.name = n;
+        this.st = { name: n, round: 1, score: 0, hist: [], results: [] };
         document.getElementById('scr-welcome').classList.add('hidden');
         document.getElementById('scr-intro').classList.remove('hidden');
         this.runIntro();
