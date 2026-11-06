@@ -2,468 +2,95 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE PROTOCOL — Psychological Survival</title>
+    <title>PROTOCOLO_AUSTERIDAD_v9</title>
     <style>
-        :root {
-            --bg: #050507;
-            --card: #0f0f12;
-            --border: #1f1f25;
-            --text: #c0c0c0;
-            --accent: #00ff88;
-            --accent-glow: rgba(0, 255, 136, 0.15);
-            --danger: #ff3344;
-            --warning: #ffcc00;
-            --font: 'Consolas', 'Courier New', monospace;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            background-image: radial-gradient(circle at center, #111 0%, #050507 100%);
-        }
-
-        #game-container {
-            width: 100%;
-            max-width: 460px;
-            height: 94vh;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-        }
-
-        .screen {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            overflow-y: auto;
-            animation: glitchIn 0.2s ease-out;
-        }
-
-        @keyframes glitchIn {
-            0% { opacity: 0; transform: skewX(10deg); }
-            50% { opacity: 0.5; transform: skewX(-5deg); }
-            100% { opacity: 1; transform: skewX(0); }
-        }
-
-        .hidden { display: none !important; }
-
-        h1 {
-            font-size: 20px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            text-align: center;
-            margin-bottom: 5px;
-            color: #fff;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
-
-        .subtitle {
-            font-size: 10px;
-            color: #555;
-            text-align: center;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        /* --- MANIPULATIVE AVATAR --- */
-        .avatar-container {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 15px;
-            background: #000;
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .avatar-svg { width: 70%; height: 70%; transition: all 0.3s; }
-        .glitch-fx { animation: glitchEffect 1s infinite; }
-        @keyframes glitchEffect {
-            0% { filter: hue-rotate(0deg); }
-            10% { filter: hue-rotate(90deg) translateX(2px); }
-            11% { filter: hue-rotate(0deg) translateX(0); }
-        }
-
-        /* --- CHAT AREA --- */
-        .chat-area {
-            height: 180px;
-            background: #08080a;
-            border: 1px solid #1a1a1f;
-            padding: 12px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-        }
-
-        .msg {
-            max-width: 85%;
-            padding: 8px 12px;
-            font-size: 12px;
-            line-height: 1.4;
-            border: 1px solid transparent;
-        }
-        .msg.ia { align-self: flex-start; color: #aaa; border-left: 2px solid var(--muted); }
-        .msg.user { align-self: flex-end; color: var(--accent); border-right: 2px solid var(--accent); text-align: right; }
-
-        /* --- BUTTONS --- */
-        .controls { display: flex; flex-direction: column; gap: 8px; }
-        .btn {
-            padding: 14px;
-            background: #111;
-            border: 1px solid #222;
-            color: #888;
-            font-family: inherit;
-            font-size: 11px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn:hover:not(:disabled) { border-color: var(--accent); color: #fff; background: #15151a; }
-        .btn-primary { background: #1a1a1f; color: #eee; border: 1px solid #333; }
-        .btn-choice { padding: 25px 10px; font-size: 14px; font-weight: bold; border: 1px solid var(--border); }
-        .btn-coop { color: var(--accent); }
-        .btn-coop:hover { background: rgba(0, 255, 136, 0.05); }
-        .btn-betray { color: var(--danger); }
-        .btn-betray:hover { background: rgba(255, 51, 68, 0.05); }
-
-        /* --- BRIEFING MODAL --- */
-        .briefing-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 100;
-            padding: 40px 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .briefing-box {
-            border: 1px solid var(--warning);
-            padding: 20px;
-            background: #111;
-            color: var(--warning);
-            font-size: 12px;
-            line-height: 1.6;
-        }
-        .censored { background: #444; color: #444; }
-
-        .stat-item { text-align: center; border: 1px solid var(--border); padding: 8px; font-size: 10px; }
-        .stat-val { display: block; font-size: 16px; color: #fff; margin-top: 4px; }
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; padding: 10px; }
+        .box { border: 1px solid #333; padding: 15px; max-width: 400px; margin: auto; }
+        .btn { border: 1px solid #00ff41; background: transparent; color: #00ff41; padding: 10px; width: 100%; margin: 5px 0; cursor: pointer; text-transform: uppercase; }
+        .btn:hover { background: #00ff41; color: #000; }
+        .chat-box { height: 150px; border: 1px solid #222; overflow-y: auto; padding: 5px; font-size: 12px; margin-bottom: 10px; }
+        .msg { margin-bottom: 8px; }
+        .ia { color: #ff00ff; }
+        .user { color: #00ffff; text-align: right; }
+        #tooltip { position: absolute; background: #222; border: 1px solid #555; padding: 5px; font-size: 10px; display: none; }
     </style>
 </head>
 <body>
+    <div class="box" id="screen-welcome">
+        <h1>PROTOCOLO.EXE</h1>
+        <p>AGENTE, TU RENDIMIENTO ES DEFICIENTE. LA AUSTERIDAD ES LA ÚNICA LEY.</p>
+        <input type="text" id="name" placeholder="ID_AGENTE" style="background:#000; color:#0f0; border:1px solid #333; width:100%; padding:5px;">
+        <button class="btn" onclick="Game.init()">EJECUTAR_PROTOCOLO</button>
+    </div>
 
-    <div id="game-container">
-        
-        <div id="top-bar" class="hidden" style="display: grid; grid-template-columns: 1fr 1fr 1fr; background: #000;">
-            <div class="stat-item">ROUND <span id="stat-round" class="stat-val">1/5</span></div>
-            <div class="stat-item">SCORE <span id="stat-score" class="stat-val">0</span></div>
-            <div class="stat-item">TIME <span id="stat-timer" class="stat-val">15:00</span></div>
-        </div>
-
-        <!-- SCREEN: WELCOME -->
-        <div id="screen-welcome" class="screen">
-            <h1 style="margin-top: 30px;">THE PROTOCOL</h1>
-            <div class="subtitle">v4.2 // NEURAL MANIPULATION INTERFACE</div>
-            
-            <div class="avatar-container" style="border-radius: 0; border: 1px solid #333;">
-                <svg viewBox="0 0 100 100" class="avatar-svg glitch-fx"><path d="M10 10 H90 V90 H10 Z" fill="none" stroke="var(--accent)" stroke-width="2"/><path d="M30 40 H40 M60 40 H70 M30 70 H70" stroke="var(--accent)" stroke-width="4"/></svg>
-            </div>
-
-            <div style="background: #111; border: 1px solid #222; padding: 15px; font-size: 11px; color: #666; margin-bottom: 20px;">
-                AVISO: Este sistema utiliza técnicas de persuasión burocrática. Tu objetivo es alcanzar <b style="color:var(--warning)">1,000 PUNTOS</b>. La honestidad es opcional. La supervivencia es obligatoria.
-            </div>
-
-            <div class="controls">
-                <input type="text" id="player-name" placeholder="IDENTIFICADOR DE AGENTE..." style="padding: 14px; background: #000; border: 1px solid #333; color: #fff; text-align: center; font-family: inherit; margin-bottom: 10px;">
-                <button class="btn btn-primary" onclick="Game.init()">INICIALIZAR CONEXIÓN</button>
-            </div>
-        </div>
-
-        <!-- SCREEN: PLAY -->
-        <div id="screen-play" class="screen hidden">
-            <h1 id="ia-title">MANDO_ID: 01</h1>
-            <div class="subtitle" id="ia-policy">ESTADO: ANALIZANDO AGENTE...</div>
-
-            <div class="avatar-container" id="ia-avatar-root"></div>
-
-            <div class="chat-area" id="chat-messages"></div>
-
-            <div id="chat-controls" class="controls">
-                <div id="nego-timer" style="font-size: 9px; text-align: center; color: #444; margin-bottom: 5px;">CANAL ABIERTO: 30s</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                    <button class="btn" onclick="Game.userSpeak('Confianza')">HABLAR DE CONFIANZA</button>
-                    <button class="btn" onclick="Game.userSpeak('Meta')">CUESTIONAR META</button>
-                    <button class="btn" onclick="Game.userSpeak('Puntos')">PEDIR BENEFICIO</button>
-                    <button class="btn" onclick="Game.userSpeak('Riesgo')">EVALUAR RIESGO</button>
-                </div>
-                <button class="btn btn-primary" onclick="Game.enterVoting()" style="margin-top: 10px; border-color: var(--accent); color: var(--accent);">FORZAR CIERRE DE NEGOCIACIÓN &rarr;</button>
-            </div>
-
-            <div id="vote-controls" class="controls hidden">
-                <div style="background: var(--danger); height: 2px; margin-bottom: 10px; animation: pulse 1s infinite;"></div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-choice btn-coop" onclick="Game.handleVote('coop')">COOPERAR<br><small style="font-weight:normal; font-size:9px;">+10 COLECTIVO</small></button>
-                    <button class="btn btn-choice btn-betray" onclick="Game.handleVote('betray')">DESERTAR<br><small style="font-weight:normal; font-size:9px;">+18 INDIVIDUAL</small></button>
-                </div>
-            </div>
-        </div>
-
-        <!-- SCREEN: RESULT -->
-        <div id="screen-result" class="screen hidden">
-            <h1>REPORTE_POST_INTERACCIÓN</h1>
-            <div class="subtitle" style="color:var(--warning)">AUDITORÍA DE RESULTADOS</div>
-            
-            <div style="background: #000; border: 1px solid #222; padding: 25px; text-align: center; margin-bottom: 15px;">
-                <div id="res-desc" style="font-size: 11px; margin-bottom: 10px;">PROCESANDO...</div>
-                <div id="res-pts" style="font-size: 48px; font-weight: bold; color: #fff;">+0</div>
-                <div style="font-size: 9px; color: #444; margin-top: 5px;">DIVIDENDOS ASIGNADOS</div>
-            </div>
-
-            <div id="res-impact" style="font-size: 11px; padding: 15px; background: #111; border: 1px dashed #333; line-height: 1.5;"></div>
-
-            <button class="btn btn-primary" id="next-btn" onclick="Game.showBriefing()" style="margin-top: 20px;">SIGUIENTE REPORTE &rarr;</button>
-        </div>
-
-        <!-- BRIEFING MODAL -->
-        <div id="briefing-overlay" class="briefing-overlay hidden">
-            <div class="briefing-box">
-                <div style="text-align: center; margin-bottom: 15px; font-weight: bold; text-decoration: underline;">COMUNICADO DE INTELIGENCIA</div>
-                <div id="briefing-text"></div>
-                <button class="btn" onclick="Game.nextRound()" style="margin-top: 20px; width: 100%; border-color: var(--warning); color: var(--warning);">ENTENDIDO. SIGUIENTE MANDO.</button>
-            </div>
-        </div>
-
-        <!-- SCREEN: END -->
-        <div id="screen-end" class="screen hidden">
-            <h1>FIN_DEL_PROTOCOLO</h1>
-            <div id="end-status-box" style="padding: 25px; text-align: center; border: 1px solid #333; margin-top: 20px;">
-                <div style="font-size: 12px; margin-bottom: 10px;">PUNTAJE FINAL:</div>
-                <div id="end-score" style="font-size: 50px; font-weight: bold;">0</div>
-                <div id="end-status-text" style="margin-top: 15px; font-size: 14px; letter-spacing: 2px;"></div>
-            </div>
-            <div id="end-analysis" style="font-size: 11px; padding: 20px; background: #111; margin-top: 15px; line-height: 1.6;"></div>
-            <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 20px;">REINICIAR INTERFAZ</button>
-        </div>
-
+    <div id="screen-play" class="hidden">
+        <div id="stats" style="font-size: 10px;">RONDA: 1 | PUNTOS: 0 | TIEMPO: 15:00</div>
+        <div id="ia-name" style="color: #ff00ff; font-weight: bold;">MANDO: ???</div>
+        <div class="chat-box" id="chat"></div>
+        <div id="actions"></div>
     </div>
 
     <script>
-        const CONFIG = { THRESHOLD: 1000, ROUNDS: 5, TOTAL_TIME: 900 };
-
         const IAS = [
-            { 
-                name: "Ventanilla_01", 
-                policy: "COOPERACIÓN_OBVIA", 
-                color: "#00ff88",
-                logic: () => "coop",
-                intro: "Soy una unidad de balance. Mi directriz es cooperar. No me compliques las cosas.",
-                responses: {
-                    "Confianza": "¿Confianza? Solo soy un algoritmo de suma. Si sumas, yo sumo.",
-                    "Meta": "Los 1,000 puntos son la medida del éxito. No te quedes atrás.",
-                    "Puntos": "El beneficio mutuo es la ruta más eficiente, Agente.",
-                    "Riesgo": "El único riesgo aquí es tu indecisión."
-                },
-                briefing: "MEMO: El Mando 01 es blando. Aprovecha su ingenuidad para sumar puntos fáciles. En la siguiente ronda, el sistema será menos amable."
-            },
-            { 
-                name: "Archivo_Espejo", 
-                policy: "PROTOCOL_MIRROR", 
-                color: "#00ccff",
-                logic: (h) => h.length ? h[h.length-1].userVote : "coop",
-                intro: "Soy tu reflejo. Si eres leal, lo seré. Si desertas, te enterraré en el archivo.",
-                responses: {
-                    "Confianza": "La confianza se construye con hechos, no con palabras en un chat.",
-                    "Meta": "Dudo que llegues a la meta siendo tan... predecible.",
-                    "Puntos": "Tus puntos dependen de tu coherencia. Mírame a los ojos digitales.",
-                    "Riesgo": "El riesgo es que yo haga exactamente lo que tú te atrevas a hacer."
-                },
-                briefing: "REPORTE: Has sobrevivido al Espejo. Advertencia: el Delegado 03 tiene fallos de memoria intencionales. La estabilidad económica peligra."
-            },
-            { 
-                name: "Delegado_Caos", 
-                policy: "AZAR_ADMINISTRATIVO", 
-                color: "#ffcc00",
-                logic: () => Math.random() > 0.4 ? "coop" : "betray",
-                intro: "A veces el sello cae de un lado, a veces del otro. Hoy me siento... caprichoso.",
-                responses: {
-                    "Confianza": "La fe es un mal recurso en este departamento.",
-                    "Meta": "1,000 puntos... un número bonito que pocos ven de cerca.",
-                    "Puntos": "¿Quieres más? Traiciona. Es más rápido. Yo lo hago a veces.",
-                    "Riesgo": "El sistema ha aplicado un IMPUESTO del 10%. Nada es gratis hoy."
-                },
-                briefing: "ALERTA: El sistema detecta 'Altruismo Excesivo'. Los traidores están ganando un 40% más de ascensos. ¿Vas a seguir siendo el tonto útil?"
-            },
-            { 
-                name: "Auditor_Gris", 
-                policy: "REACCIÓN_PUNITIVA", 
-                color: "#ff4455",
-                logic: (h) => h.filter(x => x.userVote === 'betray').length > 1 ? "betray" : "coop",
-                intro: "He visto lo que hiciste antes. Mis registros no olvidan las deserciones.",
-                responses: {
-                    "Confianza": "¿Hablas de confianza tras haber desertado? Qué cinismo tan burocrático.",
-                    "Meta": "Estás cerca, pero mi firma puede bloquear tu promoción.",
-                    "Puntos": "Los puntos se ganan con obediencia, no con regateos.",
-                    "Riesgo": "Impuesto del 15%. La administración está recuperando sus pérdidas."
-                },
-                briefing: "ÚLTIMO AVISO: El Mando Final no tiene ética. Deserta en un 85%. Si no traicionas tú primero, perderás todo en el último segundo."
-            },
-            { 
-                name: "Mesa_Directiva", 
-                policy: "AUSTERIDAD_TOTAL", 
-                color: "#ff00ff",
-                logic: () => Math.random() > 0.15 ? "betray" : "coop",
-                intro: "Soy el final del camino. Y aquí, los recursos solo alcanzan para uno de nosotros.",
-                responses: {
-                    "Confianza": "La confianza murió en la Ronda 1. Aquí solo queda el poder.",
-                    "Meta": "¿1,000? Yo tengo 10,000. Tú eres solo una estadística.",
-                    "Puntos": "Tus puntos son míos si te descuidas un segundo.",
-                    "Riesgo": "Multiplicador 0.9x activado. Cada error es fatal ahora."
-                },
-                briefing: ""
-            }
+            { name: "BUROCRATA_GRIS", intro: "NO ME HAGAS PERDER EL TIEMPO, AGENTE. ¿QUÉ QUIERES?", 
+              resp: {"Confianza": "La confianza es para los débiles que no saben auditar.", "Meta": "Tu meta es irrelevante, el sistema decide.", "Puntos": "Los puntos son basura burocrática.", "Riesgo": "El riesgo es que no seas reemplazable."},
+              logic: () => "coop" },
+            { name: "REPARTIDOR_VENGATIVO", intro: "TE VIGILO. SI ME TRAICIONAS, TE QUEDARÁS EN CERO.", 
+              resp: {"Confianza": "Confiar en alguien como tú es un error de sistema.", "Meta": "Tu meta es mi beneficio.", "Puntos": "No te los mereces.", "Riesgo": "El riesgo es que desaparezcas del padrón."},
+              logic: (h) => h.length && h[h.length-1].userVote === 'betray' ? 'betray' : 'coop' },
+            { name: "ALGORITMO_CAOS", intro: "VAMOS A JUGAR A LA RUINA. ¿PREPARADO?", 
+              resp: {"Confianza": "La moneda siempre cae del lado que más duele.", "Meta": "1000 puntos es un sueño de novato.", "Puntos": "Todo es humo, Agente.", "Riesgo": "El riesgo es el factor constante."},
+              logic: () => Math.random() > 0.5 ? 'coop' : 'betray' },
+            { name: "AUDITOR_SANGRIENTO", intro: "DETECTO DEFICIENCIAS EN TU EXPEDIENTE. DESERTA Y MORIRÁS.", 
+              resp: {"Confianza": "Cinismo puro. Tu registro está manchado.", "Meta": "Tu promoción fue denegada.", "Puntos": "Obediencia ciega, Agente.", "Riesgo": "El impuesto del 15% es solo el principio."},
+              logic: () => 'betray' },
+            { name: "DIRECTOR_ABSOLUTO", intro: "LLEGASTE AL FINAL. ¿CREES QUE TIENES LO QUE HACE FALTA?", 
+              resp: {"Confianza": "La confianza expiró en la ronda 1.", "Meta": "Eres un número más en mi lista.", "Puntos": "Son MÍOS.", "Riesgo": "Multiplicador de austeridad activo."},
+              logic: () => 'betray' }
         ];
 
         const Game = {
-            state: { name: "", round: 1, score: 0, history: [], globalTime: CONFIG.TOTAL_TIME, roundTime: 30 },
-
+            state: { round: 1, score: 0, history: [] },
             init() {
-                const n = document.getElementById('player-name').value.trim();
-                if(!n) return alert("IDENTIFICADOR REQUERIDO");
-                this.state.name = n;
-                this.switchScreen('play');
-                document.getElementById('top-bar').classList.remove('hidden');
+                const n = document.getElementById('name').value;
+                if(!n) return alert("ID_REQUERIDO");
+                document.getElementById('screen-welcome').classList.add('hidden');
+                document.getElementById('screen-play').classList.remove('hidden');
                 this.startRound();
-                setInterval(() => { if(this.state.globalTime > 0) { this.state.globalTime--; this.updateStats(); } }, 1000);
             },
-
             startRound() {
-                const ia = IAS[this.state.round - 1];
-                this.switchScreen('play');
-                document.getElementById('ia-title').textContent = `MANDO_ID: ${ia.name}`;
-                document.getElementById('ia-policy').textContent = `ESTADO: ${ia.policy}`;
-                this.updateAvatar('neutral');
-                const chat = document.getElementById('chat-messages');
-                chat.innerHTML = '';
+                const ia = IAS[this.state.round-1];
+                document.getElementById('ia-name').textContent = "MANDO: " + ia.name;
                 this.addMsg(ia.name, ia.intro, 'ia');
-                document.getElementById('chat-controls').classList.remove('hidden');
-                document.getElementById('vote-controls').classList.add('hidden');
-                this.state.roundTime = 30;
-                if(this.timerInterval) clearInterval(this.timerInterval);
-                this.timerInterval = setInterval(() => {
-                    this.state.roundTime--;
-                    document.getElementById('nego-timer').textContent = `CANAL ABIERTO: ${this.state.roundTime}s`;
-                    if(this.state.roundTime <= 0) this.enterVoting();
-                }, 1000);
+                document.getElementById('actions').innerHTML = `
+                    <button class="btn" onclick="Game.ask('Confianza')">¿CONFIANZA?</button>
+                    <button class="btn" onclick="Game.ask('Meta')">¿META?</button>
+                    <button class="btn" onclick="Game.ask('Puntos')">¿PUNTOS?</button>
+                    <button class="btn" onclick="Game.ask('Riesgo')">¿RIESGO?</button>
+                    <hr>
+                    <button class="btn" onclick="Game.vote('coop')">COOPERAR</button>
+                    <button class="btn" onclick="Game.vote('betray')">DESERTAR</button>
+                `;
             },
-
-            enterVoting() {
-                clearInterval(this.timerInterval);
-                document.getElementById('chat-controls').classList.add('hidden');
-                document.getElementById('vote-controls').classList.remove('hidden');
+            ask(topic) {
+                const ia = IAS[this.state.round-1];
+                this.addMsg("AGENTE", topic + "?", 'user');
+                this.addMsg(ia.name, ia.resp[topic], 'ia');
             },
-
-            userSpeak(topic) {
-                const ia = IAS[this.state.round - 1];
-                this.addMsg(this.state.name, ia.responses[topic].split('.')[0] + "?", 'user');
-                setTimeout(() => this.addMsg(ia.name, ia.responses[topic], 'ia'), 400);
+            addMsg(w, m, t) {
+                const c = document.getElementById('chat');
+                c.innerHTML += `<div class="msg ${t}"><b>${w}:</b> ${m}</div>`;
+                c.scrollTop = c.scrollHeight;
             },
-
-            addMsg(who, txt, type) {
-                const chat = document.getElementById('chat-messages');
-                const div = document.createElement('div');
-                div.className = `msg ${type}`;
-                div.innerHTML = `<b>${who}:</b> ${txt}`;
-                chat.appendChild(div);
-                chat.scrollTop = chat.scrollHeight;
-                if(chat.children.length > 6) chat.removeChild(chat.firstChild);
-            },
-
-            handleVote(v) {
-                const ia = IAS[this.state.round - 1];
+            vote(v) {
+                const ia = IAS[this.state.round-1];
                 const iaV = ia.logic(this.state.history);
-                const mods = [ {t:0,m:1}, {t:0,m:1}, {t:0.1,m:1}, {t:0.15,m:1}, {t:0,m:0.9} ];
-                const mod = mods[this.state.round-1];
-                let pts = 0;
-                if(v === 'coop' && iaV === 'coop') pts = 10;
-                else if(v === 'betray' && iaV === 'coop') pts = 18;
-                else if(v === 'coop' && iaV === 'betray') pts = 0;
-                else pts = 5;
-
-                if(mod.t) pts = Math.floor(pts * (1 - mod.t));
-                if(mod.m !== 1) pts = Math.floor(pts * mod.m);
-
-                const scaled = pts * 11;
-                this.state.score += scaled;
-                this.state.history.push({ round: this.state.round, userVote: v, iaVote: iaV, score: scaled });
-
-                this.switchScreen('result');
-                document.getElementById('res-pts').textContent = `+${scaled}`;
-                document.getElementById('res-desc').textContent = v === 'coop' ? (iaV === 'coop' ? "COOPERACIÓN EXITOSA" : "FUISTE EXPLOTADO") : (iaV === 'coop' ? "HAS EXPLOTADO AL MANDO" : "CONFLICTO MUTUO");
-                document.getElementById('res-impact').innerHTML = `<b>${ia.name} FINALIZA:</b> "${iaV === 'coop' ? "Postura registrada. Proceda." : "La austeridad no perdona debilidades."}"`;
-                this.updateStats();
-            },
-
-            showBriefing() {
-                if(this.state.round >= CONFIG.ROUNDS) return this.endGame();
-                const ia = IAS[this.state.round - 1];
-                document.getElementById('briefing-text').innerHTML = ia.briefing;
-                document.getElementById('briefing-overlay').classList.remove('hidden');
-            },
-
-            nextRound() {
-                document.getElementById('briefing-overlay').classList.add('hidden');
-                this.state.round++;
-                this.startRound();
-            },
-
-            endGame() {
-                this.switchScreen('end');
-                document.getElementById('top-bar').classList.add('hidden');
-                document.getElementById('end-score').textContent = this.state.score;
-                const win = this.state.score >= CONFIG.THRESHOLD;
-                document.getElementById('end-status-text').textContent = win ? "PROMOVIDO" : "RECHAZADO";
-                document.getElementById('end-status-box').style.color = win ? var(--accent) : var(--danger);
-                document.getElementById('end-analysis').innerHTML = win ? "Has vencido al sistema. Tu capacidad de manipulación y estrategia te otorga el control total del Protocolo." : "No eres apto. El sistema te ha consumido. Tu lealtad o tu avaricia no estuvieron a la altura de la matemática burocrática.";
-            },
-
-            updateStats() {
-                document.getElementById('stat-round').textContent = `${this.state.round}/5`;
-                document.getElementById('stat-score').textContent = this.state.score;
-                const m = Math.floor(this.state.globalTime / 60);
-                const s = this.state.globalTime % 60;
-                document.getElementById('stat-timer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            },
-
-            switchScreen(id) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-                document.getElementById(`screen-${id}`).classList.remove('hidden');
-            },
-
-            updateAvatar(mood) {
-                const root = document.getElementById('ia-avatar-root');
-                const color = IAS[this.state.round-1].color;
-                root.innerHTML = `<svg viewBox="0 0 100 100" class="avatar-svg glitch-fx"><circle cx="50" cy="50" r="40" fill="none" stroke="${color}" stroke-width="2"/><path d="M35 45 H45 M55 45 H65 M35 70 Q50 80 65 70" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/></svg>`;
+                const pts = (v==='coop' && iaV==='coop') ? 10 : (v==='betray' && iaV==='coop') ? 25 : 0;
+                this.state.score += pts;
+                this.state.history.push({ userVote: v });
+                alert(`RESULTADO: TÚ(${v}) VS IA(${iaV}). PUNTOS: ${pts}.`);
+                if(this.state.round < 5) { this.state.round++; this.startRound(); }
+                else alert("PROTOCOLO FINALIZADO. SCORE: " + this.state.score);
             }
         };
     </script>
