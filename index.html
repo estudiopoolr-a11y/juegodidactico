@@ -31,11 +31,10 @@
             overflow: hidden;
         }
 
-        /* --- UI COMPONENTS --- */
         #game-container {
             width: 100%;
-            max-width: 500px;
-            height: 90vh;
+            max-width: 480px;
+            height: 92vh;
             background: var(--card);
             border: 2px solid var(--border);
             border-radius: 12px;
@@ -43,48 +42,46 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .screen {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
-            animation: fadeIn 0.4s ease-out forwards;
+            animation: fadeIn 0.3s ease-out forwards;
         }
 
         .hidden { display: none !important; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             letter-spacing: 2px;
             text-transform: uppercase;
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #fff;
             text-shadow: 0 0 10px var(--accent-glow);
         }
 
         .subtitle {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--muted);
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             text-transform: uppercase;
         }
 
-        /* --- AVATARS (SVG) --- */
         .avatar-container {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 12px;
             position: relative;
             background: #101012;
             border: 1px solid var(--border);
@@ -93,18 +90,17 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .avatar-svg {
             width: 80%;
             height: 80%;
-            transition: transform 0.2s ease;
         }
 
         .mood-angry { filter: sepia(1) saturate(5) hue-rotate(-50deg); }
         .mood-happy { filter: sepia(1) saturate(3) hue-rotate(90deg); }
 
-        /* --- STATS BAR --- */
         .stats-bar {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -114,44 +110,38 @@
             font-size: 11px;
             text-transform: uppercase;
             font-weight: bold;
+            flex-shrink: 0;
         }
         .stat-item { text-align: center; }
         .stat-val { display: block; font-size: 14px; color: var(--warning); }
 
-        /* --- CHAT BOX --- */
         .chat-area {
-            flex: 1;
+            height: 140px;
             background: #0d0d0f;
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
+            padding: 10px;
+            margin-bottom: 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .msg {
-            max-width: 85%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            line-height: 1.4;
-            animation: slideIn 0.2s ease-out;
+            max-width: 90%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.3;
         }
-        .msg.ia { align-self: flex-start; background: #222; border-bottom-left-radius: 2px; color: #ccc; }
-        .msg.user { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 2px; color: #000; font-weight: 500; }
+        .msg.ia { align-self: flex-start; background: #222; color: #ccc; border-bottom-left-radius: 2px; }
+        .msg.user { align-self: flex-end; background: var(--accent); color: #000; font-weight: 500; border-bottom-right-radius: 2px; }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        /* --- BUTTONS & CONTROLS --- */
-        .controls { display: flex; flex-direction: column; gap: 12px; }
+        .controls { display: flex; flex-direction: column; gap: 10px; }
         .btn {
-            padding: 16px;
+            padding: 14px;
             background: #2a2a30;
             border: 1px solid var(--border);
             color: #fff;
@@ -161,8 +151,6 @@
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
         }
         .btn:hover:not(:disabled) { background: #35353d; border-color: var(--muted); }
         .btn:active { transform: scale(0.98); }
@@ -170,11 +158,11 @@
         .btn-primary { background: var(--accent); color: #000; border: none; }
         .btn-primary:hover:not(:disabled) { background: #00e67a; box-shadow: 0 0 15px var(--accent-glow); }
 
-        .btn-row { display: flex; gap: 10px; }
+        .btn-row { display: flex; gap: 8px; }
         .choice-btn {
             flex: 1;
-            padding: 20px 10px;
-            font-size: 14px;
+            padding: 14px 8px;
+            font-size: 12px;
             text-align: center;
         }
         .btn-coop { border-bottom: 4px solid #008844; }
@@ -182,59 +170,28 @@
         .btn-betray { border-bottom: 4px solid #880022; }
         .btn-betray:hover { background: #3d1c1c; }
 
-        /* --- TIMER --- */
-        .timer-circle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* --- RESULTS / ANIMATIONS --- */
         .result-box {
             background: #000;
             border: 1px solid var(--border);
-            padding: 20px;
+            padding: 16px;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         .score-anim {
-            font-size: 48px;
+            font-size: 40px;
             font-weight: bold;
             color: var(--warning);
-            margin: 10px 0;
-        }
-        .floating-pts {
-            position: fixed;
-            pointer-events: none;
-            font-weight: bold;
-            font-size: 24px;
-            z-index: 100;
-            animation: floatUp 1.2s forwards;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-100px); }
+            margin: 6px 0;
         }
 
-        /* --- PROGRESS BAR --- */
         .progress-container {
             width: 100%;
             height: 10px;
             background: #111;
             border: 1px solid var(--border);
             border-radius: 5px;
-            margin-top: 10px;
+            margin-top: 8px;
             overflow: hidden;
         }
         .progress-fill {
@@ -244,25 +201,23 @@
             transition: width 0.5s ease;
         }
 
-        /* --- MANUAL/GUIDE --- */
         .guide-box {
             background: rgba(0, 255, 136, 0.05);
             border: 1px dashed var(--accent);
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             color: #bbb;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
-
     </style>
 </head>
 <body>
 
     <div id="game-container">
         
-        <!-- TOP STATS (Hidden on welcome/end) -->
+        <!-- TOP STATS -->
         <div id="top-bar" class="stats-bar hidden">
             <div class="stat-item">RONDA <span id="stat-round">1/5</span></div>
             <div class="stat-item">PUNTOS <span id="stat-score" class="stat-val">0</span></div>
@@ -271,7 +226,7 @@
 
         <!-- SCREEN: WELCOME -->
         <div id="screen-welcome" class="screen">
-            <h1 style="margin-top: 40px;">EL PROTOCOLO</h1>
+            <h1 style="margin-top: 20px;">EL PROTOCOLO</h1>
             <div class="subtitle">Bureaucratic Cognitive Simulator</div>
             
             <div class="avatar-container" id="welcome-avatar">
@@ -280,12 +235,12 @@
 
             <div class="guide-box">
                 <b>OBJETIVO:</b> Sobrevivir a 5 rondas de negociación contra los Altos Mandos. <br><br>
-                <b>REGLA DE ORO:</b> Cruza el umbral de los <b>1,000 PUNTOS</b> para ser promovido. Si fallas, serás auditado. <br><br>
+                <b>REGLA DE ORO:</b> Cruza el umbral de los <b>1,000 PUNTOS</b> para ser promovido. <br><br>
                 <b>DURACIÓN:</b> 15 minutos exactos de alto rendimiento cognitivo.
             </div>
 
             <div class="controls">
-                <input type="text" id="player-name" placeholder="INGRESA TU NOMBRE DE AGENTE..." style="padding: 16px; background: #000; border: 1px solid var(--border); color: #fff; text-align: center; border-radius: 8px;">
+                <input type="text" id="player-name" placeholder="INGRESA TU NOMBRE DE AGENTE..." style="padding: 14px; background: #000; border: 1px solid var(--border); color: #fff; text-align: center; border-radius: 8px;">
                 <button class="btn btn-primary" onclick="Game.init()">INICIAR PROTOCOLO</button>
             </div>
         </div>
@@ -294,20 +249,20 @@
         <div id="screen-tutorial" class="screen hidden">
             <h1>MANUAL DE CAMPO</h1>
             <div class="subtitle">Directrices de Operación</div>
-            <div class="chat-area" style="font-size: 14px;">
-                <p><b>1. NEGOCIACIÓN:</b> Tendrás 1 min para hablar con el mando asignado. Analiza su actitud.</p>
-                <p><b>2. DECISIÓN:</b> Elige cooperar para un beneficio estable (+10), o desertar para ganar ventaja inmediata (+18) a costa de la confianza.</p>
-                <p><b>3. DIFICULTAD:</b> A medida que avanzas, el sistema impondrá impuestos y auditorías reactivas. La victoria es posible, pero requiere precisión quirúrgica.</p>
+            <div class="chat-area" style="height: auto; font-size: 13px;">
+                <p><b>1. NEGOCIACIÓN:</b> Conversa brevemente con el mando asignado antes de que cierre el plazo.</p><br>
+                <p><b>2. DECISIÓN:</b> Elige cooperar (+10) o desertar (+18). Tu decisión define si el sistema colapsa.</p><br>
+                <p><b>3. DIFICULTAD:</b> Impuestos y auditorías reactivas pondrán a prueba tu estrategia matemática.</p>
             </div>
-            <button class="btn btn-primary" onclick="Game.startRounds()">ENTENDIDO</button>
+            <button class="btn btn-primary" onclick="Game.startRounds()" style="margin-top: 15px;">ENTENDIDO</button>
         </div>
 
         <!-- SCREEN: PLAY (CHAT/VOTE) -->
         <div id="screen-play" class="screen hidden">
-            <h1 id="ia-title">ALTO MANDO 01</h1>
+            <h1 id="ia-title" style="font-size: 18px;">ALTO MANDO 01</h1>
             <div class="subtitle" id="ia-policy">Politica: Cooperación Directa</div>
 
-            <div class="avatar-container">
+            <div class="avatar-container" style="width: 70px; height: 70px; margin-bottom: 8px;">
                 <div id="ia-avatar-root"></div>
             </div>
 
@@ -316,17 +271,19 @@
             </div>
 
             <div id="chat-controls" class="controls">
+                <div style="font-size: 11px; color: var(--muted); text-align: center;" id="nego-timer">Fase de Negociación: 30s</div>
                 <div class="btn-row">
                     <button class="btn choice-btn" onclick="Game.userSpeak('¿Podemos confiar?')">¿Podemos confiar?</button>
                     <button class="btn choice-btn" onclick="Game.userSpeak('Propongo alianza')">Propongo alianza</button>
                 </div>
+                <button class="btn btn-primary" onclick="Game.enterVoting()" style="padding: 10px; font-size: 12px;">SALTAR A VOTACIÓN &rarr;</button>
             </div>
 
             <div id="vote-controls" class="controls hidden">
-                <p style="text-align: center; margin-bottom: 10px;">TIEMPO DE DECISIÓN</p>
+                <p style="text-align: center; font-size: 12px; color: var(--warning); margin-bottom: 6px;">EMITE TU POSTURA</p>
                 <div class="btn-row">
-                    <button class="btn choice-btn btn-coop" onclick="Game.handleVote('coop')">COOPERAR<br><small>Bien Común</small></button>
-                    <button class="btn choice-btn btn-betray" onclick="Game.handleVote('betray')">DESERTAR<br><small>Interés Propio</small></button>
+                    <button class="btn choice-btn btn-coop" onclick="Game.handleVote('coop')">COOPERAR<br><small>+10 / Colectivo</small></button>
+                    <button class="btn choice-btn btn-betray" onclick="Game.handleVote('betray')">DESERTAR<br><small>+18 / Individual</small></button>
                 </div>
             </div>
         </div>
@@ -334,16 +291,16 @@
         <!-- SCREEN: ROUND RESULT -->
         <div id="screen-result" class="screen hidden">
             <h1>REPORTE DE AUDITORÍA</h1>
-            <div class="subtitle">Resultado de la Interacción</div>
+            <div class="subtitle">Resultado del Periodo</div>
             
             <div class="result-box">
-                <div id="res-desc">Ambos cooperaron.</div>
+                <div id="res-desc" style="font-size: 13px;">Ambos cooperaron.</div>
                 <div class="score-anim" id="res-pts">+0</div>
-                <div style="color: var(--muted); font-size: 12px;">PUNTOS SUMADOS</div>
+                <div style="color: var(--muted); font-size: 11px;">PUNTOS SUMADOS</div>
             </div>
 
             <div class="guide-box" id="res-impact">
-                La confianza se mantiene estable. El sistema no ha detectado anomalías graves en este periodo.
+                La confianza se mantiene estable.
             </div>
 
             <button class="btn btn-primary" id="next-btn" onclick="Game.nextRound()">CONTINUAR PROTOCOLO</button>
@@ -351,24 +308,24 @@
 
         <!-- SCREEN: END GAME -->
         <div id="screen-end" class="screen hidden">
-            <h1 id="end-title">PROTOCOLO CERRADO</h1>
-            <div class="subtitle" id="end-subtitle">Evaluación de Desempeño Final</div>
+            <h1 id="end-title" style="font-size: 18px;">PROTOCOLO CERRADO</h1>
+            <div class="subtitle">Evaluación Final</div>
 
-            <div class="result-box">
-                <div style="font-size: 16px;">PUNTAJE TOTAL</div>
-                <div class="score-anim" id="end-score">0</div>
+            <div class="result-box" style="padding: 12px;">
+                <div style="font-size: 13px;">PUNTAJE TOTAL</div>
+                <div class="score-anim" id="end-score" style="font-size: 36px;">0</div>
                 <div class="progress-container">
                     <div id="end-progress" class="progress-fill"></div>
                 </div>
-                <div style="font-size: 12px; margin-top: 10px; color: var(--muted);">META: 1,000 PUNTOS</div>
+                <div style="font-size: 11px; margin-top: 6px; color: var(--muted);">META: 1,000 PUNTOS</div>
             </div>
 
-            <div id="end-status-box" style="padding: 20px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-transform: uppercase;">
+            <div id="end-status-box" style="padding: 12px; border-radius: 6px; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; text-align: center; font-size: 13px;">
                 ESTADO: <span id="end-status-text">RECHAZADO</span>
             </div>
 
-            <div class="guide-box" id="end-analysis">
-                <!-- Analysis goes here -->
+            <div class="guide-box" id="end-analysis" style="margin-bottom: 12px;">
+                <!-- Analysis -->
             </div>
 
             <button class="btn btn-primary" onclick="location.reload()">REINTENTAR SIMULACIÓN</button>
@@ -376,83 +333,65 @@
 
     </div>
 
-    <!-- UI SFX SIMULATION (CSS ONLY) -->
-    <div id="particles"></div>
-
     <script>
-        // --- GAME ENGINE & LOGIC ---
-
         const CONFIG = {
             THRESHOLD: 1000,
-            MAX_THEO: 1050,
             ROUNDS: 5,
-            ROUND_TIME: 180, // 3 mins in seconds
-            TOTAL_TIME: 900  // 15 mins total
+            TOTAL_TIME: 900
         };
 
         const IAS = [
             { 
                 name: "Ventanilla Única", 
                 policy: "Cooperación Directiva", 
-                desc: "Este mando es programático. Coopera si nota intención de orden.",
                 color: "#00ff88",
-                logic: (history) => "coop",
-                intro: "Bienvenido, agente. El sistema requiere fluidez. Cooperemos por el bien de la base.",
-                reactCoop: "Excelente. La eficiencia aumenta un 12%.",
-                reactBetray: "Inexplicable. Has generado un cuello de botella en el proceso."
+                logic: () => "coop",
+                intro: "Bienvenido. El sistema requiere fluidez. Cooperemos.",
+                reactCoop: "Eficiencia aumentada.",
+                reactBetray: "Inexplicable. Cuello de botella generado."
             },
             { 
                 name: "Archivo Recíproco", 
                 policy: "Protocolo Espejo", 
-                desc: "Devuelve exactamente lo que recibe. No olvida.",
                 color: "#00ccff",
                 logic: (history) => history.length ? history[history.length-1].userVote : "coop",
-                intro: "Mis directrices dependen de tus acciones. Trátame como desees ser tratado.",
-                reactCoop: "Reciprocidad aceptada. Sigamos el manual.",
-                reactBetray: "Traición registrada. El archivo ha sido actualizado para reflejar tu deslealtad."
+                intro: "Mis directrices dependen de tus acciones.",
+                reactCoop: "Reciprocidad aceptada.",
+                reactBetray: "Traición registrada en el historial."
             },
             { 
                 name: "Delegado Intermitente", 
                 policy: "Criterio Fluctuante", 
-                desc: "Introduce azar administrativo. Difícil de predecir.",
                 color: "#ffcc00",
                 logic: () => Math.random() > 0.3 ? "coop" : "betray",
-                intro: "Hoy los presupuestos están tensos. Quizás coopere, quizás no. Es un día largo.",
-                reactCoop: "Tuviste suerte, los sellos estaban a favor.",
-                reactBetray: "Decisión agresiva. Me gusta tu ambición, pero el sistema sufre."
+                intro: "Presupuestos tensos hoy. ¿Cooperamos o qué?",
+                reactCoop: "Tuviste suerte con los sellos.",
+                reactBetray: "Ambición agresiva. Me gusta."
             },
             { 
                 name: "Auditoría Reactiva", 
                 policy: "Respuesta Punitoria", 
-                desc: "Castiga severamente si detecta deserción previa.",
                 color: "#ff4455",
                 logic: (history) => {
                     const betrayals = history.filter(h => h.userVote === 'betray').length;
                     return Math.random() > (betrayals * 0.3) ? "coop" : "betray";
                 },
-                intro: "He revisado tus archivos anteriores. Estoy aquí para asegurar que no haya fugas de puntos.",
-                reactCoop: "Cumplimiento aceptable. Por ahora.",
-                reactBetray: "Detectado. Tu falta de ética ha sido notificada al nivel superior."
+                intro: "Revisando tus archivos anteriores para evitar fugas.",
+                reactCoop: "Cumplimiento aceptable.",
+                reactBetray: "Falta de ética notificada."
             },
             { 
                 name: "Mesa Directiva", 
                 policy: "Austeridad Extrema", 
-                desc: "Protege sus propios puntos con ferocidad. Casi siempre deserta.",
                 color: "#ff00ff",
                 logic: () => Math.random() > 0.15 ? "betray" : "coop",
-                intro: "Llegaste al final. Pero los recursos son limitados y yo soy la prioridad. No esperes piedad.",
-                reactCoop: "Ingenuo. La directiva siempre gana.",
-                reactBetray: "Guerra de poderes. Al menos eres honesto en tu egoísmo."
+                intro: "Los recursos son limitados y yo soy la prioridad.",
+                reactCoop: "Ingenuo. La directiva gana.",
+                reactBetray: "Guerra de poderes aceptada."
             }
         ];
 
-        const PAYOFFS = {
-            both_coop: 10,
-            user_betray: 18,
-            ia_betray: 0,
-            both_betray: 5
-        };
-
+        const PAYOFFS = { both_coop: 10, user_betray: 18, ia_betray: 0, both_betray: 5 };
         const MODS = [
             { name: "ESTÁNDAR", tax: 0, mult: 1 },
             { name: "ESTÁNDAR", tax: 0, mult: 1 },
@@ -462,16 +401,7 @@
         ];
 
         const Game = {
-            state: {
-                name: "",
-                round: 1,
-                score: 0,
-                history: [], // { round, userVote, iaVote, score }
-                globalTime: CONFIG.TOTAL_TIME,
-                roundTime: 0,
-                currentPhase: 'welcome',
-                isPaused: false
-            },
+            state: { name: "", round: 1, score: 0, history: [], globalTime: CONFIG.TOTAL_TIME, roundTime: 30 },
 
             init() {
                 const name = document.getElementById('player-name').value.trim();
@@ -479,18 +409,15 @@
                 this.state.name = name;
                 this.switchScreen('tutorial');
                 
-                // Start global timer
                 setInterval(() => {
-                    if(this.state.currentPhase !== 'welcome' && this.state.currentPhase !== 'end') {
+                    if(this.state.globalTime > 0) {
                         this.state.globalTime--;
                         this.updateStats();
-                        if(this.state.globalTime <= 0) this.endGame();
                     }
                 }, 1000);
             },
 
             startRounds() {
-                this.state.currentPhase = 'play';
                 document.getElementById('top-bar').classList.remove('hidden');
                 this.startRound();
             },
@@ -499,66 +426,46 @@
                 const ia = IAS[this.state.round - 1];
                 this.switchScreen('play');
                 
-                // Update UI for IA
                 document.getElementById('ia-title').textContent = `MANDO: ${ia.name}`;
                 document.getElementById('ia-policy').textContent = `POLÍTICA: ${ia.policy}`;
-                document.getElementById('ia-title').style.color = ia.color;
                 this.updateAvatar('neutral');
 
-                // Clear Chat
                 const chat = document.getElementById('chat-messages');
                 chat.innerHTML = '';
-                this.addChatMessage(ia.name, ia.intro, 'ia');
+                this.addMessage(ia.name, ia.intro, 'ia');
 
-                // Phases
                 document.getElementById('chat-controls').classList.remove('hidden');
                 document.getElementById('vote-controls').classList.add('hidden');
                 
-                this.state.roundTime = 60; // 1 min negotiation
-                this.updateRoundTimer('Negociación');
-            },
-
-            updateRoundTimer(phaseName) {
+                this.state.roundTime = 30; // 30s negotiation
                 if(this.timerInterval) clearInterval(this.timerInterval);
-                document.getElementById('playPhaseName').textContent = phaseName;
                 
                 this.timerInterval = setInterval(() => {
                     this.state.roundTime--;
-                    const m = Math.floor(this.state.roundTime / 60);
-                    const s = this.state.roundTime % 60;
-                    document.getElementById('playTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
+                    document.getElementById('nego-timer').textContent = `Fase de Negociación: ${this.state.roundTime}s`;
                     if(this.state.roundTime <= 0) {
                         clearInterval(this.timerInterval);
-                        if(phaseName === 'Negociación') this.enterVoting();
-                        else if(phaseName === 'Votación') this.handleVote('coop'); // Auto-coop if time runs out
+                        this.enterVoting();
                     }
                 }, 1000);
             },
 
             enterVoting() {
+                if(this.timerInterval) clearInterval(this.timerInterval);
                 document.getElementById('chat-controls').classList.add('hidden');
                 document.getElementById('vote-controls').classList.remove('hidden');
-                this.state.roundTime = 45; 
-                this.updateRoundTimer('Votación');
-                this.addChatMessage("SISTEMA", "TIEMPO DE NEGOCIACIÓN AGOTADO. EMITE TU VOTO.", 'ia');
             },
 
             userSpeak(msg) {
-                this.addChatMessage(this.state.name, msg, 'user');
+                this.addMessage(this.state.name, msg, 'user');
                 const ia = IAS[this.state.round - 1];
                 setTimeout(() => {
-                    const responses = [
-                        "Registrado. Continuemos.",
-                        "Mis algoritmos sugieren que esa es una ruta aceptable.",
-                        "El Protocolo no permite desviaciones sentimentales.",
-                        "Interesante postura. Veremos si se refleja en el voto."
-                    ];
-                    this.addChatMessage(ia.name, responses[Math.floor(Math.random()*responses.length)], 'ia');
-                }, 800);
+                    const resps = ["Registrado.", "Mis algoritmos avalan eso.", "El Protocolo no admite desvíos.", "Interesante postura."];
+                    this.addMessage(ia.name, resps[Math.floor(Math.random()*resps.length)], 'ia');
+                }, 500);
             },
 
-            addChatMessage(sender, msg, type) {
+            addMessage(sender, msg, type) {
                 const chat = document.getElementById('chat-messages');
                 const div = document.createElement('div');
                 div.className = `msg ${type}`;
@@ -568,60 +475,34 @@
             },
 
             handleVote(userVote) {
-                clearInterval(this.timerInterval);
                 const ia = IAS[this.state.round - 1];
                 const iaVote = ia.logic(this.state.history);
                 const mod = MODS[this.state.round - 1];
 
-                let rawPts = 0;
+                let raw = 0;
                 let desc = "";
 
-                if(userVote === 'coop' && iaVote === 'coop') {
-                    rawPts = PAYOFFS.both_coop;
-                    desc = "COOPERACIÓN MUTUA DETECTADA.";
-                    this.updateAvatar('happy');
-                } else if(userVote === 'betray' && iaVote === 'coop') {
-                    rawPts = PAYOFFS.user_betray;
-                    desc = "HAS EXPLOTADO AL MANDO COOPERATIVO.";
-                    this.updateAvatar('angry');
-                } else if(userVote === 'coop' && iaVote === 'betray') {
-                    rawPts = PAYOFFS.ia_betray;
-                    desc = "FUISTE VICTIMA DE UNA MANIOBRA DE AUSTERIDAD.";
-                    this.updateAvatar('angry');
-                } else {
-                    rawPts = PAYOFFS.both_betray;
-                    desc = "CONFLICTO DE INTERESES. AMBOS DESERTARON.";
-                    this.updateAvatar('angry');
-                }
+                if(userVote === 'coop' && iaVote === 'coop') { raw = PAYOFFS.both_coop; desc = "COOPERACIÓN MUTUA."; this.updateAvatar('happy'); }
+                else if(userVote === 'betray' && iaVote === 'coop') { raw = PAYOFFS.user_betray; desc = "EXPLOTASTE AL MANDO."; this.updateAvatar('angry'); }
+                else if(userVote === 'coop' && iaVote === 'betray') { raw = PAYOFFS.ia_betray; desc = "FUISTE TRAICIONADO."; this.updateAvatar('angry'); }
+                else { raw = PAYOFFS.both_betray; desc = "CONFLICTO: AMBOS DESERTARON."; this.updateAvatar('angry'); }
 
-                // Apply Modifiers (Impuestos/Mult)
-                let finalRoundPts = rawPts;
-                if(mod.tax) finalRoundPts = Math.floor(finalRoundPts * (1 - mod.tax));
-                if(mod.mult !== 1) finalRoundPts = Math.floor(finalRoundPts * mod.mult);
+                if(mod.tax) raw = Math.floor(raw * (1 - mod.tax));
+                if(mod.mult !== 1) raw = Math.floor(raw * mod.mult);
 
-                // Multiplicar por 10 para llegar al umbral de 1000 rápidamente
-                // Escalamiento: 15 iteraciones por ronda o 1 sola? 
-                // Para que dure 15 mins, hagamos que cada ronda sea un "periodo de 20 decisiones" simuladas o 
-                // mejor: que cada decision valga x20 puntos.
-                const scaledPts = finalRoundPts * 11; // Max por ronda: 18 * 11 = 198. Max total: ~1050
+                const scaled = raw * 11; // Escalado para umbral 1000
+                this.state.score += scaled;
+                this.state.history.push({ round: this.state.round, userVote, iaVote, score: scaled });
 
-                this.state.score += scaledPts;
-                this.state.history.push({ round: this.state.round, userVote, iaVote, score: scaledPts });
-
-                this.showRoundResult(desc, scaledPts, ia.name, (iaVote === 'coop' ? ia.reactCoop : ia.reactBetray));
-            },
-
-            showRoundResult(desc, pts, iaName, iaReact) {
                 this.switchScreen('result');
                 document.getElementById('res-desc').textContent = desc;
-                document.getElementById('res-pts').textContent = `+${pts}`;
-                document.getElementById('res-impact').innerHTML = `<b>${iaName} dice:</b> "${iaReact}"<br><br>Regla aplicada: ${MODS[this.state.round-1].name}`;
+                document.getElementById('res-pts').textContent = `+${scaled}`;
+                document.getElementById('res-impact').innerHTML = `<b>${ia.name}:</b> "${iaVote === 'coop' ? ia.reactCoop : ia.reactBetray}"<br>Regla: ${mod.name}`;
                 
-                this.spawnParticles(pts > 100 ? 'gold' : 'blue');
                 this.updateStats();
 
                 if(this.state.round >= CONFIG.ROUNDS) {
-                    document.getElementById('next-btn').textContent = "FINALIZAR EVALUACIÓN";
+                    document.getElementById('next-btn').textContent = "VER EVALUACIÓN FINAL";
                     document.getElementById('next-btn').onclick = () => this.endGame();
                 }
             },
@@ -632,38 +513,33 @@
             },
 
             endGame() {
-                this.state.currentPhase = 'end';
                 this.switchScreen('end');
                 document.getElementById('top-bar').classList.add('hidden');
                 
                 const score = this.state.score;
                 document.getElementById('end-score').textContent = score;
-                
-                const pct = Math.min(100, (score / CONFIG.THRESHOLD) * 100);
-                document.getElementById('end-progress').style.width = `${pct}%`;
+                document.getElementById('end-progress').style.width = `${Math.min(100, (score/CONFIG.THRESHOLD)*100)}%`;
 
-                const statusBox = document.getElementById('end-status-box');
-                const statusText = document.getElementById('end-status-text');
-                const analysis = document.getElementById('end-analysis');
+                const box = document.getElementById('end-status-box');
+                const txt = document.getElementById('end-status-text');
+                const an = document.getElementById('end-analysis');
 
                 if(score >= CONFIG.THRESHOLD) {
-                    statusBox.style.background = 'var(--success-bg)';
-                    statusBox.style.color = 'var(--success)';
-                    statusText.textContent = "PROMOVIDO / GANADOR";
-                    analysis.innerHTML = "<b>LOGRO DESBLOQUEADO:</b> Has dominado el Protocolo. Tu capacidad para equilibrar la traición calculada con la cooperación estratégica te sitúa en el 1% superior de la burocracia.";
-                    this.spawnParticles('gold');
+                    box.style.background = 'rgba(55, 178, 77, 0.2)';
+                    box.style.color = '#37b24d';
+                    txt.textContent = "PROMOVIDO / GANADOR";
+                    an.innerHTML = "Has dominado el Protocolo cruzando la marca de los 1,000 puntos.";
                 } else {
-                    statusBox.style.background = 'var(--danger-bg)';
-                    statusBox.style.color = 'var(--danger)';
-                    statusText.textContent = "AUDITADO / FALLIDO";
-                    analysis.innerHTML = "<b>ANÁLISIS DE FALLO:</b> La meta de 1,000 puntos requería una eficiencia del 95.2%. Tus decisiones generaron demasiada fricción. El sistema recomienda re-capacitación inmediata.";
+                    box.style.background = 'rgba(241, 76, 76, 0.2)';
+                    box.style.color = '#f14c4c';
+                    txt.textContent = "AUDITADO / FALLIDO";
+                    an.innerHTML = "Tus decisiones generaron fricción y no alcanzaste el umbral de los 1,000 puntos.";
                 }
             },
 
             updateStats() {
                 document.getElementById('stat-round').textContent = `${this.state.round}/${CONFIG.ROUNDS}`;
                 document.getElementById('stat-score').textContent = this.state.score;
-                
                 const m = Math.floor(this.state.globalTime / 60);
                 const s = this.state.globalTime % 60;
                 document.getElementById('stat-timer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
@@ -678,40 +554,9 @@
                 const root = document.getElementById('ia-avatar-root');
                 const color = IAS[this.state.round-1].color;
                 let path = mood === 'happy' ? "M30 65 Q50 85 70 65" : (mood === 'angry' ? "M30 75 Q50 65 70 75" : "M30 70 Q50 70 70 70");
-                
-                root.innerHTML = `
-                    <svg viewBox="0 0 100 100" class="avatar-svg ${mood === 'angry' ? 'mood-angry' : (mood === 'happy' ? 'mood-happy' : '')}">
-                        <path d="M50 10 C30 10 10 30 10 50 C10 70 30 90 50 90 C70 90 90 70 90 50 C90 30 70 10 50 10" fill="#222" stroke="${color}" stroke-width="3"/>
-                        <circle cx="35" cy="40" r="6" fill="${color}"/>
-                        <circle cx="65" cy="40" r="6" fill="${color}"/>
-                        <path d="${path}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
-                    </svg>
-                `;
-            },
-
-            spawnParticles(type) {
-                const container = document.getElementById('particles');
-                for(let i=0; i<20; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'floating-pts';
-                    p.style.left = Math.random() * 100 + 'vw';
-                    p.style.top = '80vh';
-                    p.style.color = type === 'gold' ? '#ffcc00' : '#00ff88';
-                    p.textContent = type === 'gold' ? '★' : '++';
-                    container.appendChild(p);
-                    setTimeout(() => p.remove(), 1200);
-                }
+                root.innerHTML = `<svg viewBox="0 0 100 100" class="avatar-svg ${mood}"><circle cx="50" cy="50" r="45" fill="#222" stroke="${color}" stroke-width="3"/><circle cx="35" cy="40" r="6" fill="${color}"/><circle cx="65" cy="40" r="6" fill="${color}"/><path d="${path}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"/></svg>`;
             }
         };
-
-        // UI Glow interactions
-        document.addEventListener('mousemove', (e) => {
-            const game = document.getElementById('game-container');
-            const x = (e.clientX - window.innerWidth/2) / 50;
-            const y = (e.clientY - window.innerHeight/2) / 50;
-            game.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
-        });
-
     </script>
 </body>
 </html>
