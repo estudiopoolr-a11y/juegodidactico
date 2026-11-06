@@ -9,7 +9,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Courier New',monospace;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 60%, #050508 100%);color:var(--text);overflow:hidden;width:100vw;height:100vh}
 #canvas3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 100%);}
-#ui-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;justify-content:center;align-items:flex-end;padding-bottom:2vh}
+#ui-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;justify-content:center;align-items:center;padding:0}
 #ui-layer>*{pointer-events:auto}
 .screen{width:min(94vw,460px);display:flex;flex-direction:column;animation:fadeUp .6s ease}
 .hidden{display:none!important}
@@ -19,8 +19,8 @@ h1{text-align:center;font-size:22px;color:var(--accent);text-shadow:0 0 20px var
 .sub{text-align:center;font-size:10px;color:#667;letter-spacing:2px;margin-bottom:14px}
 .badge{display:inline-block;background:rgba(0,242,255,0.08);border:1px solid rgba(0,242,255,0.2);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:bold;color:var(--accent);letter-spacing:1px}
 .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-input#p-name{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);color:#fff;text-align:center;font-family:inherit;font-size:13px;outline:none;margin-bottom:14px;letter-spacing:2px}
-input#p-name:focus{border-color:var(--accent)}
+input#p-name{width:100%;padding:14px;border-radius:12px;border:2px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.5);color:#fff;text-align:center;font-family:inherit;font-size:13px;outline:none;margin-bottom:14px;letter-spacing:2px}
+input#p-name:focus{border-color:var(--accent);box-shadow:0 0 20px var(--glow)}
 .btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;transition:.2s}
 .btn-neon{background:linear-gradient(135deg,var(--accent),#0066ff);color:#000;box-shadow:0 6px 25px var(--glow)}
 .btn-neon:hover{transform:translateY(-2px);box-shadow:0 10px 35px var(--glow)}
