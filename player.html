@@ -3,687 +3,253 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Protocolo de Austeridad — Sesión Estudiante</title>
+<title>El Protocolo — Estudiante</title>
 <style>
-  :root {
-    --bg: #1e1e1e;
-    --card: #252526;
-    --border: #3c3c3c;
-    --text: #d4d4d4;
-    --muted: #858585;
-    --accent: #007acc;
-    --accent-hover: #1c97ea;
-    --danger: #f14c4c;
-    --danger-bg: #401515;
-    --success: #37b24d;
-    --success-bg: #1b3a21;
-    --font: 'Courier New', Courier, monospace;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    padding: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  .app {
-    width: 100%;
-    max-width: 480px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-  }
-  h1 {
-    font-size: 16px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
-    margin-bottom: 12px;
-    color: #fff;
-  }
-  .status-bar {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--muted);
-    background: #111;
-    padding: 6px 10px;
-    border: 1px solid var(--border);
-    margin-bottom: 12px;
-    border-radius: 2px;
-  }
-  .status-bar span b { color: var(--text); }
-  .timer-card {
-    text-align: center;
-    background: #111;
-    border: 1px solid var(--border);
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  .timer-card .big {
-    font-size: 32px;
-    font-weight: bold;
-    color: #fff;
-    letter-spacing: 2px;
-  }
-  .timer-card .sub {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-top: 4px;
-  }
-  .panel {
-    border: 1px solid var(--border);
-    padding: 12px;
-    margin-bottom: 12px;
-    background: #2d2d2d;
-    border-radius: 2px;
-  }
-  .panel h2 {
-    font-size: 13px;
-    text-transform: uppercase;
-    color: #fff;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .badge {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 2px;
-    background: #444;
-    color: #fff;
-    text-transform: uppercase;
-  }
-  .badge.human { background: #1e3a5f; color: #75beff; }
-  .badge.sub { background: #5c3a1e; color: #ffcc66; }
-  p { font-size: 13px; line-height: 1.4; margin-bottom: 8px; }
-  input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    background: #111;
-    border: 1px solid var(--border);
-    color: #fff;
-    font-family: var(--font);
-    font-size: 14px;
-    margin-bottom: 8px;
-    border-radius: 2px;
-  }
-  input[type="text"]:focus { outline: 1px solid var(--accent); }
-  .btn {
-    width: 100%;
-    padding: 12px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    font-family: var(--font);
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: background 0.1s ease;
-    margin-top: 4px;
-  }
-  .btn:hover { background: var(--accent-hover); }
-  .btn:disabled { background: var(--muted); cursor: not-allowed; }
-  .btn-row { display: flex; gap: 8px; }
-  .btn-choice {
-    flex: 1;
-    padding: 16px 8px;
-    font-size: 13px;
-    font-weight: bold;
-    text-transform: uppercase;
-    border: 1px solid var(--border);
-    background: #333;
-    color: #fff;
-    cursor: pointer;
-    font-family: var(--font);
-  }
-  .btn-choice.coop { border-color: #2b7a37; background: #1c3620; }
-  .btn-choice.coop:hover { background: #264a2a; }
-  .btn-choice.bet { border-color: #8c2626; background: #3d1c1c; }
-  .btn-choice.bet:hover { background: #4d2424; }
-  .btn-choice.selected { outline: 2px solid #fff; }
-  .chat-box {
-    height: 90px;
-    background: #181818;
-    border: 1px solid var(--border);
-    padding: 6px;
-    overflow-y: auto;
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-  .chat-msg { margin-bottom: 4px; word-break: break-word; }
-  .chat-msg b { color: #75beff; }
-  .chat-row { display: flex; gap: 6px; }
-  .chat-row input { margin-bottom: 0; }
-  .chat-row button { width: auto; padding: 0 12px; margin-top: 0; }
-  .err { color: var(--danger); font-size: 12px; margin-top: 4px; }
-  .history-item {
-    font-size: 12px;
-    padding: 6px;
-    border-bottom: 1px dotted var(--border);
-    display: flex;
-    justify-content: space-between;
-  }
-  .history-item:last-child { border-bottom: none; }
-  .table { width: 100%; font-size: 12px; border-collapse: collapse; margin-top: 6px; }
-  .table th, .table td { border: 1px solid var(--border); padding: 6px; text-align: left; }
-  .table th { background: #333; }
-  .footer-note {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 12px;
-    border-top: 1px solid var(--border);
-    padding-top: 8px;
-  }
+  :root { --bg: #1e1e1e; --card: #252526; --border: #3c3c3c; --text: #d4d4d4; --accent: #007acc; --danger: #f14c4c; --font: 'Courier New', monospace; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; min-height: 100vh; margin: 0; }
+  .app { width: 100%; max-width: 480px; background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 4px; }
+  h1 { font-size: 18px; text-transform: uppercase; color: #fff; margin-bottom: 20px; text-align: center; }
+  input { width: 100%; padding: 12px; margin-bottom: 15px; background: #333; border: 1px solid var(--border); color: #fff; font-family: var(--font); font-size: 14px; box-sizing: border-box; }
+  input:focus { outline: none; border-color: var(--accent); }
+  .btn { width: 100%; padding: 14px; background: var(--accent); border: none; color: #fff; font-family: var(--font); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 14px; transition: background 0.2s; }
+  .btn:hover { background: #0062a3; }
+  .btn:disabled { background: #555; cursor: not-allowed; }
   .hidden { display: none !important; }
-  .offline-notice {
-    background: #5c3a1e;
-    color: #ffcc66;
-    font-size: 11px;
-    padding: 4px 8px;
-    text-align: center;
-    border-radius: 2px;
-    margin-bottom: 8px;
-  }
+  .error { color: var(--danger); font-size: 12px; margin-top: 10px; text-align: center; min-height: 18px; }
+  .status-bar { display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .timer { font-size: 32px; font-weight: bold; text-align: center; margin: 20px 0; color: #fff; }
+  .phase-info { text-align: center; margin-bottom: 20px; font-size: 14px; color: #aaa; }
+  .action-area { display: flex; gap: 10px; margin-top: 20px; }
+  .action-btn { flex: 1; padding: 15px; background: #333; border: 1px solid var(--border); color: #fff; cursor: pointer; font-family: var(--font); font-weight: bold; }
+  .action-btn:hover { background: #444; border-color: #666; }
+  .action-btn.selected { background: var(--accent); border-color: var(--accent); }
+  .log { background: #111; padding: 10px; height: 100px; overflow-y: auto; font-size: 11px; border: 1px solid var(--border); margin-top: 20px; }
+  .log p { margin: 2px 0; color: #888; }
 </style>
 </head>
 <body>
-<div class="app" id="app">
-  <h1>El Protocolo de Austeridad</h1>
-  <div id="offlineNotice" class="offline-notice hidden">⚠️ Sin conexión a la nube — jugando en modo local-first. Tus datos se guardarán aquí.</div>
-
-  <!-- PANTALLA 1: ENTRADA -->
-  <div id="screenConnect" class="panel">
-    <h2>Ingreso al Protocolo</h2>
-    <p>Introduce la sesión que te dio el instructor (ej: <b>CLASE-01</b>) y tu nombre completo.</p>
-    <div style="margin-top: 10px;">
-      <label style="font-size:11px; color:var(--muted)">CÓDIGO DE SESIÓN</label>
-      <input type="text" id="inSession" placeholder="CLASE-01" style="text-transform: uppercase;" />
-      <label style="font-size:11px; color:var(--muted)">TU NOMBRE</label>
-      <input type="text" id="inName" placeholder="Tu nombre y apellido" />
-      <button class="btn" id="btnJoin">Entrar al Protocolo</button>
-      <div id="errJoin" class="err"></div>
-    </div>
+<div class="app">
+  <!-- PANTALLA DE CONEXIÓN -->
+  <div id="connectScreen">
+    <h1>El Protocolo de Austeridad</h1>
+    <p style="font-size:12px; color:#888; text-align:center; margin-bottom:20px;">Ingresa tus datos para iniciar la simulación.</p>
+    <input type="text" id="sessionInput" placeholder="Código de Sesión (ej: CLASE1)" maxlength="20" />
+    <input type="text" id="nameInput" placeholder="Tu Nombre Completo" maxlength="30" />
+    <button id="btnConnect" class="btn">Conectar al Sistema</button>
+    <div id="connectError" class="error"></div>
   </div>
 
-  <!-- PANTALLA 2: BUSCANDO / EMPAREJANDO -->
-  <div id="screenMatch" class="panel hidden">
+  <!-- PANTALLA DE JUEGO -->
+  <div id="gameScreen" class="hidden">
     <div class="status-bar">
-      <span>Ronda <b id="matchRound">1</b> / 5</span>
-      <span>Código: <b id="matchCode">--</b></span>
+      <span id="displaySession">Sesión: -</span>
+      <span id="displayCode">ID: -</span>
     </div>
-    <div class="timer-card">
-      <div class="big" id="matchTimer">00:08</div>
-      <div class="sub" id="matchSubText">Buscando homólogo en la red...</div>
+    
+    <div class="timer" id="timerDisplay">00:00</div>
+    <div class="phase-info" id="phaseDisplay">Esperando inicio...</div>
+    
+    <div id="interactionArea" class="hidden">
+      <p style="text-align:center; font-size:13px; margin-bottom:10px;">¿Cuál es tu decisión?</p>
+      <div class="action-area">
+        <button id="btnCoop" class="action-btn">COOPERAR</button>
+        <button id="btnBet" class="action-btn">DESERTAR</button>
+      </div>
+      <div id="voteStatus" style="text-align:center; font-size:12px; margin-top:10px; color:#888;"></div>
     </div>
-    <p id="matchHint">Si ningún colega está buscando en este momento, el sistema te asignará un <b>RESPALDO (IA)</b> de manera automática en unos segundos.</p>
+
+    <div id="waitingArea" style="text-align:center; color:#666; font-size:12px; margin-top:30px;">
+      Esperando instrucciones del sistema...
+    </div>
+
+    <div class="log" id="gameLog"></div>
   </div>
 
-  <!-- PANTALLA 3: NEGOCIACIÓN Y VOTACIÓN -->
-  <div id="screenPlay" class="panel hidden">
-    <div class="status-bar">
-      <span>Ronda <b id="playRound">1</b>/5 &bull; <b id="playRuleName">Estándar</b></span>
-      <span>Score: <b id="playScore">0</b> pts</span>
+  <!-- PANTALLA FINAL -->
+  <div id="endScreen" class="hidden">
+    <h1>Simulación Finalizada</h1>
+    <div style="text-align:center; margin: 20px 0;">
+      <p>Puntaje Individual: <strong id="finalScore" style="font-size:24px; color:#fff;">0</strong></p>
+      <p>Pool Colectivo: <strong id="finalPool" style="font-size:18px; color:#aaa;">0</strong> / 1000</p>
     </div>
-    <div class="timer-card">
-      <div class="big" id="playTimer">03:00</div>
-      <div class="sub" id="playPhaseName">Negociación de Directrices</div>
+    <div id="mathProof" style="background:#333; padding:15px; font-size:12px; line-height:1.4; border:1px solid #555;">
+      <strong>Análisis del Sistema:</strong><br>
+      La meta era inalcanzable sin cooperación total. Cada deserción restó puntos vitales al colectivo.
     </div>
-
-    <!-- FASE 1: NEGOCIACIÓN Y CHAT -->
-    <div id="phaseNegot" class="panel" style="background:#222; margin-bottom:8px;">
-      <h2>Pareja asignada <span id="oppBadge" class="badge human">Humano</span></h2>
-      <p>Colega: <b id="oppName">Cargando...</b></p>
-      <div class="chat-box" id="chatBox"></div>
-      <div class="chat-row" id="chatRow">
-        <input type="text" id="chatInput" placeholder="Escribe al colega..." />
-        <button class="btn" id="chatSend" style="margin-top:0;">Enviar</button>
-      </div>
-    </div>
-
-    <!-- FASE 2: VOTACIÓN -->
-    <div id="phaseVote" class="panel hidden" style="background:#222; margin-bottom:8px;">
-      <h2>Declaración de postura</h2>
-      <p id="votePrompt">¿Qué decides para esta ronda?</p>
-      <div class="btn-row" id="voteButtons">
-        <button class="btn-choice coop" id="btnCoop">COOPERAR<br><small style="font-weight:normal">+10 / +10</small></button>
-        <button class="btn-choice bet" id="btnBet">DESERTAR<br><small style="font-weight:normal">+18 / 0</small></button>
-      </div>
-      <div id="voteWait" class="hidden" style="text-align:center; padding:12px; color:var(--muted);">
-        Voto registrado. Esperando resolución de la contraparte...
-      </div>
-    </div>
-
-    <!-- FASE 3: RESOLUCIÓN / AUDITORÍA -->
-    <div id="phaseRes" class="panel hidden" style="background:#222; margin-bottom:0;">
-      <h2>Resultado del periodo</h2>
-      <div id="resSummary" style="font-size:12px; line-height:1.5; margin-bottom:8px;"></div>
-      <button class="btn" id="btnNextRound">Siguiente Ronda &rarr;</button>
-    </div>
+    <button onclick="location.reload()" class="btn" style="margin-top:20px;">Reiniciar Simulación</button>
   </div>
-
-  <!-- PANTALLA 4: RESULTADOS FINALES -->
-  <div id="screenResult" class="panel hidden">
-    <h2>Protocolo Finalizado</h2>
-    <div class="timer-card" style="margin-bottom:8px;">
-      <div class="big" id="resFinalScore">0 pts</div>
-      <div class="sub">Tu puntaje acumulado</div>
-    </div>
-    <div id="resOutcome" style="padding:8px; margin-bottom:8px; font-size:12px; text-align:center; border:1px solid var(--border);"></div>
-    <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Historial de tus 5 rondas:</p>
-    <div id="resHistory" style="max-height:160px; overflow-y:auto; border:1px solid var(--border); background:#151515; padding:4px; margin-bottom:10px;"></div>
-    <div class="btn-row">
-      <button class="btn" id="btnCopyReport" style="background:#444;">Copiar Reporte</button>
-      <button class="btn" id="btnDownloadCsv">Descargar CSV</button>
-    </div>
-    <div id="copyNotice" style="font-size:11px; color:var(--success); text-align:center; margin-top:4px;"></div>
-  </div>
-
-  <div class="footer-note">El Protocolo de Austeridad v2 &bull; Sistema Asíncrono</div>
 </div>
 
 <script type="module">
-  import {
-    GAME_VERSION, TOTAL_ROUNDS, ROUND_BUDGET_S, MATCH_WINDOW_S, NEGOTIATION_S, VOTATION_S, RESOLUTION_S,
-    MODIFIERS, maxPerPlayer, resolveHuman, resolveSubstitute, exportResult, exportCsv,
-    saveRun, loadRun, clearRun, queueReport
-  } from './engine.js';
-  import { online, claimCode, heartbeat, seekOpponent, watchOffer, submitVote, sendChat, markResolved, reportFinal } from './cloud.js';
+  import { GameDB } from './firebase.js';
 
-  // ESTADO LOCAL DE LA PARTIDA
+  // Estado local
   let state = {
-    session: '',
-    code: '',
-    name: '',
-    isolated: false,
-    round: 1,
+    session: null,
+    code: null,
+    name: null,
     score: 0,
-    history: [],
-    subCount: 0,
-    coopCount: 0,
-    state: 'connect' // connect, match, play, result
+    round: 0,
+    phase: -1,
+    timeLeft: 0,
+    hasVoted: false
   };
 
-  let roundTimer = null;
-  let roundTimeLeft = ROUND_BUDGET_S;
-  let activeMatch = null;
-  let activeOfferUnsub = null;
-  let activeChatUnsub = null;
-  let myVote = null;
-  let otherVote = null;
-  let lastOppName = '';
-  let lastOppKind = 'human';
+  let unsubscribe = null;
 
-  const $ = (id) => document.getElementById(id);
-  const show = (id, visible) => $(id).classList.toggle('hidden', !visible);
+  // Elementos DOM
+  const screens = {
+    connect: document.getElementById('connectScreen'),
+    game: document.getElementById('gameScreen'),
+    end: document.getElementById('endScreen')
+  };
+  const inputs = {
+    session: document.getElementById('sessionInput'),
+    name: document.getElementById('nameInput')
+  };
+  const btnConnect = document.getElementById('btnConnect');
+  const errDiv = document.getElementById('connectError');
+  
+  // Botones de acción
+  const btnCoop = document.getElementById('btnCoop');
+  const btnBet = document.getElementById('btnBet');
+  const voteStatus = document.getElementById('voteStatus');
+  const interactionArea = document.getElementById('interactionArea');
+  const waitingArea = document.getElementById('waitingArea');
+  const gameLog = document.getElementById('gameLog');
 
-  // Avisador de conexión
-  if (!online()) $('offlineNotice').classList.remove('hidden');
+  // Función de Log
+  function log(msg) {
+    const p = document.createElement('p');
+    p.textContent = `> ${msg}`;
+    gameLog.appendChild(p);
+    gameLog.scrollTop = gameLog.scrollHeight;
+  }
 
-  // Recuperar sesión anterior si existe
-  window.addEventListener('DOMContentLoaded', () => {
-    const savedSession = localStorage.getItem('jda:last_session');
-    if (savedSession) {
-      const saved = loadRun(savedSession);
-      if (saved && saved.state === 'play' && saved.round <= TOTAL_ROUNDS) {
-        if (confirm(`Tienes una partida activa en la sesión "${savedSession}" (Ronda ${saved.round}/5). ¿Deseas retomarla?`)) {
-          state = saved;
-          $('inSession').value = state.session;
-          $('inName').value = state.name;
-          startPlaying();
-          return;
-        } else {
-          clearRun(savedSession);
-          localStorage.removeItem('jda:last_session');
-        }
-      }
+  // Conectar
+  btnConnect.addEventListener('click', async () => {
+    const sess = inputs.session.value.trim();
+    const name = inputs.name.value.trim();
+
+    if (!sess || !name) {
+      errDiv.textContent = "Debes ingresar sesión y nombre.";
+      return;
+    }
+
+    btnConnect.disabled = true;
+    btnConnect.textContent = "Conectando...";
+    errDiv.textContent = "";
+
+    try {
+      // Intentamos unirnos. Si falla, mostramos error.
+      const assignedCode = await GameDB.joinGame(sess, name);
+      
+      state.session = sess;
+      state.code = assignedCode;
+      state.name = name;
+
+      // Cambiar pantalla
+      screens.connect.classList.add('hidden');
+      screens.game.classList.remove('hidden');
+
+      document.getElementById('displaySession').textContent = `Sesión: ${sess}`;
+      document.getElementById('displayCode').textContent = `ID: ${assignedCode}`;
+      
+      log(`Conectado como Agente ${assignedCode}.`);
+
+      // Suscribirse a cambios
+      unsubscribe = GameDB.subscribeToGame(sess, (data) => {
+        if (!data) return;
+        updateView(data);
+      });
+
+    } catch (e) {
+      console.error(e);
+      errDiv.textContent = e.message || "Error de conexión. Verifica el código.";
+      btnConnect.disabled = false;
+      btnConnect.textContent = "Conectar al Sistema";
     }
   });
 
-  // 1. CONEXIÓN
-  $('btnJoin').onclick = async () => {
-    const session = $('inSession').value.trim().toUpperCase();
-    const name = $('inName').value.trim();
-    $('errJoin').textContent = '';
-    if (!session) { $('errJoin').textContent = 'Introduce el código de sesión.'; return; }
-    if (!name) { $('errJoin').textContent = 'Introduce tu nombre.'; return; }
+  // Actualizar Vista
+  function updateView(data) {
+    if (!state.code) return;
 
-    $('btnJoin').disabled = true;
-    $('btnJoin').textContent = 'Conectando...';
+    const playerData = data.players ? data.players[state.code] : null;
+    if (playerData) state.score = playerData.score || 0;
 
-    const res = await claimCode(session, name);
-    state.session = session;
-    state.code = res.code;
-    state.name = name;
-    state.isolated = res.isolated;
-    state.state = 'match';
-    localStorage.setItem('jda:last_session', session);
+    // Timer
+    const m = Math.floor(data.timeLeft / 60).toString().padStart(2, '0');
+    const s = (data.timeLeft % 60).toString().padStart(2, '0');
+    document.getElementById('timerDisplay').textContent = `${m}:${s}`;
 
-    saveRun(session, state);
-    goToMatch();
-  };
+    // Fase
+    const phases = ["NEGOCIACIÓN", "VOTACIÓN", "AUDITORÍA", "RESULTADOS"];
+    const phaseName = data.phase >= 0 && data.phase < 4 ? phases[data.phase] : "ESPERA";
+    document.getElementById('phaseDisplay').textContent = `Ronda ${data.round}/5 — ${phaseName}`;
 
-  function switchScreen(scr) {
-    ['screenConnect', 'screenMatch', 'screenPlay', 'screenResult'].forEach(s => show(s, s === scr));
-  }
-
-  // 2. EMPAREJAMIENTO DIFERIDO
-  function goToMatch() {
-    switchScreen('screenMatch');
-    $('matchRound').textContent = state.round;
-    $('matchCode').textContent = state.code;
-    $('matchTimer').textContent = '00:08';
-    $('matchSubText').textContent = 'Buscando homólogo en la red...';
-
-    let elapsed = 0;
-    const iv = setInterval(() => {
-      elapsed++;
-      const left = Math.max(0, MATCH_WINDOW_S - elapsed);
-      $('matchTimer').textContent = `00:${String(left).padStart(2, '0')}`;
-      if (left <= 0) clearInterval(iv);
-    }, 1000);
-
-    heartbeat(state.session, { code: state.code, name: state.name, round: state.round, state: 'matching', score: state.score });
-
-    activeMatch = seekOpponent(state.session, { code: state.code, name: state.name, score: state.score }, state.round, {
-      onPaired: (match) => {
-        clearInterval(iv);
-        lastOppKind = 'human';
-        lastOppName = match.name;
-        startRoundPhase(match);
-      },
-      onAlone: () => {
-        clearInterval(iv);
-        lastOppKind = 'substitute';
-        // Asignar respaldo IA según la ronda
-        const subsList = ['Ventanilla Única', 'Archivo Recíproco', 'Delegado Intermitente', 'Auditoría Reactiva', 'Mesa Directiva'];
-        lastOppName = subsList[state.round - 1] || 'Mesa Directiva';
-        state.subCount++;
-        startRoundPhaseAsSubstitute();
+    // Lógica de interacción
+    if (data.running && data.phase === 1) { // Fase de Votación
+      if (!state.hasVoted) {
+        interactionArea.classList.remove('hidden');
+        waitingArea.classList.add('hidden');
+        voteStatus.textContent = "Selecciona una opción:";
+        btnCoop.disabled = false;
+        btnBet.disabled = false;
+        btnCoop.classList.remove('selected');
+        btnBet.classList.remove('selected');
+      } else {
+        interactionArea.classList.add('hidden');
+        waitingArea.classList.remove('hidden');
+        waitingArea.textContent = "Voto registrado. Esperando resolución...";
       }
-    });
-  }
-
-  // 3. FASE DE JUEGO (HUMANO O IA)
-  function startRoundPhase(match) {
-    switchScreen('screenPlay');
-    $('playRound').textContent = state.round;
-    $('playRuleName').textContent = MODIFIERS[state.round - 1].name;
-    $('playScore').textContent = state.score;
-
-    $('oppBadge').textContent = 'Humano';
-    $('oppBadge').className = 'badge human';
-    $('oppName').textContent = lastOppName;
-    show('phaseNegot', true);
-    show('phaseVote', false);
-    show('phaseRes', false);
-
-    myVote = null;
-    otherVote = null;
-    chatBox.innerHTML = '';
-    chatInput.value = '';
-
-    // Reloj individual de la ronda (3 minutos)
-    roundTimeLeft = ROUND_BUDGET_S;
-    if (roundTimer) clearInterval(roundTimer);
-
-    // Chat en tiempo real
-    if (activeChatUnsub) activeChatUnsub();
-    // (chat opcional sobre match.ref)
-
-    let phaseIndex = 0; // 0: Negot (60s), 1: Vote (45s), 2: Audit/Res (30s)
-    let phaseTime = NEGOTIATION_S;
-
-    $('playPhaseName').textContent = 'Negociación de Directrices';
-
-    roundTimer = setInterval(() => {
-      roundTimeLeft--;
-      const m = Math.floor(roundTimeLeft / 60);
-      const s = roundTimeLeft % 60;
-      $('playTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-      phaseTime--;
-      if (phaseTime <= 0) {
-        if (phaseIndex === 0) {
-          // Pasa a votación
-          phaseIndex = 1;
-          phaseTime = VOTATION_S;
-          $('playPhaseName').textContent = 'Declaración de Postura';
-          show('phaseNegot', false);
-          show('phaseVote', true);
-        } else if (phaseIndex === 1 && !myVote) {
-          // Si expiró la votación y no votó, default coopera
-          doVote('coop', match);
-        }
-      }
-
-      if (roundTimeLeft <= 0) {
-        clearInterval(roundTimer);
-        if (!myVote) doVote('coop', match);
-      }
-    }, 1000);
-
-    // Votación clicks
-    $('btnCoop').onclick = () => doVote('coop', match);
-    $('btnBet').onclick = () => doVote('bet', match);
-
-    // Escuchar oferta remota
-    if (activeOfferUnsub) activeOfferUnsub();
-    activeOfferUnsub = watchOffer(match.ref, state.code, {
-      onState: (st) => {
-        otherVote = st.otherVote;
-        if (st.chat && st.chat.length) {
-          chatBox.innerHTML = st.chat.map(m => `<div class="chat-msg"><b>${lastOppName}:</b> ${m.text}</div>`).join('');
-          chatBox.scrollTop = chatBox.scrollHeight;
-        }
-        if (myVote && otherVote && phaseIndex === 1) {
-          resolveAndShow(myVote, otherVote, 'human', match.ref);
-        }
-      },
-      onAbstention: () => {
-        // El otro no contestó en 20s -> resolvemos contra respaldo local
-        if (phaseIndex === 1 && myVote && !otherVote) {
-          const subRes = resolveSubstitute(myVote, state.round, state.history.map(h => h.vote));
-          resolveAndShow(myVote, subRes.thinks || 'coop', 'substitute', match.ref);
-        }
-      }
-    });
-
-    $('chatSend').onclick = async () => {
-      const txt = chatInput.value.trim();
-      if (!txt) return;
-      chatInput.value = '';
-      appendChat('Tú', txt);
-      await sendChat(match.ref, state.code, txt);
-    };
-  }
-
-  function startRoundPhaseAsSubstitute() {
-    switchScreen('screenPlay');
-    $('playRound').textContent = state.round;
-    $('playRuleName').textContent = MODIFIERS[state.round - 1].name;
-    $('playScore').textContent = state.score;
-
-    $('oppBadge').textContent = 'Respaldo IA';
-    $('oppBadge').className = 'badge sub';
-    $('oppName').textContent = lastOppName;
-    show('phaseNegot', true);
-    show('phaseVote', false);
-    show('phaseRes', false);
-
-    chatBox.innerHTML = `<div class="chat-msg"><b>${lastOppName}:</b> Saludos. Operamos bajo el protocolo de respaldo automático. Directrices abiertas.</div>`;
-    chatInput.value = '';
-
-    roundTimeLeft = ROUND_BUDGET_S;
-    if (roundTimer) clearInterval(roundTimer);
-
-    let phaseIndex = 0;
-    let phaseTime = NEGOTIATION_S;
-    $('playPhaseName').textContent = 'Negociación (Respaldo IA)';
-
-    roundTimer = setInterval(() => {
-      roundTimeLeft--;
-      const m = Math.floor(roundTimeLeft / 60);
-      const s = roundTimeLeft % 60;
-      $('playTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-      phaseTime--;
-      if (phaseTime <= 0 && phaseIndex === 0) {
-        phaseIndex = 1;
-        phaseTime = VOTATION_S;
-        $('playPhaseName').textContent = 'Declaración de Postura';
-        show('phaseNegot', false);
-        show('phaseVote', true);
-      }
-      if (roundTimeLeft <= 0 && !myVote) {
-        clearInterval(roundTimer);
-        doVoteSub('coop');
-      }
-    }, 1000);
-
-    $('btnCoop').onclick = () => doVoteSub('coop');
-    $('btnBet').onclick = () => doVoteSub('bet');
-
-    $('chatSend').onclick = () => {
-      const txt = chatInput.value.trim();
-      if (!txt) return;
-      chatInput.value = '';
-      appendChat('Tú', txt);
-      setTimeout(() => {
-        appendChat(lastOppName, 'Recibido en central. Su postura ha sido registrada para el análisis.');
-      }, 600);
-    };
-  }
-
-  async function doVote(v, match) {
-    if (myVote) return;
-    myVote = v;
-    $('btnCoop').disabled = true;
-    $('btnBet').disabled = true;
-    show('voteWait', false); // feedback inmediato
-    await submitVote(match.ref, state.code, v);
-    if (otherVote) resolveAndShow(myVote, otherVote, 'human', match.ref);
-  }
-
-  function doVoteSub(v) {
-    if (myVote) return;
-    myVote = v;
-    const subRes = resolveSubstitute(v, state.round, state.history.map(h => h.vote));
-    resolveAndShow(v, subRes.thinks || 'coop', 'substitute', null);
-  }
-
-  function appendChat(who, txt) {
-    chatBox.innerHTML += `<div class="chat-msg"><b>${who}:</b> ${txt}</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function resolveAndShow(mVote, oVote, kind, ref) {
-    if (roundTimer) clearInterval(roundTimer);
-    if (activeOfferUnsub) { activeOfferUnsub(); activeOfferUnsub = null; }
-
-    let res;
-    if (kind === 'human') {
-      res = resolveHuman(mVote, oVote, state.round);
     } else {
-      res = resolveSubstitute(mVote, state.round, state.history.map(h => h.vote));
-      res.theirs = res.theirVote;
-      oVote = res.theirs;
+      interactionArea.classList.add('hidden');
+      waitingArea.classList.remove('hidden');
+      
+      if (data.phase === 0) waitingArea.textContent = "Negociando con tu pareja...";
+      if (data.phase === 2) waitingArea.textContent = "Procesando auditoría del sistema...";
+      if (data.phase === 3) waitingArea.textContent = "Calculando resultados...";
     }
 
-    state.score += res.mine;
-    if (mVote === 'coop') state.coopCount++;
-
-    const item = {
-      round: state.round,
-      modName: MODIFIERS[state.round - 1].name,
-      oppName: lastOppName,
-      kind: kind,
-      vote: mVote,
-      oppVote: oVote,
-      score: res.mine
-    };
-    state.history.push(item);
-    saveRun(state.session, state);
-
-    if (ref) markResolved(state.session, state.code, state.round).catch(() => {});
-
-    // Mostrar fase de resolución
-    show('phaseVote', false);
-    show('phaseRes', true);
-    $('playPhaseName').textContent = 'Resolución de Periodo';
-
-    const myTxt = mVote === 'coop' ? 'COOPERAR' : 'DESERTAR';
-    const oppTxt = oVote === 'coop' ? 'COOPERAR' : 'DESERTAR';
-    $('resSummary').innerHTML = `
-      Tu decisión: <b>${myTxt}</b><br>
-      Colega (${lastOppName}): <b>${oppTxt}</b><br>
-      Puntos obtenidos: <b>+${res.mine} pts</b><br>
-      <i style="color:var(--muted)">${kind === 'substitute' ? 'Atendido por Respaldo IA automático.' : 'Cruce verificado con homólogo real.'}</i>
-    `;
-
-    $('btnNextRound').onclick = () => {
-      if (state.round < TOTAL_ROUNDS) {
-        state.round++;
-        saveRun(state.session, state);
-        goToMatch();
-      } else {
-        finishGame();
-      }
-    };
+    // Fin del juego
+    if (!data.running && data.round >= 5) {
+      showEndScreen(data);
+    }
   }
 
-  function finishGame() {
-    state.state = 'result';
-    switchScreen('screenResult');
-    clearRun(state.session);
-    localStorage.removeItem('jda:last_session');
-
-    $('resFinalScore').textContent = `${state.score} pts`;
-    $('resOutcome').innerHTML = `Partida concluida en protocolo cerrado.<br>Tu contribución total a la pool: <b>${state.score} / ${maxPerPlayer()} pts</b> posibles.`;
-
-    $('resHistory').innerHTML = state.history.map(h => `
-      <div class="history-item">
-        <span>R${h.round} &bull; ${h.oppName} [${h.kind === 'substitute' ? 'IA' : 'Hum'}]</span>
-        <span>Yo: ${h.vote.toUpperCase()} / Él: ${h.oppVote.toUpperCase()} &rarr; <b>+${h.score}</b></span>
-      </div>
-    `).join('');
-
-    // Reporte a la nube (asíncrono, si falla se encola)
-    const payload = {
-      code: state.code, name: state.name, score: state.score,
-      coopCount: state.coopCount, history: state.history, state: 'finished'
-    };
-    reportFinal(state.session, payload).then((ok) => {
-      if (!ok) queueReport(state.session, payload);
-    });
-
-    $('btnCopyReport').onclick = () => {
-      navigator.clipboard.writeText(exportResult(state));
-      $('copyNotice').textContent = '¡Reporte copiado al portapapeles!';
-    };
-
-    $('btnDownloadCsv').onclick = () => {
-      const blob = new Blob([exportCsv(state)], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Protocolo_${state.session}_${state.code}.csv`;
-      a.click();
-    };
+  // Mostrar Pantalla Final
+  function showEndScreen(data) {
+    screens.game.classList.add('hidden');
+    screens.end.classList.remove('hidden');
+    document.getElementById('finalScore').textContent = state.score;
+    document.getElementById('finalPool').textContent = data.poolScore || 0;
+    if (unsubscribe) unsubscribe();
   }
+
+  // Manejo de Votos
+  async function submitVote(type) {
+    if (state.hasVoted || !state.session || !state.code) return;
+
+    btnCoop.disabled = true;
+    btnBet.disabled = true;
+    
+    try {
+      await GameDB.submitVote(state.session, state.code, type);
+      state.hasVoted = true;
+      log(`Voto enviado: ${type === 'coop' ? 'COOPERAR' : 'DESERTAR'}`);
+      updateView({ running: true, phase: 1 }); // Forzar refresh visual
+    } catch (e) {
+      console.error(e);
+      alert("Error al enviar voto: " + e.message);
+      btnCoop.disabled = false;
+      btnBet.disabled = false;
+    }
+  }
+
+  btnCoop.onclick = () => submitVote('coop');
+  btnBet.onclick = () => submitVote('bet');
+
 </script>
 </body>
 </html>
