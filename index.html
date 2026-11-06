@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EL PROTOCOLO — Mesa de Mandos con Avatares</title>
+<title>EL PROTOCOLO — Mesa eSports Cyberpunk Edition</title>
 <style>
-:root{--bg:#050508;--card:rgba(12,16,28,0.96);--accent:#00f2ff;--glow:rgba(0,242,255,0.3);--sec:#ff00ea;--danger:#ff3c5f;--text:#e8e8f0}
+:root{--bg:#050508;--card:rgba(12,16,28,0.96);--accent:#00f2ff;--glow:rgba(0,242,255,0.4);--sec:#ff00ea;--danger:#ff3c5f;--text:#e8e8f0}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Courier New',monospace;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 60%, #050508 100%);color:var(--text);overflow:hidden;width:100vw;height:100vh}
 #canvas3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
@@ -13,39 +13,40 @@ body{font-family:'Courier New',monospace;background:radial-gradient(circle at ce
 /* CAPA DE UI */
 #ui-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;justify-content:center;align-items:center}
 #ui-layer>*{pointer-events:auto}
-.screen{width:min(95vw, 520px);display:flex;flex-direction:column;animation:fadeUp .6s ease}
+.screen{width:min(95vw, 540px);display:flex;flex-direction:column;animation:fadeUp .6s ease}
 .hidden{display:none!important}
 @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
-/* PANELES */
-.panel{background:var(--card);border:2px solid rgba(0,242,255,0.25);border-radius:24px;padding:26px;backdrop-filter:blur(20px);box-shadow:0 0 80px rgba(0,242,255,0.12),0 20px 80px rgba(0,0,0,0.8)}
+/* PANELES ESTILO ESPORTS */
+.panel{background:var(--card);border:2px solid rgba(0,242,255,0.3);border-radius:24px;padding:24px;backdrop-filter:blur(20px);box-shadow:0 0 90px rgba(0,242,255,0.15),0 20px 80px rgba(0,0,0,0.8)}
 h1{text-align:center;font-size:26px;color:var(--accent);text-shadow:0 0 20px var(--glow);margin-bottom:4px;letter-spacing:4px}
 .sub{text-align:center;font-size:11px;color:#667;letter-spacing:3px;margin-bottom:18px}
 
-/* AVATAR DE LA MESA */
+/* AVATAR ESPORTS / GAMER CON ARO DE NEÓN */
 .avatar-box {
-    width: 80px; height: 80px; margin: 0 auto 12px;
-    border-radius: 50%; background: radial-gradient(circle, rgba(0,242,255,0.2) 0%, transparent 70%);
-    border: 2px solid var(--accent); display: flex; justify-content: center; align-items: center;
-    box-shadow: 0 0 20px var(--glow); transition: 0.3s;
+    width: 110px; height: 110px; margin: 0 auto 14px;
+    border-radius: 50%; background: #0a0b12;
+    border: 3px solid var(--accent); display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 0 30px var(--glow), inset 0 0 15px rgba(0,242,255,0.2);
+    position: relative; overflow: hidden;
 }
-.svg-avatar { width: 50px; height: 50px; fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
-.angry-avatar { stroke: var(--danger) !important; filter: drop-shadow(0 0 8px var(--danger)); }
-.happy-avatar { stroke: #00ff88 !important; filter: drop-shadow(0 0 8px #00ff88); }
+.avatar-box.angry { border-color: var(--danger); box-shadow: 0 0 30px rgba(255,60,95,0.5); }
+.avatar-box.happy { border-color: #00ff88; box-shadow: 0 0 30px rgba(0,255,136,0.5); }
+.svg-gamer { width: 100%; height: 100%; }
 
-/* CHAT GRANDE */
-#chat-container{height:150px;background:rgba(0,0,0,0.5);border-radius:16px;padding:14px;overflow-y:auto;margin-bottom:12px;border:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:8px}
+/* CHAT GRANDE Y LEGIBLE */
+#chat-container{height:150px;background:rgba(0,0,0,0.55);border-radius:16px;padding:14px;overflow-y:auto;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px}
 .chat-bubble{max-width:92%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;animation:fadeUp .3s ease}
-.bubble-ia{background:rgba(255,0,234,0.1);color:#f0d0ff;align-self:flex-start;border-left:4px solid var(--sec);border-bottom-left-radius:2px}
-.bubble-user{background:rgba(0,242,255,0.15);color:var(--accent);align-self:flex-end;border-bottom-right-radius:2px;font-weight:700}
-.bubble-sys{background:rgba(255,204,0,0.1);color:#ffcc00;align-self:center;text-align:center;font-size:11px;border:1px solid rgba(255,204,0,0.2)}
+.bubble-ia{background:rgba(255,0,234,0.12);color:#f0d0ff;align-self:flex-start;border-left:4px solid var(--sec);border-bottom-left-radius:2px}
+.bubble-user{background:rgba(0,242,255,0.18);color:var(--accent);align-self:flex-end;border-bottom-right-radius:2px;font-weight:700}
+.bubble-sys{background:rgba(255,204,0,0.12);color:#ffcc00;align-self:center;text-align:center;font-size:11px;border:1px solid rgba(255,204,0,0.25)}
 
 /* BOTONES */
 .grid-q{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;transition:.2s}
 .btn-neon{background:linear-gradient(135deg,var(--accent),#0066ff);color:#000;box-shadow:0 6px 25px var(--glow)}
 .btn-neon:hover{transform:translateY(-2px);box-shadow:0 10px 35px var(--glow)}
-.btn-dark{background:rgba(255,255,255,0.05);color:#ccc;border:1px solid rgba(255,255,255,0.1);font-size:11px;padding:10px}
+.btn-dark{background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.12);font-size:11px;padding:10px}
 .btn-dark:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,242,255,0.05)}
 
 /* VOTOS */
@@ -57,7 +58,7 @@ h1{text-align:center;font-size:26px;color:var(--accent);text-shadow:0 0 20px var
 .vc-betray:hover{border-color:var(--danger);background:rgba(255,60,95,0.15);box-shadow:0 0 30px rgba(255,60,95,0.4)}
 
 /* WAITING OVERLAY */
-.wait-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,8,0.9);z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;animation:fadeIn .5s ease}
+.wait-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,8,0.92);z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;animation:fadeIn .5s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .wait-title{font-size:22px;color:var(--accent);margin-bottom:15px;letter-spacing:3px}
 .wait-bar{width:280px;height:4px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden}
@@ -75,13 +76,13 @@ h1{text-align:center;font-size:26px;color:var(--accent);text-shadow:0 0 20px var
     <!-- WELCOME -->
     <div id="scr-welcome" class="screen">
         <div class="panel">
-            <div class="top-bar"><span class="badge">PROTOCOL // 3D</span></div>
+            <div class="top-bar"><span class="badge">PROTOCOL // ESPORTS</span></div>
             <h1>EL PROTOCOLO</h1>
             <p class="sub">MESA DE LOS MANDOS</p>
             <p style="text-align:center;font-size:12px;color:#889;line-height:1.6;margin-bottom:20px">
-                5 Mandos te esperan sentados en la mesa circular.<br>
-                Cada ronda la cámara enfoca a un personaje distinto.<br>
-                Alcanza <b style="color:var(--accent)">300 puntos</b> para sobrevivir.
+                5 Mandos cibernéticos te esperan en la mesa circular.<br>
+                Cada ronda enfoca a un rival con su propio estilo y patrón.<br>
+                Alcanza <b style="color:var(--accent)">300 puntos</b> para ser promovido.
             </p>
             <input id="p-name" placeholder="ID DE AGENTE..." style="width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.4);color:#fff;text-align:center;margin-bottom:14px;font-family:inherit;font-size:13px;outline:none;letter-spacing:2px">
             <button class="btn btn-neon" onclick="Game.init()">Sentarse a la Mesa</button>
@@ -98,14 +99,9 @@ h1{text-align:center;font-size:26px;color:var(--accent);text-shadow:0 0 20px var
             
             <p style="text-align:center;font-size:11px;color:var(--sec);font-weight:bold;letter-spacing:2px;margin-bottom:6px" id="ia-title">MANDO: AUDITOR_GRIS</p>
             
-            <!-- AVATAR HOLOGRÁFICO DEL MANDO -->
-            <div class="avatar-box" id="avatar-container">
-                <svg viewBox="0 0 100 100" class="svg-avatar" id="avatar-svg">
-                    <circle cx="50" cy="50" r="40" />
-                    <circle cx="35" cy="40" r="6" fill="currentColor" />
-                    <circle cx="65" cy="40" r="6" fill="currentColor" />
-                    <path d="M30 65 Q50 75 70 65" id="avatar-mouth" />
-                </svg>
+            <!-- AVATAR ILUSTRADO ESTILO ESPORTS (INCRUSTADO SVG) -->
+            <div class="avatar-box" id="avatar-box">
+                <div id="avatar-svg-container" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;"></div>
             </div>
 
             <div id="chat-container"></div>
@@ -151,7 +147,7 @@ h1{text-align:center;font-size:26px;color:var(--accent);text-shadow:0 0 20px var
 <script>
 // --- MOTOR 3D & CÁMARA ---
 const C3D = {
-    canvas: null, gl: null, time: 0, cam: {x:0, y:2, z:5, tx:0, ty:2, tz:5},
+    canvas: null, gl: null, time: 0,
     init() {
         this.canvas = document.getElementById('canvas3d');
         try {
@@ -161,7 +157,7 @@ const C3D = {
             window.onresize = () => this.resize();
             requestAnimationFrame(t => this.render(t));
         } catch(e) {
-            this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%)";
+            this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%);";
         }
     },
     resize() {
@@ -170,20 +166,60 @@ const C3D = {
         this.canvas.height = window.innerHeight * dpr;
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     },
-    lerp(a, b, n) { return (1 - n) * a + n * b; },
-    moveTo(idx) {
-        const angles = [0, 72, 144, 216, 288];
-        const rad = angles[idx] * Math.PI / 180;
-        this.cam.tx = Math.sin(rad) * 4;
-        this.cam.tz = Math.cos(rad) * 4;
-    },
     render(ts) {
         this.time = ts * 0.001;
-        this.cam.x = this.lerp(this.cam.x, this.cam.tx, 0.05);
-        this.cam.z = this.lerp(this.cam.z, this.cam.tz, 0.05);
-        const g = Math.sin(this.time * 0.3) * 12;
+        const g = Math.sin(this.time * 0.3) * 10;
         this.canvas.style.filter = `hue-rotate(${g}deg)`;
         requestAnimationFrame(t => this.render(t));
+    }
+};
+
+// --- GENERADOR DE AVATARES ESPORTS / CYBERPUNK (SVG ILUSTRADOS) ---
+const GamerAvatars = {
+    getSVG(index, mood) {
+        const primaryColors = ['#00f2ff', '#ff00ea', '#ffcc00', '#ff3c5f', '#a800ff'];
+        const col = primaryColors[index];
+        const eyeColor = mood === 'angry' ? '#ff3c5f' : (mood === 'happy' ? '#00ff88' : primaryColors[index]);
+
+        return `
+        <svg viewBox="0 0 100 100" class="svg-gamer">
+            <!-- Fondo interno -->
+            <circle cx="50" cy="50" r="48" fill="#0d111a" stroke="${col}" stroke-width="2"/>
+            
+            <!-- Casco Gamer / Auriculares -->
+            <path d="M22 55 C22 25, 78 25, 78 55" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round"/>
+            <rect x="15" y="45" width="12" height="28" rx="6" fill="${col}"/>
+            <rect x="73" y="45" width="12" height="28" rx="6" fill="${col}"/>
+            
+            <!-- Micrófono de diadema -->
+            <path d="M79 65 Q85 85 65 82" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="63" cy="81" r="3" fill="${eyeColor}"/>
+
+            <!-- Rostro / Pelo estilizado anime -->
+            <path d="M35 38 Q50 28 65 38 Q72 52 68 75 Q50 82 32 75 Q28 52 35 38 Z" fill="#1e2530"/>
+            <path d="M32 40 Q45 30 55 35 Q68 32 65 45 Q50 38 32 40 Z" fill="${col}" opacity="0.8"/>
+
+            <!-- Ojos Gamer Cyberpunk -->
+            <circle cx="42" cy="52" r="5" fill="${eyeColor}"/>
+            <circle cx="58" cy="52" r="5" fill="${eyeColor}"/>
+            <circle cx="43" cy="51" r="2" fill="#fff"/>
+            <circle cx="59" cy="51" r="2" fill="#fff"/>
+
+            <!-- Cejas / Expresión -->
+            ${mood === 'angry' ? 
+                `<path d="M37 46 L47 50 M63 46 L53 50" stroke="${eyeColor}" stroke-width="3"/>` : 
+                (mood === 'happy' ? `<path d="M38 45 Q42 43 46 46 M62 45 Q58 43 54 46" stroke="${eyeColor}" stroke-width="2"/>` : 
+                `<line x1="38" y1="47" x2="46" y2="47" stroke="${eyeColor}" stroke-width="2"/><line x1="54" y1="47" x2="62" y2="47" stroke="${eyeColor}" stroke-width="2"/>`)
+            }
+
+            <!-- Boca / Sonrisa -->
+            ${mood === 'happy' ? 
+                `<path d="M42 68 Q50 76 58 68" fill="none" stroke="${eyeColor}" stroke-width="3" stroke-linecap="round"/>` :
+              (mood === 'angry' ? 
+                `<path d="M42 70 Q50 64 58 70" fill="none" stroke="${eyeColor}" stroke-width="3" stroke-linecap="round"/>` :
+                `<line x1="44" y1="68" x2="56" y2="68" stroke="#889" stroke-width="3" stroke-linecap="round"/>`)
+            }
+        </svg>`;
     }
 };
 
@@ -209,31 +245,22 @@ const Game = {
         this.startRound();
     },
     startRound() {
-        const ia = IAS[this.st.round-1];
+        const idx = this.st.round - 1;
+        const ia = IAS[idx];
         document.getElementById('st-r').textContent = this.st.round;
         document.getElementById('ia-title').textContent = `MANDO ${this.st.round}/5: ${ia.id}`;
         document.getElementById('chat-container').innerHTML = '';
         document.getElementById('nego-layer').classList.remove('hidden');
         document.getElementById('vote-layer').classList.add('hidden');
         
-        // Reset avatar to neutral
-        this.setAvatarMood('neutral');
-        C3D.moveTo(this.st.round-1);
+        // Renderizar avatar gamer correspondiente a este Mando
+        this.renderAvatar(idx, 'neutral');
         this.addMsg(ia.id, ia.intro, 'ia');
     },
-    setAvatarMood(mood) {
-        const svg = document.getElementById('avatar-svg');
-        const mouth = document.getElementById('avatar-mouth');
-        svg.classList.remove('angry-avatar', 'happy-avatar');
-        if(mood === 'angry') {
-            svg.classList.add('angry-avatar');
-            mouth.setAttribute('d', 'M30 72 Q50 58 70 72'); // Boca triste/enojada
-        } else if(mood === 'happy') {
-            svg.classList.add('happy-avatar');
-            mouth.setAttribute('d', 'M30 60 Q50 78 70 60'); // Sonrisa
-        } else {
-            mouth.setAttribute('d', 'M30 65 Q50 65 70 65'); // Neutral recta
-        }
+    renderAvatar(idx, mood) {
+        const box = document.getElementById('avatar-box');
+        box.className = 'avatar-box ' + mood;
+        document.getElementById('avatar-svg-container').innerHTML = GamerAvatars.getSVG(idx, mood);
     },
     addMsg(w, m, t) {
         const c = document.getElementById('chat-container');
@@ -251,14 +278,15 @@ const Game = {
         document.getElementById('vote-layer').classList.remove('hidden');
     },
     vote(v) {
-        const ia = IAS[this.st.round-1];
+        const idx = this.st.round - 1;
+        const ia = IAS[idx];
         const iaV = ia.logic(this.st.hist);
         let pts = 0;
         
-        if(v==='coop' && iaV==='coop') { pts = 60; this.setAvatarMood('happy'); }
-        else if(v==='betray' && iaV==='coop') { pts = 75; this.setAvatarMood('angry'); }
-        else if(v==='coop' && iaV==='betray') { pts = 0; this.setAvatarMood('angry'); }
-        else { pts = 15; this.setAvatarMood('angry'); }
+        if(v==='coop' && iaV==='coop') { pts = 60; this.renderAvatar(idx, 'happy'); }
+        else if(v==='betray' && iaV==='coop') { pts = 75; this.renderAvatar(idx, 'angry'); }
+        else if(v==='coop' && iaV==='betray') { pts = 0; this.renderAvatar(idx, 'angry'); }
+        else { pts = 15; this.renderAvatar(idx, 'angry'); }
         
         this.st.score += pts;
         this.st.hist.push(v);
@@ -272,7 +300,7 @@ const Game = {
     },
     showWait(cb) {
         const w = document.createElement('div'); w.className = 'wait-overlay';
-        w.innerHTML = `<div class="wait-title">ROTANDO CÁMARA...</div><div class="wait-bar"><div class="wait-fill" id="wf"></div></div>`;
+        w.innerHTML = `<div class="wait-title">ROTANDO CÁMARA A SIGUIENTE RIVAL...</div><div class="wait-bar"><div class="wait-fill" id="wf"></div></div>`;
         document.body.appendChild(w);
         const f = document.getElementById('wf');
         setTimeout(() => f.style.width = '100%', 50);
