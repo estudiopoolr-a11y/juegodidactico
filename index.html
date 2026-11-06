@@ -136,6 +136,12 @@ const C3D={
   init(){
     this.canvas=document.getElementById('canvas3d');
     try {
+        // Detect file protocol - WebGL is blocked on file://
+        if (window.location.protocol === 'file:') {
+            console.warn("WebGL deshabilitado en file://, usando fondo CSS");
+            this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%)";
+            return;
+        }
         this.gl=this.canvas.getContext('webgl',{antialias:true,alpha:true});
         if(!this.gl)throw new Error("No WebGL");
         this.resize();
@@ -151,6 +157,7 @@ const C3D={
         requestAnimationFrame(t=>this.render(t));
     } catch(e) {
         console.error("3D Falla, pero el juego sigue:", e);
+        this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%)";
     }
   },
   cs(s,t){const g=this.gl,sh=g.createShader(t);g.shaderSource(sh,s);g.compileShader(sh);if(!g.getShaderParameter(sh,g.COMPILE_STATUS))console.error(g.getShaderInfoLog(sh));return sh;},
