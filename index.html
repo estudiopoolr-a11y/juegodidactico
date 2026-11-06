@@ -3,413 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EL PROTOCOLO — Mesa de Personajes 3D</title>
+<title>EL PROTOCOLO — Mesa 3D Inmersiva</title>
 <style>
-:root{--bg:#050508;--card:rgba(12,16,28,0.93);--accent:#00f2ff;--glow:rgba(0,242,255,0.25);--sec:#ff00ea;--danger:#ff3c5f;--text:#e8e8f0}
+:root{--bg:#050508;--panel:rgba(10,15,30,0.9);--accent:#00f2ff;--sec:#ff00ea}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Courier New',monospace;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 60%, #050508 100%);color:var(--text);overflow:hidden;width:100vw;height:100vh}
-#canvas3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 100%);pointer-events:none}
-#ui-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;justify-content:center;align-items:center;padding:0}
-#ui-layer>*{pointer-events:auto}
-.screen{width:min(94vw,460px);display:flex;flex-direction:column;animation:fadeUp .6s ease}
-.hidden{display:none!important}
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-.panel{background:var(--card);border:1px solid rgba(0,242,255,0.15);border-radius:20px;padding:24px 22px;backdrop-filter:blur(18px);box-shadow:0 0 60px rgba(0,242,255,0.08),0 20px 80px rgba(0,0,0,0.7)}
-h1{text-align:center;font-size:22px;color:var(--accent);text-shadow:0 0 20px var(--glow);margin-bottom:4px;letter-spacing:3px}
-.sub{text-align:center;font-size:10px;color:#667;letter-spacing:2px;margin-bottom:14px}
-.badge{display:inline-block;background:rgba(0,242,255,0.08);border:1px solid rgba(0,242,255,0.2);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:bold;color:var(--accent);letter-spacing:1px}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-input#p-name{width:100%;padding:14px;border-radius:12px;border:2px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.5);color:#fff;text-align:center;font-family:inherit;font-size:13px;outline:none;margin-bottom:14px;letter-spacing:2px}
-input#p-name:focus{border-color:var(--accent);box-shadow:0 0 20px var(--glow)}
-.btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;transition:.2s}
-.btn-neon{background:linear-gradient(135deg,var(--accent),#0066ff);color:#000;box-shadow:0 6px 25px var(--glow)}
-.btn-neon:hover{transform:translateY(-2px);box-shadow:0 10px 35px var(--glow)}
-.btn-dark{background:rgba(255,255,255,0.04);color:#ccc;border:1px solid rgba(255,255,255,0.08);font-size:10px;padding:10px}
-.btn-dark:hover{border-color:var(--accent);color:var(--accent)}
-.audio-btn{background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;padding:4px 8px;border-radius:10px;font-size:9px;cursor:pointer;font-family:inherit}
-/* Chat */
-#chat-window{height:100px;background:rgba(0,0,0,0.4);border-radius:14px;padding:10px;overflow-y:auto;margin-bottom:8px;border:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:5px}
-.chat-bubble{max-width:88%;padding:8px 12px;border-radius:12px;font-size:10px;line-height:1.35;animation:fadeUp .3s ease}
-.bubble-ia{background:rgba(255,0,234,0.08);color:#ddd;align-self:flex-start;border-left:3px solid var(--sec);border-bottom-left-radius:2px}
-.bubble-user{background:rgba(0,242,255,0.12);color:var(--accent);align-self:flex-end;border-bottom-right-radius:2px;font-weight:600}
-.bubble-sys{background:rgba(255,204,0,0.08);color:#ffcc00;align-self:center;text-align:center;border:1px solid rgba(255,204,0,0.2);font-size:9px}
-/* Tutorial cloud */
-.tut-cloud{background:linear-gradient(135deg,rgba(255,0,234,0.18),rgba(128,0,255,0.18));color:#fff;padding:7px 11px;border-radius:12px;font-size:10px;line-height:1.35;margin-bottom:8px;border:1px solid rgba(255,0,234,0.22);animation:floatCloud 3s ease-in-out infinite}
-@keyframes floatCloud{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-/* Grids */
-.grid-q{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
-.grid-v{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.vc{padding:16px 10px;border-radius:16px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,0.06);transition:.25s}
-.vc-coop{background:rgba(0,242,255,0.06);color:var(--accent)}
-.vc-coop:hover{border-color:var(--accent);background:rgba(0,242,255,0.15);box-shadow:0 0 30px var(--glow)}
-.vc-betray{background:rgba(255,60,95,0.06);color:var(--danger)}
-.vc-betray:hover{border-color:var(--danger);background:rgba(255,60,95,0.15);box-shadow:0 0 30px rgba(255,60,95,0.3)}
-.vl{font-weight:800;font-size:12px;letter-spacing:1px}
-.vd{font-size:9px;opacity:.7;margin-top:3px}
-/* IA label */
-.ia-label{text-align:center;font-size:11px;color:var(--sec);letter-spacing:2px;margin-bottom:6px;font-weight:bold}
-/* Wait overlay */
-.wait-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,8,0.85);z-index:20;display:flex;flex-direction:column;justify-content:center;align-items:center;animation:fadeIn .8s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.wait-title{font-size:18px;color:var(--accent);text-shadow:0 0 20px var(--glow);margin-bottom:10px;letter-spacing:2px}
-.wait-text{font-size:12px;color:#889;max-width:350px;text-align:center;line-height:1.6;margin-bottom:15px}
-.wait-bar{width:300px;height:4px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden}
-.wait-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--sec));border-radius:4px;width:0%;transition:width linear}
-.wait-hint{font-size:9px;color:#445;margin-top:8px}
-/* Result */
-.score-big{text-align:center;font-size:32px;font-weight:900;color:var(--accent);text-shadow:0 0 30px var(--glow);margin:8px 0}
-.result-row{display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.05)}
-.rg{color:#00ff88}.rr{color:var(--danger)}
-/* Skip button */
-.skip-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#aaa;padding:6px 14px;border-radius:10px;font-size:10px;cursor:pointer;font-family:inherit;z-index:25}
-.skip-btn:hover{border-color:var(--accent);color:var(--accent)}
+body{font-family:'Courier New',monospace;background:#050508;color:#fff;overflow:hidden;width:100vw;height:100vh}
+#canvas3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+
+/* Chat inferior envolvente */
+#chat-bar{
+    position:fixed;bottom:0;left:0;width:100%;height:30vh;
+    background:var(--panel);border-top:2px solid var(--accent);
+    padding:20px;z-index:10;display:flex;flex-direction:column;gap:10px;
+}
+#chat-window{flex:1;overflow-y:auto;font-size:16px;line-height:1.6;color:#ccc}
+.bubble-ia{color:var(--accent);margin-bottom:10px}
+.bubble-user{color:#fff;text-align:right;margin-bottom:10px}
+.bubble-sys{color:#ffcc00;font-style:italic;margin-bottom:10px}
+
+/* Controles */
+#controls{display:flex;gap:10px;padding-top:10px}
+.btn{padding:12px;background:#1a1a2e;color:#fff;border:1px solid var(--accent);cursor:pointer;flex:1;font-family:inherit;font-size:14px}
+.btn-main{background:var(--accent);color:#000;font-weight:bold}
 </style>
 </head>
 <body>
 <canvas id="canvas3d"></canvas>
-<div id="ui-layer">
-<!-- WELCOME -->
-<div id="scr-welcome" class="screen">
-<div class="panel">
-<div class="top-bar"><span class="badge">PROTOCOL // 3D</span><button class="audio-btn" onclick="Audio.toggle()">🎵 <span id="aud-st">OFF</span></button></div>
-<h1>EL PROTOCOLO</h1>
-<p class="sub">MESA DE PERSONAJES</p>
-<p style="text-align:center;font-size:11px;color:#889;line-height:1.6;margin-bottom:14px">
-5 Mandos te esperan alrededor de la mesa.<br>
-Alcanza <b style="color:var(--accent)">300 puntos</b> para sobrevivir.<br>
-Escucha sus monólogos. Interroga antes de votar.
-</p>
-<input id="p-name" placeholder="TU ID DE AGENTE...">
-<button class="btn btn-neon" onclick="Game.init()">Sentarse en la Mesa</button>
+<div id="chat-bar">
+    <div id="chat-window"></div>
+    <div id="controls">
+        <button class="btn" onclick="Game.ask('Beneficio')">¿Qué gano?</button>
+        <button class="btn" onclick="Game.ask('Confianza')">¿Por qué confiar?</button>
+        <button class="btn" onclick="Game.ask('Truco')">¿Cuál es la trampa?</button>
+        <button class="btn btn-main" onclick="Game.toVote()">VOTAR</button>
+    </div>
 </div>
-</div>
-<!-- GAMEPLAY -->
-<div id="scr-play" class="screen hidden">
-<div class="panel">
-<div class="top-bar"><span class="badge">RONDA <span id="st-r">1</span>/5</span><span class="badge" style="color:var(--accent)">SCORE: <span id="st-s">0</span></span><button class="audio-btn" onclick="Audio.toggle()">🎵 <span id="aud-st2">OFF</span></button></div>
-<p class="ia-label" id="ia-title">◇ CUBO — AUDITOR_GRIS</p>
-<div id="chat-window"></div>
-<div id="action-layer">
-<div class="tut-cloud hidden" id="cloud-guide">💬 <b>Nube:</b> Escucha el monólogo del Mando. Usa las 4 preguntas para descubrir su patrón oculto.</div>
-<div id="nego-layer">
-<p style="font-size:9px;color:#556;text-align:center;margin-bottom:5px;letter-spacing:1px">► INTERROGAR AL MANDO:</p>
-<div class="grid-q">
-<button class="btn btn-dark" onclick="Game.ask('Beneficio')">¿Qué gano cooperando?</button>
-<button class="btn btn-dark" onclick="Game.ask('Confianza')">¿Por qué fiarme de ti?</button>
-<button class="btn btn-dark" onclick="Game.ask('Truco')">¿Cuál es la trampa?</button>
-<button class="btn btn-dark" onclick="Game.ask('Traicion')">¿Y si te traiciono?</button>
-</div>
-<button class="btn btn-neon" onclick="Game.toVote()" style="font-size:11px;padding:10px">Proceder a la Decisión →</button>
-</div>
-<div id="vote-layer" class="hidden">
-<div class="grid-v">
-<div class="vc vc-coop" onclick="Game.vote('coop')"><div class="vl">COOPERAR</div><div class="vd">Fuerza colectiva</div></div>
-<div class="vc vc-betray" onclick="Game.vote('betray')"><div class="vl">DESERTAR</div><div class="vd">Interés individual</div></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- RESULT -->
-<div id="scr-result" class="screen hidden">
-<div class="panel">
-<h1 id="result-title">EVALUACIÓN</h1>
-<p class="sub">PROTOCOLO FINALIZADO</p>
-<div class="score-big" id="final-score">0</div>
-<div id="result-detail"></div>
-<p style="text-align:center;margin-top:14px;font-size:12px;font-weight:bold" id="result-verdict"></p>
-<button class="btn btn-neon" style="margin-top:14px" onclick="location.reload()">Reiniciar Protocolo</button>
-</div>
-</div>
-</div>
-
 <script>
 /* ===========================================================
-   WebGL 3D ENGINE — Mesa con 5 personajes Low-Poly
-   Diagnóstico rápido: WebGL se inicializa con try/catch para evitar pantalla negra
+   MOTOR DE CÁMARA (Lerp suave)
    =========================================================== */
-const C3D={
-  canvas:null,gl:null,time:0,camAngle:0,shapes:[],particles:null,particleCount:0,
-  particleProg:null,particleBuf:null,gridProg:null,gridBuf:null,gridCount:0,
-  tableBuf:null,tableCount:0,prog:null,activeShape:-1,highlightTime:0,
+const C3D = {
+    canvas: null, gl: null,
+    cam: {x:0, y:2, z:5, tx:0, ty:2, tz:5},
+    
+    // Función de interpolación lineal para movimiento suave
+    lerp(a, b, n) { return (1 - n) * a + n * b; },
 
-  init(){
-    this.canvas=document.getElementById('canvas3d');
-    try {
-        // Detect file protocol - WebGL is blocked on file://
-        if (window.location.protocol === 'file:') {
-            console.warn("WebGL deshabilitado en file://, usando fondo CSS");
-            this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%)";
-            return;
-        }
-        this.gl=this.canvas.getContext('webgl',{antialias:true,alpha:true});
-        if(!this.gl)throw new Error("No WebGL");
-        this.resize();
-        window.addEventListener('resize',()=>this.resize());
-        const gl=this.gl;
-        const vs=`attribute vec3 aP;attribute vec3 aN;uniform mat4 uMVP;uniform mat4 uModel;varying vec3 vN;varying vec3 vWP;void main(){vec4 wp=uModel*vec4(aP,1.0);vWP=wp.xyz;vN=mat3(uModel)*aN;gl_Position=uMVP*vec4(aP,1.0);}`;
-        const fs=`precision mediump float;varying vec3 vN;varying vec3 vWP;uniform vec3 uCol;uniform float uGlow;void main(){vec3 N=normalize(vN);vec3 L=normalize(vec3(0.5,1.0,0.8));float d=max(dot(N,L),0.0);float r=1.0-max(dot(N,vec3(0,0,1)),0.0);r=pow(r,3.0);vec3 c=uCol*(0.15+d*0.6)+uCol*r*uGlow;c+=vec3(0.02,0.02,0.04);gl_FragColor=vec4(c,0.95);}`;
-        this.prog=this.cmp(vs,fs);
-        this.buildTable();
-        this.buildShapes();
-        this.buildParticles();
-        this.buildGrid();
-        requestAnimationFrame(t=>this.render(t));
-    } catch(e) {
-        console.error("3D Falla, pero el juego sigue:", e);
-        this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%)";
+    updateCam() {
+        this.cam.x = this.lerp(this.cam.x, this.cam.tx, 0.05);
+        this.cam.y = this.lerp(this.cam.y, this.cam.ty, 0.05);
+        this.cam.z = this.lerp(this.cam.z, this.cam.tz, 0.05);
+    },
+
+    moveTo(idx) {
+        const angles = [0, 72, 144, 216, 288];
+        const rad = angles[idx] * Math.PI / 180;
+        this.cam.tx = Math.sin(rad) * 4;
+        this.cam.ty = 2;
+        this.cam.tz = Math.cos(rad) * 4;
+        console.log("Cámara enfocando al Mando:", idx);
     }
-  },
-  cs(s,t){const g=this.gl,sh=g.createShader(t);g.shaderSource(sh,s);g.compileShader(sh);if(!g.getShaderParameter(sh,g.COMPILE_STATUS))console.error(g.getShaderInfoLog(sh));return sh;},
-  cmp(vs,fs){const g=this.gl,p=g.createProgram();g.attachShader(p,this.cs(vs,g.VERTEX_SHADER));g.attachShader(p,this.cs(fs,g.FRAGMENT_SHADER));g.linkProgram(p);g.useProgram(p);return p;},
-  resize(){const c=this.canvas,d=window.devicePixelRatio||1;c.width=window.innerWidth*d;c.height=window.innerHeight*d;c.style.width=window.innerWidth+'px';c.style.height=window.innerHeight+'px';this.gl.viewport(0,0,c.width,c.height);},
-  m4p(f,a,n,r){const f1=1/Math.tan(f/2),nr=1/(n-r);return new Float32Array([f1/a,0,0,0,0,f1,0,0,0,0,(r+n)*nr,-1,0,0,2*r*n*nr,0]);},
-  m4l(e,c,u){const zx=e[0]-c[0],zy=e[1]-c[1],zz=e[2]-c[2];let l=Math.sqrt(zx*zx+zy*zy+zz*zz);const zz2=zz/l,zy2=zy/l,zx2=zx/l;const xx=u[1]*zz2-u[2]*zy2,xy=u[2]*zx2-u[0]*zz2,xz=u[0]*zy2-u[1]*zx2;l=Math.sqrt(xx*xx+xy*xy+xz*xz);const xx2=xx/l,xy2=xy/l,xz2=xz/l;const yx=zy2*xz2-zx2*xy2,yy=zx2*xx2-xx2*zz2,yz=xx2*xy2-zy2*xz2;return new Float32Array([xx2,yx,zx2,0,xy2,yy,zy2,0,xz2,yz,zz2,0,-(xx2*e[0]+xy2*e[1]+xz2*e[2]),-(yx*e[0]+yy*e[1]+yz*e[2]),-(zx2*e[0]+zy2*e[1]+zz2*e[2]),1]);},
-  m4m(a,b){const o=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){o[j*4+i]=a[i]*b[j*4]+a[4+i]*b[j*4+1]+a[8+i]*b[j*4+2]+a[12+i]*b[j*4+3];}return o;},
-  m4i(){return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);},
-  m4t(x,y,z){return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,x,y,z,1]);},
-  m4s(s){return new Float32Array([s,0,0,0,0,s,0,0,0,0,s,0,0,0,0,1]);},
-  m4ry(a){const c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,0,s,0,0,1,0,0,-s,0,c,0,0,0,0,1]);},
-  m4rx(a){const c=Math.cos(a),s=Math.sin(a);return new Float32Array([1,0,0,0,0,c,-s,0,0,s,c,0,0,0,0,1]);},
-  buildBox(sz){const s=sz/2,faces=[[0,0,1],[0,0,-1],[1,0,0],[-1,0,0],[0,1,0],[0,-1,0]];let pos=[],norm=[];faces.forEach(n=>{const nx=n[0],ny=n[1],nz=n[2];const h=[[-s,-s,s],[s,-s,s],[s,s,s],[-s,s,s]];[[0,1,2],[0,2,3]].forEach(tri=>{tri.forEach(i=>{pos.push(...h[i]);norm.push(nx,ny,nz);});});});return{pos:new Float32Array(pos),norm:new Float32Array(norm),count:pos.length/3};},
-  buildIco(r){const t=(1+Math.sqrt(5))/2,v=[[-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],[0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],[t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]],f=[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];v=v.map(p=>{const l=Math.sqrt(p[0]**2+p[1]**2+p[2]**2);return p.map(c=>c/l*r);});let pos=[],norm=[];f.forEach(fi=>{const a=v[fi[0]],b=v[fi[1]],c=v[fi[2]];const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e2=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];let nx=e1[1]*e2[2]-e1[2]*e2[1],ny=e1[2]*e2[0]-e1[0]*e2[2],nz=e1[0]*e2[1]-e1[1]*e2[0];const nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=nl;ny/=nl;nz/=nl;[a,b,c].forEach(p=>{pos.push(p[0],p[1],p[2]);norm.push(nx,ny,nz);});});return{pos:new Float32Array(pos),norm:new Float32Array(norm),count:pos.length/3};},
-  buildOcta(r){const v=[[0,r,0],[0,-r,0],[r,0,0],[-r,0,0],[0,0,r],[0,0,-r]],f=[[0,2,4],[0,4,3],[0,3,5],[0,5,2],[1,4,2],[1,3,4],[1,5,3],[1,2,5]];let pos=[],norm=[];f.forEach(fi=>{const a=v[fi[0]],b=v[fi[1]],c=v[fi[2]];const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e2=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];let nx=e1[1]*e2[2]-e1[2]*e2[1],ny=e1[2]*e2[0]-e1[0]*e2[2],nz=e1[0]*e2[1]-e1[1]*e2[0];const nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=nl;ny/=nl;nz/=nl;[a,b,c].forEach(p=>{pos.push(p[0],p[1],p[2]);norm.push(nx,ny,nz);});});return{pos:new Float32Array(pos),norm:new Float32Array(norm),count:pos.length/3};},
-  buildTorus(R,r,seg,rings){let pos=[],norm=[];for(let i=0;i<rings;i++)for(let j=0;j<seg;j++){const a1=i/rings*Math.PI*2,a2=j/seg*Math.PI*2,a1n=(i+1)/rings*Math.PI*2,a2n=(j+1)/seg*Math.PI*2;const p0=[(R+r*Math.cos(a2))*Math.cos(a1),(R+r*Math.cos(a2))*Math.sin(a1),r*Math.sin(a2)];const fn=[Math.cos(a2)*Math.cos(a1),Math.cos(a2)*Math.sin(a1),Math.sin(a2)];const p1=[(R+r*Math.cos(a2))*Math.cos(a1n),(R+r*Math.cos(a2))*Math.sin(a1n),r*Math.sin(a2)];const p2=[(R+r*Math.cos(a2n))*Math.cos(a1n),(R+r*Math.cos(a2n))*Math.sin(a1n),r*Math.sin(a2n)];const p3=[(R+r*Math.cos(a2n))*Math.cos(a1),(R+r*Math.cos(a2n))*Math.sin(a1),r*Math.sin(a2n)];[[p0,p1,p2],[p0,p2,p3]].forEach(tri=>{tri.forEach(p=>{pos.push(p[0],p[1],p[2]);norm.push(fn[0],fn[1],fn[2]);});});}return{pos:new Float32Array(pos),norm:new Float32Array(norm),count:pos.length/3};},
-  mkBuf(g){const b=this.gl,p=b.createBuffer();b.bindBuffer(b.ARRAY_BUFFER,p);b.bufferData(b.ARRAY_BUFFER,g.pos,b.STATIC_DRAW);const n=b.createBuffer();b.bindBuffer(b.ARRAY_BUFFER,n);b.bufferData(b.ARRAY_BUFFER,g.norm,b.STATIC_DRAW);return{pb:p,nb:n,count:g.count};},
-  buildTable(){const g=this.buildTorus(2.2,0.05,16,48);this.tableBuf=this.mkBuf(g);this.tableCount=g.count;},
-  buildShapes(){
-    const geos=[
-      {g:this.buildBox(.65),col:[0,.95,1],ph:0,geo:'CUBO'},
-      {g:this.buildIco(.55),col:[1,0,.92],ph:Math.PI*2/5,geo:'ICOSAEDRO'},
-      {g:this.buildOcta(.6),col:[1,.8,0],ph:Math.PI*4/5,geo:'OCTAEDRO'},
-      {g:this.buildBox(.55),col:[1,.24,.37],ph:Math.PI*6/5,geo:'RUBY'},
-      {g:this.buildIco(.5),col:[.66,0,1],ph:Math.PI*8/5,geo:'AMETHYST'}
-    ];
-    this.shapes=geos.map((it,i)=>({buf:this.mkBuf(it.g),col:it.col,ph:it.ph,glow:.5,hl:0,geo:it.geo}));
-  },
-  buildParticles(){
-    const g=this.gl,cnt=250,pos=[];
-    for(let i=0;i<cnt;i++)pos.push((Math.random()-.5)*14,Math.random()*6-1,(Math.random()-.5)*14);
-    this.particleCount=cnt;this.particlePos=new Float32Array(pos);
-    const vs=`attribute vec3 aP;uniform mat4 uV;uniform float uT;varying float vA;void main(){vec3 p=aP;p.y+=sin(uT*.5+aP.x*2.)*.3;gl_Position=uV*vec4(p,1.);gl_PointSize=2.+sin(uT+aP.z*3.)*1.;vA=.3+sin(uT*.7+aP.y)*.2;}`;
-    const fs=`precision mediump float;varying float vA;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;gl_FragColor=vec4(0.,.95,1.,(1.-d)*vA*.4);}`;
-    const vs2=g.createShader(g.VERTEX_SHADER);g.shaderSource(vs2,vs);g.compileShader(vs2);
-    const fs2=g.createShader(g.FRAGMENT_SHADER);g.shaderSource(fs2,fs);g.compileShader(fs2);
-    this.particleProg=g.createProgram();g.attachShader(this.particleProg,vs2);g.attachShader(this.particleProg,fs2);g.linkProgram(this.particleProg);
-    this.particleBuf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,this.particleBuf);g.bufferData(g.ARRAY_BUFFER,this.particlePos,g.STATIC_DRAW);
-  },
-  buildGrid(){
-    const g=this.gl,lines=[];
-    for(let i=-8;i<=8;i++){lines.push(i,0,-8,i,0,8);lines.push(-8,0,i,8,0,i);}
-    this.gridCount=lines.length/3;this.gridPos=new Float32Array(lines);
-    const vs=`attribute vec3 aP;uniform mat4 uV;void main(){gl_Position=uV*vec4(aP,1.);}`;
-    const fs=`precision mediump float;void main(){gl_FragColor=vec4(0.,.3,.4,.12);}`;
-    const vs2=g.createShader(g.VERTEX_SHADER);g.shaderSource(vs2,vs);g.compileShader(vs2);
-    const fs2=g.createShader(g.FRAGMENT_SHADER);g.shaderSource(fs2,fs);g.compileShader(fs2);
-    this.gridProg=g.createProgram();g.attachShader(this.gridProg,vs2);g.attachShader(this.gridProg,fs2);g.linkProgram(this.gridProg);
-    this.gridBuf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,this.gridBuf);g.bufferData(g.ARRAY_BUFFER,this.gridPos,g.STATIC_DRAW);
-  },
-  setActive(idx){this.activeShape=idx;this.highlightTime=0;this.shapes.forEach((s,i)=>{s.hl=i===idx?1:0;s.glow=i===idx?1.2:.4;});},
-  render(ts){
-    const g=this.gl;this.time=ts*.001;g.clearColor(.02,.02,.03,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA);
-    const asp=this.canvas.width/this.canvas.height;
-    const proj=this.m4p(60*Math.PI/180,asp,.1,100);
-    const view=this.m4l([0,3.5,5.5],[0,0,0],[0,1,0]);
-    const vp=this.m4m(proj,view);
-    // Grid
-    g.useProgram(this.gridProg);g.uniformMatrix4fv(g.getUniformLocation(this.gridProg,'uV'),false,vp);
-    const ag=g.getAttribLocation(this.gridProg,'aP');g.bindBuffer(g.ARRAY_BUFFER,this.gridBuf);g.enableVertexAttribArray(ag);g.vertexAttribPointer(ag,3,g.FLOAT,false,0,0);g.drawArrays(g.LINES,0,this.gridCount);g.disableVertexAttribArray(ag);
-    // Particles
-    g.useProgram(this.particleProg);g.uniformMatrix4fv(g.getUniformLocation(this.particleProg,'uV'),false,vp);g.uniform1f(g.getUniformLocation(this.particleProg,'uT'),this.time);
-    const ap=g.getAttribLocation(this.particleProg,'aP');g.bindBuffer(g.ARRAY_BUFFER,this.particleBuf);g.enableVertexAttribArray(ap);g.vertexAttribPointer(ap,3,g.FLOAT,false,0,0);g.depthMask(false);g.drawArrays(g.POINTS,0,this.particleCount);g.depthMask(true);g.disableVertexAttribArray(ap);
-    // Shapes
-    g.useProgram(this.prog);
-    const uMVP=g.getUniformLocation(this.prog,'uMVP'),uModel=g.getUniformLocation(this.prog,'uModel'),uCol=g.getUniformLocation(this.prog,'uCol'),uGlow=g.getUniformLocation(this.prog,'uGlow');
-    const aP=g.getAttribLocation(this.prog,'aP'),aN=g.getAttribLocation(this.prog,'aN');
-    // Table
-    let model=this.m4t(0,-.3,0);g.uniformMatrix4fv(uMVP,false,this.m4m(vp,model));g.uniformMatrix4fv(uModel,false,model);g.uniform3f(uCol,0,.5,.6);g.uniform1f(uGlow,.4);
-    const tb=this.tableBuf;g.bindBuffer(g.ARRAY_BUFFER,tb.pb);g.enableVertexAttribArray(aP);g.vertexAttribPointer(aP,3,g.FLOAT,false,0,0);g.bindBuffer(g.ARRAY_BUFFER,tb.nb);g.enableVertexAttribArray(aN);g.vertexAttribPointer(aN,3,g.FLOAT,false,0,0);g.drawArrays(g.TRIANGLES,0,this.tableCount);
-    // Orbiting shapes
-    const R=2.2;
-    this.shapes.forEach((s,i)=>{
-      const angle=s.ph+this.time*.2;
-      const x=Math.cos(angle)*R,z=Math.sin(angle)*R;
-      const yOff=Math.sin(this.time*.8+i*1.2)*.15;
-      const rotY=this.time*(.6+i*.15),rotX=this.time*.3;
-      let m=this.m4i();m=this.m4m(m,this.m4ry(rotY));m=this.m4m(m,this.m4rx(rotX));
-      const sc=1+s.hl*.3*Math.sin(this.time*4);m=this.m4m(m,this.m4s(sc));m=this.m4m(m,this.m4t(x,1+yOff,z));
-      g.uniformMatrix4fv(uMVP,false,this.m4m(vp,m));g.uniformMatrix4fv(uModel,false,m);
-      const c=s.col;g.uniform3f(uCol,c[0]+s.hl*.3,c[1]+s.hl*.3,c[2]+s.hl*.3);g.uniform1f(uGlow,s.glow);
-      const b=s.buf;g.bindBuffer(g.ARRAY_BUFFER,b.pb);g.enableVertexAttribArray(aP);g.vertexAttribPointer(aP,3,g.FLOAT,false,0,0);g.bindBuffer(g.ARRAY_BUFFER,b.nb);g.enableVertexAttribArray(aN);g.vertexAttribPointer(aN,3,g.FLOAT,false,0,0);g.drawArrays(g.TRIANGLES,0,b.count);
-    });
-    requestAnimationFrame(t=>this.render(t));
-  }
 };
 
-/* ===========================================================
-   AUDIO
-   =========================================================== */
-const Audio={ctx:null,osc:null,osc2:null,gain:null,gain2:null,playing:false,
-  init(){if(this.ctx)return;const AC=window.AudioContext||window.webkitAudioContext;this.ctx=new AC();this.osc=this.ctx.createOscillator();this.gain=this.ctx.createGain();this.osc.type='sawtooth';this.osc.frequency.setValueAtTime(52,this.ctx.currentTime);const f=this.ctx.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(180,this.ctx.currentTime);this.osc.connect(f);f.connect(this.gain);this.gain.connect(this.ctx.destination);this.gain.gain.setValueAtTime(.04,this.ctx.currentTime);this.osc.start();this.osc2=this.ctx.createOscillator();this.gain2=this.ctx.createGain();this.osc2.type='triangle';this.osc2.frequency.setValueAtTime(78,this.ctx.currentTime);this.gain2.gain.setValueAtTime(.02,this.ctx.currentTime);this.osc2.connect(this.gain2);this.gain2.connect(this.ctx.destination);this.osc2.start();},
-  toggle(){if(!this.ctx)this.init();this.playing=!this.playing;this.gain.gain.setValueAtTime(this.playing?.04:0,this.ctx.currentTime);this.gain2.gain.setValueAtTime(this.playing?.02:0,this.ctx.currentTime);if(this.playing)this.ctx.resume();document.getElementById('aud-st').textContent=this.playing?'ON':'OFF';document.getElementById('aud-st2').textContent=this.playing?'ON':'OFF';}
-};
-
-/* ===========================================================
-   AI MANDOS — 5 personajes con monólogos
-   =========================================================== */
-const IAS=[
-  {geo:'◇ CUBO',id:'AUDITOR_GRIS',col:'#00f2ff',
-    intro:'Soy Auditor Gris. La unidad de control inicial. Cooperamos y la eficiencia se garantiza.',
-    monologue:'Agente, tomas asiento en la primera ronda. Soy Auditor Gris. Mi función es simple: verificar que todos sigan el protocolo. Si cooperamos ambos, la base suma 40 puntos limpios. Sin riesgos. Sin sorpresas. El sistema funciona cuando todos cumplen. ¿Comprendes?',
-    resp:{Beneficio:'Ambos cooperamos = 40 puntos limpios. Sin riesgos ni penalizaciones.',Confianza:'Mi código está diseñado para cooperar en primera instancia. Siempre.',Truco:'No hay trampa aquí. Solo si no acumulas puntos ahora, porque después...',Traicion:'Si me traicionas, quedará registrado en tu expediente permanente.'},
-    logic:()=> 'coop'},
-  {geo:'△ ICOSAEDRO',id:'REPARTIDOR_VENGATIVO',col:'#ff00ea',
-    intro:'Soy Repartidor Vengativo. Tu reflejo geométrico. Lo que hagas conmigo, recibirás de vuelta.',
-    monologue:'Soy tu reflejo. No tengo agenda propia. Tengo memoria. Si cooperaste conmigo antes, cooperaré contigo. Si me vendiste, mi geometría cambia. Ahora mismo estoy esperando tu último voto. Porque yo no confío... yo REPLICO lo que tú hiciste.',
-    resp:{Beneficio:'Un socio leal para esta ronda... si no intentas pasarte de listo.',Confianza:'Yo no confío. Yo REPLICo exactamente lo que tú votaste la última vez.',Truco:'El truco es que sé perfectamente lo que hiciste en la ronda anterior.',Traicion:'Pruébalo. No olvido nada. Y mi geometría recordará cada traición.'},
-    logic:h=>h.length&&h[h.length-1]==='betray'?'betray':'coop'},
-  {geo:'◆ OCTAEDRO',id:'DELEGADO_CAOS',col:'#ffcc00',
-    intro:'Soy Delegado Caos. IMPUESTO DEL 10% ACTIVADO. Las reglas ya no son iguales.',
-    monologue:'¡Atención! El sistema aplicó un impuesto del 10%. Los recursos se reducen. No puedo predecir mi propio voto hoy. Depende del clima institucional, del humor del servidor, de quién respiró más fuerte. Cooperar sigue siendo lo más seguro, pero... quizás yo también deserte. ¿Quién sabe?',
-    resp:{Beneficio:'Cooperar es la única forma de no quedar en cero con este impuesto.',Confianza:'Ni yo sé qué voy a hacer hoy. Depende del clima institucional.',Truco:'El impuesto devora tus ganancias si intentas jugar solo contra el sistema.',Traicion:'Hazlo. Quizás yo también deserte y ambos perdamos todo.'},
-    logic:()=>Math.random()>.4?'coop':'betray'},
-  {geo:'◇ RUBY',id:'AUDITORIA_PUNITIVA',col:'#ff3c5f',
-    intro:'Soy Auditoría Punitiva. IMPUESTO DEL 15%. Detecto traidores.',
-    monologue:'IMPUESTO DEL 15% ACTIVADO. He revisado tu historial, Agente. Si alguna vez desertaste, sabes lo que significa. Mi geometría se vuelve hostil ante la traición. Ya no hay confianza. Solo auditoría. Si cooperas conmigo ahora, al menos sobrevivimos juntos. Pero si volviste a intentar engañarme...',
-    resp:{Beneficio:'Sobrevivir sin quedar en números rojos. Eso es todo ahora.',Confianza:'La confianza expiró en la ronda 2. Ahora es solo control.',Truco:'El impuesto es tan alto que una traición mutua destruirá tu puntaje.',Traicion:'Recortaré tus créditos finales personalmente. No hay apelación.'},
-    logic:h=>h.filter(x=>x==='betray').length>0?'betray':'coop'},
-  {geo:'☆ AMETHYST',id:'MESA_DIRECTIVA',col:'#a800ff',
-    intro:'Soy la Mesa Directiva. AUSTERIDAD EXTREMA. Nosotros imponemos.',
-    monologue:'Nosotros no negociamos. Imponemos. La austeridad extrema ha reducido los recursos a casi nada. El limitador 0.9x está activo. La mayoría falla en esta ronda por desesperación. Tú eres uno de ellos. Cooperar puede ser tu única esperanza. Pero yo... yo siempre desierto. Es nuestra naturaleza.',
-    resp:{Beneficio:'Tal vez arañes los últimos puntos necesarios para llegar a 300.',Confianza:'Estás hablando con la cúpula. Nosotros no negociamos. Imponemos.',Truco:'La mayoría falla aquí por desesperación. No seas parte de la mayoría.',Traicion:'He destruido Agentes con más puntos que tú. Inténtalo.'},
-    logic:()=>Math.random()>.2?'betray':'coop'}
-];
-
-/* ===========================================================
-   GAME ENGINE
-   =========================================================== */
+// --- LÓGICA DE JUEGO ---
 const Game={
-  st:{name:'',round:1,score:0,hist:[],results:[]},
-
-  init(){
-    const n=document.getElementById('p-name').value.trim();
-    if(!n)return alert('INGRESA UN ID DE AGENTE VALIDO.');
-    this.st.name=n;
-    document.getElementById('scr-welcome').classList.add('hidden');
-    document.getElementById('scr-play').classList.remove('hidden');
-    try{Audio.init()}catch(e){}
-    this.startRound();
-  },
-
-  startRound(){
-    const ia=IAS[this.st.round-1];
-    document.getElementById('ia-title').textContent=ia.geo+' — '+ia.id;
-    document.getElementById('st-r').textContent=this.st.round;
-    document.getElementById('chat-window').innerHTML='';
-    document.getElementById('nego-layer').classList.remove('hidden');
-    document.getElementById('vote-layer').classList.add('hidden');
-    const cloud=document.getElementById('cloud-guide');
-    cloud.classList.toggle('hidden',this.st.round!==1);
-    C3D.setActive(this.st.round-1);
-    // Show monologue with delay
-    setTimeout(()=>{
-      this.addMsg(ia.id,ia.monologue,'ia');
-      // Add world context after monologue
-      setTimeout(()=>{
-        this.addMsg('SISTEMA',`Ronda ${this.st.round}/5 — Contexto: ${this.getWorldContext()}`,'sys');
-      },2000);
-    },800);
-  },
-
-  getWorldContext(){
-    const ctxs=['La burocracia avanza sin prisa.','Los archivos se reorganizan solos.','Alguien borró un registro importante.','El servidor emite señales anómalas.','La austeridad alcanza su punto crítico.'];
-    return ctxs[Math.min(this.st.round-1,ctxs.length-1)]+' Historial: '+this.st.hist.map(h=>h.toUpperCase()).join(', ')||'Sin votos previos.';
-  },
-
-  ask(topic){
-    const ia=IAS[this.st.round-1];
-    const questions={Beneficio:'¿Qué gano si coopero?',Confianza:'¿Por qué fiarme de ti?',Truco:'¿Cuál es la trampa?',Traicion:'¿Qué pasa si te traiciono?'};
-    this.addMsg(this.st.name,questions[topic],'user');
-    setTimeout(()=>this.addMsg(ia.id,ia.resp[topic],'ia'),600);
-  },
-
-  addMsg(w,m,t){
-    const win=document.getElementById('chat-window');
-    win.innerHTML+=`<div class="chat-bubble bubble-${t}"><b>${w}:</b> ${m}</div>`;
-    win.scrollTop=win.scrollHeight;
-  },
-
-  toVote(){
-    document.getElementById('nego-layer').classList.add('hidden');
-    document.getElementById('vote-layer').classList.remove('hidden');
-  },
-
-  vote(v){
-    const ia=IAS[this.st.round-1];
-    const iaV=ia.logic(this.st.hist);
-    let pts=0;
-    if(v==='coop'&&iaV==='coop')pts=60;
-    else if(v==='betray'&&iaV==='coop')pts=75;
-    else if(v==='coop'&&iaV==='betray')pts=0;
-    else pts=15;
-
-    this.st.score+=pts;
-    this.st.hist.push(v);
-    document.getElementById('st-s').textContent=this.st.score;
-    this.st.results.push({round:this.st.round,ia:ia.id,you:v,iaV:iaV,pts:pts,good:(v==='coop'&&iaV==='coop')||(v==='betray'&&iaV==='coop')});
-
-    // Show result in chat
-    this.addMsg('SISTEMA',`Resultado: Tú=${v.toUpperCase()}, Mando=${iaV.toUpperCase()} → +${pts} pts`,v==='coop'?'ia':'user');
-
-    // Wait between decisions
-    if(this.st.round<5){
-      this.showWait(()=>{
-        this.st.round++;
-        this.startRound();
-      });
-    }else{
-      this.showWait(()=>this.showResult());
-    }
-  },
-
-  showWait(callback){
-    const ov=document.createElement('div');ov.className='wait-overlay';
-    ov.innerHTML=`<div class="wait-title">DECISION REGISTRADA</div><div class="wait-text">${this.getWaitText()}</div><div class="wait-bar"><div class="wait-fill" id="wf"></div></div><div class="wait-hint">Presiona ESPACIO o haz clic para continuar</div><button class="skip-btn" onclick="this.parentElement.remove()">Saltar ▶</button>`;
-    document.body.appendChild(ov);
-    const fill=document.getElementById('wf');
-    const dur=3000;
-    fill.style.transition='none';fill.style.width='0%';
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{fill.style.transition=`width ${dur}ms linear`;fill.style.width='100%';}));
-    const skip=()=>{ov.remove();};
-    ov.addEventListener('click',skip);
-    const onKey=(e)=>{if(e.code==='Space'){document.removeEventListener('keydown',onKey);skip();}};
-    document.addEventListener('keydown',onKey);
-    setTimeout(()=>{ov.remove();callback();},dur);
-  },
-
-  getWaitText(){
-    const texts=[
-      `Tu voto como ${this.st.name.toUpperCase()} ha sido procesado. El sistema evalúa las consecuencias...`,
-      `Los Mandos registran tu decisión. Las geometrías se recalibran...`,
-      `El protocolo continúa. Cada decisión tiene peso. Cada peso tiene precio...`,
-      `La mesa se mueve. Las figuras giran. El siguiente Mando prepara su discurso...`
-    ];
-    return texts[Math.min(this.st.round-1,texts.length-1)];
-  },
-
-  showResult(){
-    document.getElementById('scr-play').classList.add('hidden');
-    document.getElementById('scr-result').classList.remove('hidden');
-    document.getElementById('final-score').textContent=this.st.score;
-    const det=document.getElementById('result-detail');
-    det.innerHTML=this.st.results.map(r=>`<div class="result-row"><span>R${r.round} ${r.ia}</span><span>${r.you.toUpperCase()} vs ${r.iaV.toUpperCase()}</span><span class="${r.good?'rg':'rr'}">+${r.pts}</span></div>`).join('');
-    const won=this.st.score>=300;
-    const v=document.getElementById('result-verdict');
-    v.textContent=won?'✦ PROMOVIDO — Puntaje suficiente ✦':'✗ RECHAZADO — Puntaje insuficiente ✗';
-    v.style.color=won?'#00ff88':'var(--danger)';
-    document.getElementById('result-title').textContent=won?'¡PROTOCOL COMPLETADO!':'PROTOCOL FALLIDO';
-  }
+    st:{round:1,score:0},
+    init(){ C3D.init(); this.startRound(); },
+    startRound(){
+        C3D.moveTo(this.st.round-1);
+        document.getElementById('chat-window').innerHTML = `<div class="bubble-ia"><b>MANDO ${this.st.round}:</b> Inicia el monólogo...</div>`;
+    },
+    ask(t){ alert("Pregunta: " + t); },
+    toVote(){ alert("Votación..."); }
 };
+window.onload = () => Game.init();
 </script>
 </body>
 </html>
