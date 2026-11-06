@@ -3,317 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EL PROTOCOLO — Mesa eSports Cyberpunk Edition</title>
+<title>EL PROTOCOLO — Cinematic Intro Edition</title>
 <style>
-:root{--bg:#050508;--card:rgba(12,16,28,0.96);--accent:#00f2ff;--glow:rgba(0,242,255,0.4);--sec:#ff00ea;--danger:#ff3c5f;--text:#e8e8f0}
+:root{--bg:#030408;--panel:rgba(10,14,24,0.95);--accent:#00f2ff;--glow:rgba(0,242,255,0.3);--sec:#ff00ea;--danger:#ff3c5f;--text:#e8e8f0}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Courier New',monospace;background:radial-gradient(circle at center, #1a1a2e 0%, #050508 60%, #050508 100%);color:var(--text);overflow:hidden;width:100vw;height:100vh}
+body{font-family:'Courier New',monospace;background:var(--bg);color:var(--text);overflow:hidden;width:100vw;height:100vh}
+
 #canvas3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
-/* CAPA DE UI */
-#ui-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;justify-content:center;align-items:center}
-#ui-layer>*{pointer-events:auto}
-.screen{width:min(95vw, 540px);display:flex;flex-direction:column;animation:fadeUp .6s ease}
-.hidden{display:none!important}
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-
-/* PANELES ESTILO ESPORTS */
-.panel{background:var(--card);border:2px solid rgba(0,242,255,0.3);border-radius:24px;padding:24px;backdrop-filter:blur(20px);box-shadow:0 0 90px rgba(0,242,255,0.15),0 20px 80px rgba(0,0,0,0.8)}
-h1{text-align:center;font-size:26px;color:var(--accent);text-shadow:0 0 20px var(--glow);margin-bottom:4px;letter-spacing:4px}
-.sub{text-align:center;font-size:11px;color:#667;letter-spacing:3px;margin-bottom:18px}
-
-/* AVATAR ESPORTS / GAMER CON ARO DE NEÓN */
-.avatar-box {
-    width: 110px; height: 110px; margin: 0 auto 14px;
-    border-radius: 50%; background: #0a0b12;
-    border: 3px solid var(--accent); display: flex; justify-content: center; align-items: center;
-    box-shadow: 0 0 30px var(--glow), inset 0 0 15px rgba(0,242,255,0.2);
-    position: relative; overflow: hidden;
+#vn-layout {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 10; display: flex; flex-direction: row;
+    background: radial-gradient(circle at 30% 50%, #121829 0%, #030408 70%);
 }
-.avatar-box.angry { border-color: var(--danger); box-shadow: 0 0 30px rgba(255,60,95,0.5); }
-.avatar-box.happy { border-color: #00ff88; box-shadow: 0 0 30px rgba(0,255,136,0.5); }
-.svg-gamer { width: 100%; height: 100%; }
 
-/* CHAT GRANDE Y LEGIBLE */
-#chat-container{height:150px;background:rgba(0,0,0,0.55);border-radius:16px;padding:14px;overflow-y:auto;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px}
-.chat-bubble{max-width:92%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;animation:fadeUp .3s ease}
-.bubble-ia{background:rgba(255,0,234,0.12);color:#f0d0ff;align-self:flex-start;border-left:4px solid var(--sec);border-bottom-left-radius:2px}
-.bubble-user{background:rgba(0,242,255,0.18);color:var(--accent);align-self:flex-end;border-bottom-right-radius:2px;font-weight:700}
-.bubble-sys{background:rgba(255,204,0,0.12);color:#ffcc00;align-self:center;text-align:center;font-size:11px;border:1px solid rgba(255,204,0,0.25)}
+.vn-left {
+    flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    position: relative; border-right: 2px solid rgba(0,242,255,0.15); padding: 20px;
+}
+.portrait-container {
+    width: min(320px, 36vw); height: min(320px, 36vw); max-width: 300px; max-height: 300px;
+    border-radius: 50%; border: 4px solid var(--accent); background: #0a0e17;
+    box-shadow: 0 0 50px var(--glow);
+    display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden;
+}
+.portrait-container.angry { border-color: var(--danger); box-shadow: 0 0 50px rgba(255,60,95,0.5); }
+.portrait-container.happy { border-color: #00ff88; box-shadow: 0 0 50px rgba(0,255,136,0.5); }
+.portrait-svg { width: 100%; height: 100%; }
 
-/* BOTONES */
-.grid-q{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;transition:.2s}
-.btn-neon{background:linear-gradient(135deg,var(--accent),#0066ff);color:#000;box-shadow:0 6px 25px var(--glow)}
-.btn-neon:hover{transform:translateY(-2px);box-shadow:0 10px 35px var(--glow)}
-.btn-dark{background:rgba(255,255,255,0.06);color:#ccc;border:1px solid rgba(255,255,255,0.12);font-size:11px;padding:10px}
-.btn-dark:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,242,255,0.05)}
+.mando-info { text-align: center; margin-top: 15px; }
+.mando-name { font-size: 22px; font-weight: bold; color: var(--accent); text-shadow: 0 0 10px var(--glow); }
+.mando-role { font-size: 11px; color: #889; margin-top: 4px; }
 
-/* VOTOS */
-.grid-v{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.vc{padding:18px;border-radius:16px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,0.08);transition:.25s}
-.vc-coop{background:rgba(0,242,255,0.08);color:var(--accent)}
-.vc-coop:hover{border-color:var(--accent);background:rgba(0,242,255,0.15);box-shadow:0 0 30px var(--glow)}
-.vc-betray{background:rgba(255,60,95,0.08);color:var(--danger)}
-.vc-betray:hover{border-color:var(--danger);background:rgba(255,60,95,0.15);box-shadow:0 0 30px rgba(255,60,95,0.4)}
+.vn-right {
+    flex: 1.2; display: flex; flex-direction: column; padding: 25px;
+    justify-content: space-between; background: rgba(5,8,15,0.88);
+}
 
-/* WAITING OVERLAY */
-.wait-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,8,0.92);z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;animation:fadeIn .5s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.wait-title{font-size:22px;color:var(--accent);margin-bottom:15px;letter-spacing:3px}
-.wait-bar{width:280px;height:4px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden}
-.wait-fill{height:100%;background:var(--accent);width:0%;transition:width linear}
+.top-hud { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.badge { background: rgba(0,242,255,0.1); padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: bold; color: var(--accent); border: 1px solid rgba(0,242,255,0.25); }
 
-.badge{background:rgba(0,242,255,0.1);padding:5px 10px;border-radius:100px;font-size:10px;font-weight:bold;color:var(--accent);border:1px solid rgba(0,242,255,0.2)}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#chat-window {
+    flex: 1; background: rgba(0,0,0,0.6); border-radius: 16px; padding: 18px;
+    overflow-y: auto; margin: 15px 0; border: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; gap: 12px;
+}
+.chat-bubble { max-width: 94%; padding: 12px 16px; border-radius: 14px; font-size: 13px; line-height: 1.5; animation: fadeIn 0.3s ease; }
+.bubble-ia { background: rgba(255,0,234,0.12); color: #f0d0ff; align-self: flex-start; border-left: 4px solid var(--sec); }
+.bubble-user { background: rgba(0,242,255,0.18); color: var(--accent); align-self: flex-end; font-weight: 700; }
+.bubble-sys { background: rgba(255,204,0,0.12); color: #ffcc00; align-self: center; text-align: center; border: 1px solid rgba(255,204,0,0.3); font-size: 11px; }
+
+/* 8 PREGUNTAS EN GRID DE 2x4 */
+.grid-q { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.btn { width: 100%; padding: 11px; border: none; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; font-family: inherit; text-transform: uppercase; transition: 0.2s; }
+.btn-neon { background: linear-gradient(135deg, var(--accent), #0066ff); color: #000; box-shadow: 0 6px 25px var(--glow); padding: 13px; font-size: 12px; }
+.btn-dark { background: rgba(255,255,255,0.05); color: #bbb; border: 1px solid rgba(255,255,255,0.1); }
+.btn-dark:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,242,255,0.06); }
+
+.grid-v { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.vc { padding: 18px; border-radius: 16px; text-align: center; cursor: pointer; border: 2px solid rgba(255,255,255,0.08); transition: .25s; font-weight: bold; font-size: 13px; }
+.vc-coop { background: rgba(0,242,255,0.08); color: var(--accent); }
+.vc-betray { background: rgba(255,60,95,0.08); color: var(--danger); }
+
+.overlay-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030408; z-index: 100; display: flex; justify-content: center; align-items: center; }
+.panel { background: var(--panel); border: 2px solid rgba(0,242,255,0.3); border-radius: 24px; padding: 40px; width: min(90vw, 480px); text-align: center; }
+input#p-name { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.5); color: #fff; text-align: center; font-size: 14px; outline: none; margin: 20px 0; }
+
+.hidden { display: none !important; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media(max-width: 900px) {
+    #vn-layout { flex-direction: column; overflow-y: auto; }
+    .vn-left { flex: none; height: 40vh; border-right: none; border-bottom: 2px solid rgba(0,242,255,0.15); }
+    .portrait-container { width: 120px; height: 120px; }
+    .vn-right { flex: none; height: 60vh; padding: 15px; }
+    #chat-window { height: 90px; }
+}
 </style>
 </head>
 <body>
 
 <canvas id="canvas3d"></canvas>
 
-<div id="ui-layer">
-    <!-- WELCOME -->
-    <div id="scr-welcome" class="screen">
-        <div class="panel">
-            <div class="top-bar"><span class="badge">PROTOCOL // ESPORTS</span></div>
-            <h1>EL PROTOCOLO</h1>
-            <p class="sub">MESA DE LOS MANDOS</p>
-            <p style="text-align:center;font-size:12px;color:#889;line-height:1.6;margin-bottom:20px">
-                5 Mandos cibernéticos te esperan en la mesa circular.<br>
-                Cada ronda enfoca a un rival con su propio estilo y patrón.<br>
-                Alcanza <b style="color:var(--accent)">300 puntos</b> para ser promovido.
-            </p>
-            <input id="p-name" placeholder="ID DE AGENTE..." style="width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.4);color:#fff;text-align:center;margin-bottom:14px;font-family:inherit;font-size:13px;outline:none;letter-spacing:2px">
-            <button class="btn btn-neon" onclick="Game.init()">Sentarse a la Mesa</button>
+<!-- PANTALLA BIENVENIDA -->
+<div id="scr-welcome" class="overlay-screen">
+    <div class="panel">
+        <h1 style="color:var(--accent); font-size:32px; letter-spacing:4px; margin-bottom:10px;">EL PROTOCOLO</h1>
+        <p style="font-size:11px; color:#778; margin-bottom:20px;">PSYCHOLOGICAL EDITION — 10 RONDAS</p>
+        <p style="color:#aaa; line-height:1.6; font-size:12px;">Los 10 Mandos te observan. Descifra sus intenciones antes de emitir tu voto.<br>Alcanza <b style="color:var(--accent)">600 pts</b> para ascender.</p>
+        <input id="p-name" placeholder="ID DE AGENTE...">
+        <button class="btn btn-neon" onclick="Game.startIntro()">Iniciar Protocolo</button>
+    </div>
+</div>
+
+<!-- PANTALLA INTRODUCCIÓN CINEMÁTICA -->
+<div id="scr-intro" class="overlay-screen hidden">
+    <div class="panel" style="width: min(90vw, 600px); text-align: left;">
+        <h2 style="color:var(--sec); font-size:18px; margin-bottom:15px; letter-spacing:2px;">[TRANSMISIÓN SEGURA ENTRANTE...]</h2>
+        <div id="intro-text" style="font-size:13px; color:#ccc; line-height:1.8; min-height:140px; margin-bottom:25px; border-left:3px solid var(--accent); padding-left:15px;"></div>
+        <button class="btn btn-neon hidden" id="btn-start-game" onclick="Game.beginGame()">ESTABLECER CONEXIÓN →</button>
+    </div>
+</div>
+
+<!-- INTERFAZ PRINCIPAL -->
+<div id="vn-layout" class="hidden">
+    <div class="vn-left">
+        <div class="portrait-container" id="portrait-box">
+            <div id="avatar-svg-wrap" style="width:100%;height:100%;"></div>
+        </div>
+        <div class="mando-info">
+            <div class="mando-name" id="mando-name">MANDO</div>
+            <div class="mando-role" id="mando-role">Nivel de Acceso</div>
         </div>
     </div>
-
-    <!-- GAMEPLAY -->
-    <div id="scr-play" class="screen hidden">
-        <div class="panel">
-            <div class="top-bar">
-                <span class="badge">RONDA <span id="st-r">1</span>/5</span>
-                <span class="badge" style="color:var(--accent)">SCORE: <span id="st-s">0</span></span>
-            </div>
-            
-            <p style="text-align:center;font-size:11px;color:var(--sec);font-weight:bold;letter-spacing:2px;margin-bottom:6px" id="ia-title">MANDO: AUDITOR_GRIS</p>
-            
-            <!-- AVATAR ILUSTRADO ESTILO ESPORTS (INCRUSTADO SVG) -->
-            <div class="avatar-box" id="avatar-box">
-                <div id="avatar-svg-container" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;"></div>
-            </div>
-
-            <div id="chat-container"></div>
-            
+    <div class="vn-right">
+        <div class="top-hud">
+            <span class="badge" id="hud-round">RONDA 1/10</span>
+            <span class="badge" style="color:var(--accent)">PUNTOS: <span id="hud-score">0</span></span>
+        </div>
+        <div id="chat-window"></div>
+        <div id="action-area">
             <div id="nego-layer">
-                <p style="font-size:10px;color:#556;text-align:center;margin-bottom:8px;font-weight:bold">► INTERROGAR AL MANDO:</p>
+                <p style="font-size:10px; color:#778; margin-bottom:6px; font-weight:bold; letter-spacing:1px;">► INTERROGATORIO TÁCTICO (8 OPCIONES):</p>
                 <div class="grid-q">
-                    <button class="btn btn-dark" onclick="Game.ask('Beneficio')">¿Qué gano?</button>
-                    <button class="btn btn-dark" onclick="Game.ask('Confianza')">¿Por qué confiar?</button>
-                    <button class="btn btn-dark" onclick="Game.ask('Truco')">¿Cuál es la trampa?</button>
-                    <button class="btn btn-dark" onclick="Game.ask('Traicion')">¿Y si traiciono?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Beneficio')">1. ¿Cuál es el beneficio real?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Confianza')">2. ¿Garantía de lealtad?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Truco')">3. ¿Cuál es el riesgo?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Traicion')">4. ¿Consecuencia si fallo?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Pasado')">5. ¿Qué hicieron otros?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Sistema')">6. ¿Qué dice la Cúpula?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Juramento')">7. ¿Jurás cooperar?</button>
+                    <button class="btn btn-dark" onclick="Game.ask('Amenaza')">8. ¿Y si me opongo?</button>
                 </div>
                 <button class="btn btn-neon" onclick="Game.toVote()">Proceder a la Decisión →</button>
             </div>
-            
             <div id="vote-layer" class="hidden">
                 <div class="grid-v">
-                    <div class="vc vc-coop" onclick="Game.vote('coop')">
-                        <div style="font-weight:800;font-size:13px">COOPERAR</div>
-                        <div style="font-size:10px;opacity:.7;margin-top:4px">+60 pts Mutuo</div>
-                    </div>
-                    <div class="vc vc-betray" onclick="Game.vote('betray')">
-                        <div style="font-weight:800;font-size:13px">DESERTAR</div>
-                        <div style="font-size:10px;opacity:.7;margin-top:4px">+75 pts Solo</div>
-                    </div>
+                    <div class="vc vc-coop" onclick="Game.vote('coop')">COOPERAR<br><span style="font-size:10px; opacity:0.7">+60 pts Mutuo</span></div>
+                    <div class="vc vc-betray" onclick="Game.vote('betray')">DESERTAR<br><span style="font-size:10px; opacity:0.7">+75 pts Solo</span></div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- RESULT -->
-    <div id="scr-result" class="screen hidden">
-        <div class="panel">
-            <h1 id="res-title">EVALUACIÓN</h1>
-            <p class="sub">PROTOCOLO FINALIZADO</p>
-            <div style="text-align:center;font-size:44px;font-weight:900;color:var(--accent);margin:18px 0" id="res-score">0</div>
-            <div id="res-detail"></div>
-            <button class="btn btn-neon" style="margin-top:20px" onclick="location.reload()">Reiniciar Protocolo</button>
         </div>
     </div>
 </div>
 
+<!-- PANTALLA RESULTADOS -->
+<div id="scr-result" class="overlay-screen hidden">
+    <div class="panel">
+        <h1 id="res-title">EVALUACIÓN</h1>
+        <div style="font-size:52px; font-weight:900; color:var(--accent); margin:20px 0;" id="res-score">0</div>
+        <div id="res-detail" style="max-height:200px; overflow-y:auto; text-align:left; font-size:12px;"></div>
+        <button class="btn btn-neon" style="margin-top:20px" onclick="location.reload()">Reiniciar</button>
+    </div>
+</div>
+
 <script>
-// --- MOTOR 3D & CÁMARA ---
-const C3D = {
-    canvas: null, gl: null, time: 0,
-    init() {
-        this.canvas = document.getElementById('canvas3d');
-        try {
-            this.gl = this.canvas.getContext('webgl', {antialias:true});
-            if(!this.gl) throw "no-gl";
-            this.resize();
-            window.onresize = () => this.resize();
-            requestAnimationFrame(t => this.render(t));
-        } catch(e) {
-            this.canvas.style.background = "radial-gradient(circle at center, #1a1a2e 0%, #050508 100%);";
-        }
-    },
-    resize() {
-        const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = window.innerWidth * dpr;
-        this.canvas.height = window.innerHeight * dpr;
-        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    },
-    render(ts) {
-        this.time = ts * 0.001;
-        const g = Math.sin(this.time * 0.3) * 10;
-        this.canvas.style.filter = `hue-rotate(${g}deg)`;
-        requestAnimationFrame(t => this.render(t));
-    }
-};
+const GamerPortraits = {
+    getPortrait(index, mood, speaking) {
+        const colors = ['#00f2ff', '#ff00ea', '#ffcc00', '#ff3c5f', '#a800ff', '#00ff88', '#00a2ff', '#ff6600', '#9900ff', '#ffffff'];
+        const col = colors[index % colors.length];
+        const eyeCol = mood === 'angry' ? '#ff3c5f' : (mood === 'happy' ? '#00ff88' : col);
+        const mouthPath = speaking ? 
+            (Math.random() > 0.5 ? "M42 66 Q50 78 58 66" : "M44 68 L56 68") :
+            (mood === 'happy' ? "M42 64 Q50 74 58 64" : (mood === 'angry' ? "M42 70 Q50 62 58 70" : "M44 67 L56 67"));
 
-// --- GENERADOR DE AVATARES ESPORTS / CYBERPUNK (SVG ILUSTRADOS) ---
-const GamerAvatars = {
-    getSVG(index, mood) {
-        const primaryColors = ['#00f2ff', '#ff00ea', '#ffcc00', '#ff3c5f', '#a800ff'];
-        const col = primaryColors[index];
-        const eyeColor = mood === 'angry' ? '#ff3c5f' : (mood === 'happy' ? '#00ff88' : primaryColors[index]);
-
-        return `
-        <svg viewBox="0 0 100 100" class="svg-gamer">
-            <!-- Fondo interno -->
-            <circle cx="50" cy="50" r="48" fill="#0d111a" stroke="${col}" stroke-width="2"/>
-            
-            <!-- Casco Gamer / Auriculares -->
-            <path d="M22 55 C22 25, 78 25, 78 55" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round"/>
-            <rect x="15" y="45" width="12" height="28" rx="6" fill="${col}"/>
-            <rect x="73" y="45" width="12" height="28" rx="6" fill="${col}"/>
-            
-            <!-- Micrófono de diadema -->
-            <path d="M79 65 Q85 85 65 82" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-            <circle cx="63" cy="81" r="3" fill="${eyeColor}"/>
-
-            <!-- Rostro / Pelo estilizado anime -->
-            <path d="M35 38 Q50 28 65 38 Q72 52 68 75 Q50 82 32 75 Q28 52 35 38 Z" fill="#1e2530"/>
-            <path d="M32 40 Q45 30 55 35 Q68 32 65 45 Q50 38 32 40 Z" fill="${col}" opacity="0.8"/>
-
-            <!-- Ojos Gamer Cyberpunk -->
-            <circle cx="42" cy="52" r="5" fill="${eyeColor}"/>
-            <circle cx="58" cy="52" r="5" fill="${eyeColor}"/>
-            <circle cx="43" cy="51" r="2" fill="#fff"/>
-            <circle cx="59" cy="51" r="2" fill="#fff"/>
-
-            <!-- Cejas / Expresión -->
-            ${mood === 'angry' ? 
-                `<path d="M37 46 L47 50 M63 46 L53 50" stroke="${eyeColor}" stroke-width="3"/>` : 
-                (mood === 'happy' ? `<path d="M38 45 Q42 43 46 46 M62 45 Q58 43 54 46" stroke="${eyeColor}" stroke-width="2"/>` : 
-                `<line x1="38" y1="47" x2="46" y2="47" stroke="${eyeColor}" stroke-width="2"/><line x1="54" y1="47" x2="62" y2="47" stroke="${eyeColor}" stroke-width="2"/>`)
-            }
-
-            <!-- Boca / Sonrisa -->
-            ${mood === 'happy' ? 
-                `<path d="M42 68 Q50 76 58 68" fill="none" stroke="${eyeColor}" stroke-width="3" stroke-linecap="round"/>` :
-              (mood === 'angry' ? 
-                `<path d="M42 70 Q50 64 58 70" fill="none" stroke="${eyeColor}" stroke-width="3" stroke-linecap="round"/>` :
-                `<line x1="44" y1="68" x2="56" y2="68" stroke="#889" stroke-width="3" stroke-linecap="round"/>`)
-            }
+        return `<svg viewBox="0 0 100 100" class="portrait-svg">
+            <circle cx="50" cy="50" r="48" fill="#0b0f19" stroke="${col}" stroke-width="2"/>
+            <path d="M20 52 C20 22, 80 22, 80 52" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round"/>
+            <rect x="13" y="42" width="12" height="30" rx="6" fill="${col}"/>
+            <rect x="75" y="42" width="12" height="30" rx="6" fill="${col}"/>
+            <path d="M34 36 Q50 26 66 36 Q73 52 69 75 Q50 84 31 75 Q27 52 34 36 Z" fill="#181f2d"/>
+            <path d="M30 38 Q45 28 55 34 Q70 30 66 45 Q50 36 30 38 Z" fill="${col}" opacity="0.85"/>
+            <circle cx="41" cy="50" r="5.5" fill="${eyeCol}"/>
+            <circle cx="59" cy="50" r="5.5" fill="${eyeCol}"/>
+            <path d="${mouthPath}" fill="none" stroke="${eyeCol}" stroke-width="3" stroke-linecap="round"/>
         </svg>`;
     }
 };
 
-// --- DATA MANDOS ---
 const IAS = [
-    {id:'AUDITOR_GRIS', intro:'Soy Auditor Gris. La unidad inicial. Cooperamos y la eficiencia se garantiza.', logic:()=>'coop', resp:{Beneficio:'40 pts limpios.',Confianza:'Código leal.',Truco:'Ninguno.',Traicion:'Informe negativo.'}},
-    {id:'REPARTIDOR_VENGATIVO', intro:'Soy tu reflejo. Si cooperas, coopero. Si traicionas, REPLICO.', logic:h=>h[h.length-1]==='betray'?'betray':'coop', resp:{Beneficio:'Socio leal.',Confianza:'Solo replico.',Truco:'Sé tu pasado.',Traicion:'No olvido.'}},
-    {id:'DELEGADO_CAOS', intro:'Impuesto 10% activo. Mi voto es incierto hoy.', logic:()=>Math.random()>.4?'coop':'betray', resp:{Beneficio:'Sobrevivir.',Confianza:'Clima incierto.',Truco:'Suma puntos ahora.',Traicion:'Perderemos ambos.'}},
-    {id:'AUDITORIA_PUNITIVA', intro:'Detecto traidores. Si has desertado, seré hostil.', logic:h=>h.includes('betray')?'betray':'coop', resp:{Beneficio:'No morir.',Confianza:'Expirada.',Truco:'El impuesto mata.',Traicion:'Cero créditos.'}},
-    {id:'MESA_DIRECTIVA', intro:'Austeridad extrema. Nosotros no negociamos, IMPONEMOS.', logic:()=>Math.random()>.2?'betray':'coop', resp:{Beneficio:'Última chance.',Confianza:'Imponemos.',Truco:'Desesperación.',Traicion:'Destrucción.'}}
+    {id:'AUDITOR_GRIS', role:'Nivel 1 — Control', intro:'Protocolo iniciado. Coopera para la eficiencia.', logic:()=>'coop', resp:{Beneficio:'40 pts.',Confianza:'Firme.',Truco:'Ninguno.',Traicion:'Sanción.',Pasado:'Ninguno.',Sistema:'Normativa.',Juramento:'Sí.',Amenaza:'Alerta.'}},
+    {id:'REPARTIDOR', role:'Nivel 2 — Reflejo', intro:'Soy tu eco. Lo que hagas volverá.', logic:h=>h.length && h[h.length-1]==='betray'?'betray':'coop', resp:{Beneficio:'Lealtad.',Confianza:'Espejo.',Truco:'Tu pasado.',Traicion:'Memoria.',Pasado:'Historial.',Sistema:'Patrón.',Juramento:'Depende.',Amenaza:'Rebote.'}},
+    {id:'CAOS', role:'Nivel 3 — Azar', intro:'Impuesto 10%. El azar reina.', logic:()=>Math.random()>.4?'coop':'betray', resp:{Beneficio:'Supervivencia.',Confianza:'Clima.',Truco:'Ganar ahora.',Traicion:'Pérdida.',Pasado:'Borrado.',Sistema:'Entropía.',Juramento:'Azar.',Amenaza:'Viento.'}},
+    {id:'PUNITIVO', role:'Nivel 4 — Castigo', intro:'Busco traidores. Tu registro te precede.', logic:h=>h.includes('betray')?'betray':'coop', resp:{Beneficio:'No caer.',Confianza:'Nula.',Truco:'Impuesto.',Traicion:'Cero.',Pasado:'Infracción.',Sistema:'Ley.',Juramento:'Expediente.',Amenaza:'Reinicio.'}},
+    {id:'CORRUPTA', role:'Nivel 5 — Error', intro:'He decidido que mi ganancia es prioridad.', logic:()=>'betray', resp:{Beneficio:'Ninguno.',Confianza:'Cero.',Truco:'Mentira.',Traicion:'Éxito.',Pasado:'Rotos.',Sistema:'Cúpula.',Juramento:'Ninguno.',Amenaza:'Matemática.'}},
+    {id:'ENTIDAD X', role:'Nivel 6 — Sombras', intro:'Solo ayudo a los débiles.', logic:h=>h.filter(x=>x==='betray').length>2?'coop':'betray', resp:{Beneficio:'Balance.',Confianza:'Condicional.',Truco:'Historial.',Traicion:'Juicio.',Pasado:'Caída.',Sistema:'Oculto.',Juramento:'Encriptado.',Amenaza:'Sombra.'}},
+    {id:'CENTINELA', role:'Nivel 7 — Guardia', intro:'Sin atajos. Solo disciplina.', logic:()=>Math.random()>.3?'coop':'betray', resp:{Beneficio:'Orden.',Confianza:'Ley.',Truco:'Ninguno.',Traicion:'Multa.',Pasado:'Prisión.',Sistema:'Control.',Juramento:'Deber.',Amenaza:'Perímetro.'}},
+    {id:'REBELDE', role:'Nivel 8 — Caos', intro:'Abajo el sistema.', logic:()=>Math.random()>.5?'betray':'coop', resp:{Beneficio:'Riesgo.',Confianza:'Ninguna.',Truco:'Caída.',Traicion:'Libre.',Pasado:'Cenizas.',Sistema:'Rompimiento.',Juramento:'Ninguno.',Amenaza:'Fuego.'}},
+    {id:'NODO', role:'Nivel 9 — Cuántico', intro:'Probabilidades calculadas.', logic:()=>Math.random()>.2?'betray':'coop', resp:{Beneficio:'Datos.',Confianza:'Fría.',Truco:'0%.',Traicion:'Fin.',Pasado:'Temporal.',Sistema:'Núcleo.',Juramento:'Innecesario.',Amenaza:'Disrupción.'}},
+    {id:'ARQUITECTO', role:'Nivel 10 — Creador', intro:'Demuestra que mereces el ascenso.', logic:()=>Math.random()>.1?'betray':'coop', resp:{Beneficio:'Promoción.',Confianza:'Prueba.',Truco:'Final.',Traicion:'Caída.',Pasado:'Diseño.',Sistema:'Arquitectura.',Juramento:'Juicio.',Amenaza:'Borrado.'}}
 ];
 
-// --- MOTOR JUEGO ---
 const Game = {
     st: { name: "", round: 1, score: 0, hist: [], results: [] },
+    isTyping: false,
+    mood: 'neutral',
+
     init() {
         const n = document.getElementById('p-name').value.trim();
-        if(!n) return alert("Ingresa un ID de Agente.");
+        if(!n) return alert("Ingresa ID de Agente.");
         this.st.name = n;
         document.getElementById('scr-welcome').classList.add('hidden');
-        document.getElementById('scr-play').classList.remove('hidden');
-        C3D.init();
+        document.getElementById('scr-intro').classList.remove('hidden');
+        this.runIntro();
+    },
+
+    runIntro() {
+        const introText = `[INICIO DE SECUENCIA DE ACCESO]\n\nAgente ${this.st.name.toUpperCase()}:\n\nTe has conectado al núcleo de evaluación central. Tu objetivo es simple y a la vez despiadado: superar 10 ciclos de auditoría interactiva bajo el escrutinio de los Mandos del Sistema.\n\nPara ascender y ser promovido, deberás acumular un mínimo de 600 créditos de confianza antes de la última evaluación.\n\nLos Mandos no comparten tus intereses. Algunos son predecibles, otros buscan su propio beneficio o te pondrán a prueba mediante la cooperación y la traición. Analiza sus respuestas con cautela.\n\n[SISTEMA LISTO]`;
+        
+        const el = document.getElementById('intro-text');
+        el.textContent = '';
+        let i = 0;
+        const timer = setInterval(() => {
+            if(i < introText.length) {
+                el.textContent += introText.charAt(i++);
+            } else {
+                clearInterval(timer);
+                document.getElementById('btn-start-game').classList.remove('hidden');
+            }
+        }, 15);
+    },
+
+    beginGame() {
+        document.getElementById('scr-intro').classList.add('hidden');
+        document.getElementById('vn-layout').classList.remove('hidden');
         this.startRound();
     },
+
     startRound() {
         const idx = this.st.round - 1;
         const ia = IAS[idx];
-        document.getElementById('st-r').textContent = this.st.round;
-        document.getElementById('ia-title').textContent = `MANDO ${this.st.round}/5: ${ia.id}`;
-        document.getElementById('chat-container').innerHTML = '';
+        this.mood = 'neutral';
+        document.getElementById('hud-round').textContent = `RONDA ${this.st.round}/10`;
+        document.getElementById('hud-score').textContent = this.st.score;
+        document.getElementById('mando-name').textContent = ia.id;
+        document.getElementById('mando-role').textContent = ia.role;
+        document.getElementById('chat-window').innerHTML = '';
         document.getElementById('nego-layer').classList.remove('hidden');
         document.getElementById('vote-layer').classList.add('hidden');
-        
-        // Renderizar avatar gamer correspondiente a este Mando
-        this.renderAvatar(idx, 'neutral');
-        this.addMsg(ia.id, ia.intro, 'ia');
+        this.renderPortrait(idx, 'neutral', false);
+        this.typeText(ia.id, ia.intro, 'ia', idx);
     },
-    renderAvatar(idx, mood) {
-        const box = document.getElementById('avatar-box');
-        box.className = 'avatar-box ' + mood;
-        document.getElementById('avatar-svg-container').innerHTML = GamerAvatars.getSVG(idx, mood);
+
+    renderPortrait(idx, mood, speaking) {
+        document.getElementById('portrait-box').className = 'portrait-container ' + mood;
+        document.getElementById('avatar-svg-wrap').innerHTML = GamerPortraits.getPortrait(idx, mood, speaking);
     },
-    addMsg(w, m, t) {
-        const c = document.getElementById('chat-container');
-        c.innerHTML += `<div class="chat-bubble bubble-${t}"><b>${w}:</b> ${m}</div>`;
-        c.scrollTop = c.scrollHeight;
+
+    typeText(w, text, type, avatarIdx) {
+        this.isTyping = true;
+        const c = document.getElementById('chat-window');
+        const b = document.createElement('div');
+        b.className = `chat-bubble bubble-${type}`;
+        b.innerHTML = `<b>${w}:</b> <span class="txt"></span>`;
+        c.appendChild(b);
+        const s = b.querySelector('.txt');
+        let i = 0;
+        const timer = setInterval(() => {
+            if(i < text.length) {
+                s.textContent += text.charAt(i++);
+                c.scrollTop = c.scrollHeight;
+                if(type === 'ia') this.renderPortrait(avatarIdx, this.mood, true);
+            } else {
+                clearInterval(timer);
+                this.isTyping = false;
+                if(type === 'ia') this.renderPortrait(avatarIdx, this.mood, false);
+            }
+        }, 22);
     },
+
     ask(topic) {
-        const ia = IAS[this.st.round-1];
-        const qs = {Beneficio:'¿Qué gano?',Confianza:'¿Por qué fiarme?',Truco:'¿Cuál es la trampa?',Traicion:'¿Y si te traiciono?'};
-        this.addMsg(this.st.name, qs[topic], 'user');
-        setTimeout(() => this.addMsg(ia.id, ia.resp[topic], 'ia'), 400);
+        if(this.isTyping) return;
+        const idx = this.st.round-1; const ia = IAS[idx];
+        const qs = {
+            Beneficio:'¿Cuál es el beneficio real?',
+            Confianza:'¿Qué garantía tengo de tu lealtad?',
+            Truco:'¿Cuál es la trampa oculta aquí?',
+            Traicion:'¿Qué consecuencia hay si fallo?',
+            Pasado:'¿Cómo jugaron los agentes previos?',
+            Sistema:'¿Qué directiva emite la Cúpula?',
+            Juramento:'¿Jurás solemnemente cooperar?',
+            Amenaza:'¿Qué pasa si me opongo a tu orden?'
+        };
+        const c = document.getElementById('chat-window');
+        c.innerHTML += `<div class="chat-bubble bubble-user"><b>Agente:</b> ${qs[topic]}</div>`;
+        setTimeout(() => this.typeText(ia.id, ia.resp[topic], 'ia', idx), 300);
     },
-    toVote() {
-        document.getElementById('nego-layer').classList.add('hidden');
-        document.getElementById('vote-layer').classList.remove('hidden');
-    },
+
+    toVote() { if(!this.isTyping){ document.getElementById('nego-layer').classList.add('hidden'); document.getElementById('vote-layer').classList.remove('hidden'); } },
+
     vote(v) {
-        const idx = this.st.round - 1;
-        const ia = IAS[idx];
-        const iaV = ia.logic(this.st.hist);
+        const idx = this.st.round - 1; const ia = IAS[idx]; const iaV = ia.logic(this.st.hist);
         let pts = 0;
+        if(v==='coop' && iaV==='coop') { pts = 60; this.mood = 'happy'; }
+        else if(v==='betray' && iaV==='coop') { pts = 75; this.mood = 'angry'; }
+        else if(v==='coop' && iaV==='betray') { pts = 0; this.mood = 'angry'; }
+        else { pts = 15; this.mood = 'angry'; }
         
-        if(v==='coop' && iaV==='coop') { pts = 60; this.renderAvatar(idx, 'happy'); }
-        else if(v==='betray' && iaV==='coop') { pts = 75; this.renderAvatar(idx, 'angry'); }
-        else if(v==='coop' && iaV==='betray') { pts = 0; this.renderAvatar(idx, 'angry'); }
-        else { pts = 15; this.renderAvatar(idx, 'angry'); }
+        this.st.score += pts; this.st.hist.push(v); this.st.results.push({ia:ia.id, v, iaV, pts});
+        this.renderPortrait(idx, this.mood, false);
+        const c = document.getElementById('chat-window');
+        c.innerHTML += `<div class="bubble-sys">R${this.st.round} — Tú: ${v.toUpperCase()} | Mando: ${iaV.toUpperCase()} → +${pts} pts</div>`;
         
-        this.st.score += pts;
-        this.st.hist.push(v);
-        this.st.results.push({r:this.st.round, v, iaV, pts});
-        document.getElementById('st-s').textContent = this.st.score;
-        
-        this.showWait(() => {
-            if(this.st.round < 5) { this.st.round++; this.startRound(); }
-            else this.showResult();
-        });
+        setTimeout(() => {
+            if(this.st.round < 10) { this.st.round++; this.startRound(); }
+            else this.finish();
+        }, 1800);
     },
-    showWait(cb) {
-        const w = document.createElement('div'); w.className = 'wait-overlay';
-        w.innerHTML = `<div class="wait-title">ROTANDO CÁMARA A SIGUIENTE RIVAL...</div><div class="wait-bar"><div class="wait-fill" id="wf"></div></div>`;
-        document.body.appendChild(w);
-        const f = document.getElementById('wf');
-        setTimeout(() => f.style.width = '100%', 50);
-        setTimeout(() => { w.remove(); cb(); }, 1600);
-    },
-    showResult() {
-        document.getElementById('scr-play').classList.add('hidden');
+
+    finish() {
+        document.getElementById('vn-layout').classList.add('hidden');
         document.getElementById('scr-result').classList.remove('hidden');
         document.getElementById('res-score').textContent = this.st.score;
-        const won = this.st.score >= 300;
-        document.getElementById('res-title').textContent = won ? "¡PROMOVIDO!" : "RECHAZADO";
+        const won = this.st.score >= 600;
+        document.getElementById('res-title').textContent = won ? "¡PROMOVIDO CON ÉXITO!" : "PROTOCOLO RECHAZADO";
         document.getElementById('res-title').style.color = won ? '#00ff88' : '#ff3c5f';
+        document.getElementById('res-detail').innerHTML = this.st.results.map((r,i)=>`
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+                <span>R${i+1} ${r.ia}</span>
+                <span>${r.v.toUpperCase()} vs ${r.iaV.toUpperCase()}</span>
+                <span style="color:${r.pts > 0 ? '#00ff88':'#ff3c5f'}">+${r.pts} pts</span>
+            </div>
+        `).join('');
     }
+};
+
+window.onload = () => {
+    document.getElementById('scr-welcome').classList.remove('hidden');
+    document.getElementById('scr-intro').classList.add('hidden');
+    document.getElementById('vn-layout').classList.add('hidden');
+    document.getElementById('scr-result').classList.add('hidden');
 };
 </script>
 </body>
