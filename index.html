@@ -3,404 +3,981 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE PROTOCOL — Dark Synth Edition</title>
+    <title>EL PROTOCOLO — 3D Matrix Edition</title>
     <style>
         :root {
-            --bg: #0a0b10;
-            --card: #161a23;
+            --bg: #050508;
+            --card: rgba(12, 16, 28, 0.92);
             --accent: #00f2ff;
-            --accent-glow: rgba(0, 242, 255, 0.3);
+            --accent-glow: rgba(0, 242, 255, 0.25);
             --secondary: #ff00ea;
             --danger: #ff3c5f;
-            --text: #ffffff;
+            --text: #e8e8f0;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Courier New', monospace;
             background: var(--bg);
             color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             overflow: hidden;
+            width: 100vw; height: 100vh;
         }
-
-        #main-frame {
-            width: 100%;
-            max-width: 420px;
-            height: 94vh;
-            background: var(--card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
-            padding: 16px;
-            overflow: hidden;
+        #canvas3d {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
         }
+        /* ---------- UI OVERLAY ---------- */
+        #ui-layer {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #ui-layer > * { pointer-events: auto; }
 
-        .screen { flex: 1; display: flex; flex-direction: column; animation: fadeIn 0.3s ease; height: 100%; overflow: hidden; }
+        .screen {
+            width: min(92vw, 440px);
+            display: flex; flex-direction: column;
+            animation: fadeUp 0.6s ease;
+        }
         .hidden { display: none !important; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* --- BURBUJA TUTORIAL COMPACTA --- */
-        .tutorial-cloud {
-            background: linear-gradient(135deg, var(--secondary) 0%, #8000ff 100%);
-            color: #fff;
-            padding: 8px 12px;
+        .panel {
+            background: var(--card);
+            border: 1px solid rgba(0, 242, 255, 0.15);
+            border-radius: 20px;
+            padding: 28px 24px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 0 60px rgba(0, 242, 255, 0.08), 0 20px 80px rgba(0,0,0,0.7);
+        }
+
+        h1 {
+            font-size: 26px; text-align: center;
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent-glow);
+            margin-bottom: 4px;
+            letter-spacing: 3px;
+        }
+        .subtitle {
+            text-align: center; font-size: 10px;
+            color: #667; letter-spacing: 2px;
+            margin-bottom: 18px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(0, 242, 255, 0.08);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 4px 12px; border-radius: 100px;
+            font-size: 10px; font-weight: bold;
+            color: var(--accent); letter-spacing: 1px;
+        }
+        .top-bar {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 14px;
+        }
+
+        input#p-name {
+            width: 100%; padding: 14px;
             border-radius: 12px;
-            font-size: 10px;
-            font-weight: 500;
-            line-height: 1.3;
-            box-shadow: 0 4px 15px rgba(255, 0, 234, 0.3);
-            margin-bottom: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.5);
+            color: #fff; text-align: center;
+            font-family: inherit; font-size: 13px;
+            outline: none; margin-bottom: 14px;
+            letter-spacing: 2px;
         }
-
-        .character-box {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 8px;
-            position: relative;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .svg-muñeco { width: 100%; height: 100%; filter: drop-shadow(0 0 8px var(--accent)); transition: all 0.3s; }
-        .mood-angry { filter: drop-shadow(0 0 12px var(--danger)); }
-
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; }
-        .badge { background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
-        .score-val { color: var(--accent); font-size: 14px; }
-
-        /* --- CHAT FIJO CON SCROLL INTERNO --- */
-        #chat-window {
-            height: 110px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            padding: 10px;
-            overflow-y: auto;
-            margin-bottom: 8px;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .chat-bubble {
-            max-width: 85%;
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 10px;
-            line-height: 1.3;
-        }
-        .bubble-ia { background: #252a35; color: #eee; align-self: flex-start; border-bottom-left-radius: 2px; border-left: 3px solid var(--secondary); }
-        .bubble-user { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 600; }
+        input#p-name:focus { border-color: var(--accent); }
 
         .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
+            width: 100%; padding: 14px;
+            border: none; border-radius: 14px;
+            font-size: 12px; font-weight: 800;
+            cursor: pointer; font-family: inherit;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px; transition: 0.2s;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, #00a2ff 100%); color: #000; box-shadow: 0 6px 15px var(--accent-glow); }
-        .btn-primary:hover { transform: translateY(-2px); }
-        .btn-secondary { background: #1e2430; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 8px; font-size: 9px; }
-        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-neon {
+            background: linear-gradient(135deg, var(--accent), #0066ff);
+            color: #000;
+            box-shadow: 0 6px 25px var(--accent-glow);
+        }
+        .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 10px 35px var(--accent-glow); }
+        .btn-dark {
+            background: rgba(255,255,255,0.04);
+            color: #ccc;
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 10px; padding: 10px;
+        }
+        .btn-dark:hover { border-color: var(--accent); color: var(--accent); }
 
+        #chat-window {
+            height: 120px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 14px;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+            gap: 6px;
+        }
+        .chat-bubble {
+            max-width: 88%; padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 10px; line-height: 1.35;
+            animation: fadeUp 0.3s ease;
+        }
+        .bubble-ia {
+            background: rgba(255, 0, 234, 0.08);
+            color: #ddd; align-self: flex-start;
+            border-left: 3px solid var(--secondary);
+            border-bottom-left-radius: 2px;
+        }
+        .bubble-user {
+            background: rgba(0, 242, 255, 0.12);
+            color: var(--accent); align-self: flex-end;
+            border-bottom-right-radius: 2px; font-weight: 600;
+        }
+
+        .tutorial-cloud {
+            background: linear-gradient(135deg, rgba(255,0,234,0.2), rgba(128,0,255,0.2));
+            color: #fff; padding: 8px 12px;
+            border-radius: 12px; font-size: 10px;
+            line-height: 1.35; margin-bottom: 10px;
+            border: 1px solid rgba(255,0,234,0.25);
+            animation: floatCloud 3s ease-in-out infinite;
+        }
+        @keyframes floatCloud {
+            0%,100%{ transform: translateY(0); }
+            50%{ transform: translateY(-3px); }
+        }
+
+        .grid-q {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 6px; margin-bottom: 10px;
+        }
+        .grid-vote {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .vote-card {
+            padding: 18px 10px; border-radius: 16px;
+            text-align: center; cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.06);
+            transition: 0.25s;
+        }
+        .vote-coop {
+            background: rgba(0, 242, 255, 0.06);
+            color: var(--accent);
+        }
+        .vote-coop:hover { border-color: var(--accent); background: rgba(0,242,255,0.15); box-shadow: 0 0 30px var(--accent-glow); }
+        .vote-betray {
+            background: rgba(255, 60, 95, 0.06);
+            color: var(--danger);
+        }
+        .vote-betray:hover { border-color: var(--danger); background: rgba(255,60,95,0.15); box-shadow: 0 0 30px rgba(255,60,95,0.3); }
+        .vote-label { font-weight: 800; font-size: 13px; letter-spacing: 1px; }
+        .vote-desc { font-size: 9px; opacity: 0.7; margin-top: 4px; }
+
+        .score-big {
+            text-align: center; font-size: 36px;
+            font-weight: 900; color: var(--accent);
+            text-shadow: 0 0 30px var(--accent-glow);
+            margin: 10px 0;
+        }
         .audio-btn {
-            background: transparent; border: 1px solid rgba(255,255,255,0.2);
-            color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 9px; cursor: pointer;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #aaa; padding: 4px 8px;
+            border-radius: 10px; font-size: 9px;
+            cursor: pointer; font-family: inherit;
         }
 
-        .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .choice-card {
-            padding: 16px;
-            border-radius: 16px;
-            border: 2px solid rgba(255,255,255,0.05);
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
+        .result-row {
+            display: flex; justify-content: space-between;
+            padding: 6px 0; font-size: 11px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .choice-coop { background: rgba(0, 242, 255, 0.05); color: var(--accent); }
-        .choice-coop:hover { border-color: var(--accent); background: rgba(0, 242, 255, 0.1); }
-        .choice-betray { background: rgba(255, 60, 95, 0.05); color: var(--danger); }
-        .choice-betray:hover { border-color: var(--danger); background: rgba(255, 60, 95, 0.1); }
+        .result-row:last-child { border: none; }
+        .r-green { color: #00ff88; }
+        .r-red { color: var(--danger); }
+
+        .ia-geo-label {
+            text-align: center; font-size: 11px;
+            color: var(--secondary); letter-spacing: 2px;
+            margin-bottom: 8px; font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <div id="main-frame">
-        
-        <!-- SCREEN: WELCOME -->
-        <div id="scr-welcome" class="screen" style="justify-content: center;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span class="badge" style="color:var(--accent)">PROTOCOL // V13</span>
-                <button class="audio-btn" onclick="AudioEngine.toggle()">🎵 MÚSICA: <span id="music-status">OFF</span></button>
-            </div>
-            
-            <h1 style="text-align:center; font-size:22px; margin-bottom:5px;">EL PROTOCOLO</h1>
-            <p style="text-align:center; font-size:10px; color:#666; margin-bottom:12px;">Simulación Burocrática de Alta Tensión</p>
+<canvas id="canvas3d"></canvas>
 
-            <div class="character-box" style="width:100px; height:100px;">
-                <svg viewBox="0 0 100 100" class="svg-muñeco">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="3" />
-                    <circle cx="35" cy="40" r="5" fill="currentColor" />
-                    <circle cx="65" cy="40" r="5" fill="currentColor" />
-                    <path d="M30 68 Q50 78 70 68" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
-                </svg>
-            </div>
+<div id="ui-layer">
 
-            <p style="text-align:center; font-size:11px; color:#aaa; margin-bottom:20px; line-height:1.4;">
-                Sobrevive a 5 Mandos de Inteligencia.<br>
-                Alcanza <b style="color:var(--accent)">1,000 PUNTOS</b> para ser promovido.
+    <!-- ========== WELCOME ========== -->
+    <div id="scr-welcome" class="screen">
+        <div class="panel">
+            <div class="top-bar">
+                <span class="badge">PROTOCOL // 3D</span>
+                <button class="audio-btn" onclick="Audio.toggle()">🎵 AUDIO: <span id="aud-st">OFF</span></button>
+            </div>
+            <h1>EL PROTOCOLO</h1>
+            <p class="subtitle">MESA DE LA REALIDAD</p>
+
+            <p style="text-align:center; font-size:11px; color:#889; line-height:1.6; margin-bottom:16px;">
+                5 Mandos geométricos te esperan.<br>
+                Alcanza <b style="color:var(--accent)">300 puntos</b> para sobrevivir.<br>
+                Interroga antes de votar. Cada Mando tiene un patrón.
             </p>
 
-            <input type="text" id="p-name" placeholder="INGRESA ID DE AGENTE..." style="width:100%; padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:#000; color:#fff; text-align:center; margin-bottom:12px; font-family:inherit; outline:none; font-size:11px;">
-            <button class="btn btn-primary" onclick="Game.init()">Iniciar Simulación</button>
+            <input id="p-name" placeholder="TU ID DE AGENTE...">
+            <button class="btn btn-neon" onclick="Game.init()">Entrar al Protocolo</button>
         </div>
-
-        <!-- SCREEN: GAMEPLAY -->
-        <div id="scr-play" class="screen hidden">
-            <div class="top-nav">
-                <div class="badge">RONDA <span id="stat-r">1</span>/5</div>
-                <div class="badge score-val"><span id="stat-s">0</span> pts</div>
-                <button class="audio-btn" onclick="AudioEngine.toggle()">🎵 <span id="music-status-2">OFF</span></button>
-            </div>
-
-            <div id="ia-header" style="text-align:center; margin-bottom:2px;">
-                <h3 id="ia-name" style="font-size:12px; color:var(--secondary); text-transform:uppercase;">MANDO: AUDITOR_GRIS</h3>
-            </div>
-
-            <div class="character-box">
-                <div id="ia-muñeco"></div>
-            </div>
-
-            <div id="chat-window"></div>
-
-            <div id="action-layer">
-                <!-- BURBUJA TUTORIAL COMPACTA -->
-                <div class="tutorial-cloud" id="cloud-guide">
-                    💬 <b>Nube:</b> Interroga al Mando antes de votar para descubrir su patrón y decidir si cooperas o desertas.
-                </div>
-
-                <div id="nego-layer">
-                    <p style="font-size:9px; color:#666; text-align:center; margin-bottom:6px; font-weight:bold;">INTERROGAR AL MANDO:</p>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px;">
-                        <button class="btn btn-secondary" onclick="Game.ask('Beneficio')">¿Qué gano cooperando?</button>
-                        <button class="btn btn-secondary" onclick="Game.ask('Confianza')">¿Por qué fiarme de ti?</button>
-                        <button class="btn btn-secondary" onclick="Game.ask('Truco')">¿Cuál es la trampa?</button>
-                        <button class="btn btn-secondary" onclick="Game.ask('Traicion')">¿Y si te traiciono?</button>
-                    </div>
-                    <button class="btn btn-primary" onclick="Game.toVote()" style="padding:10px; font-size:11px;">Proceder a la Decisión &rarr;</button>
-                </div>
-
-                <div id="vote-layer" class="hidden" style="margin-top: 10px;">
-                    <div class="grid-choices">
-                        <div class="choice-card choice-coop" onclick="Game.vote('coop')">
-                            <div style="font-weight:bold; font-size:12px;">COOPERAR</div>
-                            <div style="font-size:9px; opacity:0.8;">+10 pts Colectivo</div>
-                        </div>
-                        <div class="choice-card choice-betray" onclick="Game.vote('betray')">
-                            <div style="font-weight:bold; font-size:12px;">DESERTAR</div>
-                            <div style="font-size:9px; opacity:0.8;">+18 pts Individual</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        const AudioEngine = {
-            ctx: null, osc: null, gain: null, isPlaying: false,
-            init() {
-                if(this.ctx) return;
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                this.ctx = new AudioCtx();
-                this.osc = this.ctx.createOscillator();
-                this.gain = this.ctx.createGain();
-                this.osc.type = 'sawtooth';
-                this.osc.frequency.setValueAtTime(55, this.ctx.currentTime);
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(200, this.ctx.currentTime);
-                this.osc.connect(filter);
-                filter.connect(this.gain);
-                this.gain.connect(this.ctx.destination);
-                this.gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
-                this.osc.start();
-            },
-            toggle() {
-                if(!this.ctx) this.init();
-                this.isPlaying = !this.isPlaying;
-                this.gain.gain.setValueAtTime(this.isPlaying ? 0.03 : 0, this.ctx.currentTime);
-                if(this.isPlaying) this.ctx.resume();
-                document.getElementById('music-status').textContent = this.isPlaying ? 'ON' : 'OFF';
-                document.getElementById('music-status-2').textContent = this.isPlaying ? 'ON' : 'OFF';
-            }
-        };
+    <!-- ========== GAMEPLAY ========== -->
+    <div id="scr-play" class="screen hidden">
+        <div class="panel">
+            <div class="top-bar">
+                <span class="badge">RONDA <span id="st-r">1</span>/5</span>
+                <span class="badge" style="color:var(--accent)">SCORE: <span id="st-s">0</span></span>
+                <button class="audio-btn" onclick="Audio.toggle()">🎵 <span id="aud-st2">OFF</span></button>
+            </div>
+            <p class="ia-geo-label" id="ia-title">◇ CUBO — AUDITOR_GRIS</p>
+            <div id="chat-window"></div>
+            <div id="action-layer">
+                <div class="tutorial-cloud hidden" id="cloud-guide">
+                    💬 <b>Nube del Sistema:</b> Usa los 4 botones para interrogar al Mando. Sus respuestas revelan su patrón oculto antes de que decidas cooperar o desertar.
+                </div>
+                <div id="nego-layer">
+                    <p style="font-size:9px; color:#556; text-align:center; margin-bottom:6px; letter-spacing:1px;">► INTERROGAR AL MANDO:</p>
+                    <div class="grid-q">
+                        <button class="btn btn-dark" onclick="Game.ask('Beneficio')">¿Qué gano cooperando?</button>
+                        <button class="btn btn-dark" onclick="Game.ask('Confianza')">¿Por qué fiarme de ti?</button>
+                        <button class="btn btn-dark" onclick="Game.ask('Truco')">¿Cuál es la trampa?</button>
+                        <button class="btn btn-dark" onclick="Game.ask('Traicion')">¿Y si te traiciono?</button>
+                    </div>
+                    <button class="btn btn-neon" onclick="Game.toVote()" style="font-size:11px; padding:10px;">Proceder a la Decisión →</button>
+                </div>
+                <div id="vote-layer" class="hidden">
+                    <div class="grid-vote">
+                        <div class="vote-card vote-coop" onclick="Game.vote('coop')">
+                            <div class="vote-label">COOPERAR</div>
+                            <div class="vote-desc">Fuerza colectiva</div>
+                        </div>
+                        <div class="vote-card vote-betray" onclick="Game.vote('betray')">
+                            <div class="vote-label">DESERTAR</div>
+                            <div class="vote-desc">Interés individual</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const IAS = [
-            { 
-                id: "AUDITOR_GRIS", color: "#00f2ff", 
-                intro: "Atención Agente. Soy la unidad de control inicial. La cooperación genera eficiencia comprobada.",
-                resp: {
-                    Beneficio: "Si ambos cooperamos, la base suma 20 puntos limpios. Sin sorpresas ni penalizaciones.",
-                    Confianza: "Mis algoritmos están programados para mantener la estabilidad en la primera ronda.",
-                    Truco: "No hay trampa aquí. La trampa vendrá después si no acumulas puntos ahora.",
-                    Traicion: "Si me traicionas, me obligarás a registrar un informe negativo en tu expediente."
-                },
-                logic: () => "coop" 
-            },
-            { 
-                id: "REPARTIDOR_VENGATIVO", color: "#ff00ea", 
-                intro: "Soy el reflejo de tus actos. Si juegas limpio conmigo, seré tu mejor aliado. Si me vendes, te arrepentirás.",
-                resp: {
-                    Beneficio: "Ganas un socio leal para esta ronda... siempre que no intentes pasarte de listo.",
-                    Confianza: "Yo no confío, yo REPLICO. Lo que tú hagas ahora definirá mi respuesta exacta.",
-                    Truco: "El truco es que sé perfectamente lo que hiciste en la ronda anterior.",
-                    Traicion: "Pruébalo y verás cómo respondo en el siguiente periodo. No olvido."
-                },
-                logic: (h) => h.length && h[h.length-1] === 'betray' ? 'betray' : 'coop' 
-            },
-            { 
-                id: "DELEGADO_CAOS", color: "#ffcc00", 
-                intro: "El sistema aplicó un IMPUESTO DEL 10%. Las cosas se están complicando, Agente.",
-                resp: {
-                    Beneficio: "Ganamos menos por culpa del impuesto. Cooperar es la única forma de no quedar en cero.",
-                    Confianza: "¿Confiar en mí? Ni yo sé qué voy a votar hoy. Depende del clima institucional.",
-                    Truco: "La trampa es que el impuesto se come tus ganancias si intentas jugar solo.",
-                    Traicion: "Hazlo. Quizás yo también deserte y ambos perdamos todo."
-                },
-                logic: () => Math.random() > 0.4 ? 'coop' : 'betray' 
-            },
-            { 
-                id: "AUDITORIA_PUNITIVA", color: "#ff3c5f", 
-                intro: "IMPUESTO DEL 15% ACTIVADO. Detecto que la clase está perdiendo puntos por culpa de traidores.",
-                resp: {
-                    Beneficio: "El beneficio es sobrevivir a esta ronda sin quedar en números rojos.",
-                    Confianza: "La confianza expiró en la ronda 2. Ahora todo es control y auditoría.",
-                    Truco: "Que el impuesto es tan alto que una traición mutua destruirá tu puntaje.",
-                    Traicion: "Si me traicionas, me aseguraré de recortar tus créditos finales."
-                },
-                logic: (h) => h.filter(x => x === 'betray').length > 0 ? 'betray' : 'coop' 
-            },
-            { 
-                name: "MESA_DIRECTIVA", color: "#a800ff", 
-                intro: "AUSTERIDAD EXTREMA. LIMITADOR 0.9x ACTIVADO. Los recursos son casi nulos.",
-                resp: {
-                    Beneficio: "Si cooperas, tal vez arañes los últimos puntos para llegar a los 1,000.",
-                    Confianza: "Estás hablando con la cúpula. Nosotros no negociamos, nosotros imponemos.",
-                    Truco: "Que la mayoría falla en esta ronda por desesperación.",
-                    Traicion: "Inténtalo. He destruido a Agentes con más puntos que tú."
-                },
-                logic: () => Math.random() > 0.2 ? 'betray' : 'coop' 
+    <!-- ========== RESULT ========== -->
+    <div id="scr-result" class="screen hidden">
+        <div class="panel">
+            <h1 id="result-title">EVALUACIÓN</h1>
+            <p class="subtitle">PROTOCOLO FINALIZADO</p>
+            <div class="score-big" id="final-score">0</div>
+            <div id="result-detail"></div>
+            <p style="text-align:center; margin-top:14px; font-size:12px; font-weight:bold;" id="result-verdict"></p>
+            <button class="btn btn-neon" style="margin-top:14px;" onclick="location.reload()">Reiniciar Protocolo</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* =======================================================
+   THREE.JS — MINI INLINE (no CDN, no fetch)
+   We build the 3D scene with raw WebGL + helper math.
+   ======================================================= */
+const C3D = {
+    canvas: null, gl: null, prog: null,
+    time: 0,
+    shapes: [], // {mesh, color, target, phase}
+    particles: [],
+
+    init() {
+        this.canvas = document.getElementById('canvas3d');
+        this.gl = this.canvas.getContext('webgl', { antialias: true, alpha: true });
+        if (!this.gl) return;
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+
+        // Shader
+        const gl = this.gl;
+        const vs = `
+            attribute vec3 aPos;
+            attribute vec3 aNorm;
+            uniform mat4 uMVP;
+            uniform mat4 uModel;
+            varying vec3 vNorm;
+            varying vec3 vWorldPos;
+            void main(){
+                vec4 wp = uModel * vec4(aPos, 1.0);
+                vWorldPos = wp.xyz;
+                vNorm = mat3(uModel) * aNorm;
+                gl_Position = uMVP * vec4(aPos, 1.0);
             }
+        `;
+        const fs = `
+            precision mediump float;
+            varying vec3 vNorm;
+            varying vec3 vWorldPos;
+            uniform vec3 uColor;
+            uniform float uGlow;
+            void main(){
+                vec3 N = normalize(vNorm);
+                vec3 L = normalize(vec3(0.5, 1.0, 0.8));
+                float diff = max(dot(N, L), 0.0);
+                float rim = 1.0 - max(dot(N, vec3(0,0,1)), 0.0);
+                rim = pow(rim, 3.0);
+                vec3 col = uColor * (0.15 + diff * 0.6) + uColor * rim * uGlow;
+                col += vec3(0.02, 0.02, 0.04);
+                float fog = 0.6;
+                col = mix(col, vec3(0.02, 0.02, 0.03), fog);
+                gl_FragColor = vec4(col, 0.95);
+            }
+        `;
+        this.prog = this.compileProgram(vs, fs);
+        this.buildTable();
+        this.buildShapes();
+        this.buildParticles();
+        this.buildGrid();
+        requestAnimationFrame(t => this.render(t));
+    },
+
+    compileShader(s, t) {
+        const gl = this.gl, sh = gl.createShader(t);
+        gl.shaderSource(sh, s); gl.compileShader(sh);
+        if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS))
+            console.error(gl.getShaderInfoLog(sh));
+        return sh;
+    },
+    compileProgram(vs, fs) {
+        const gl = this.gl, p = gl.createProgram();
+        gl.attachShader(p, this.compileShader(vs, gl.VERTEX_SHADER));
+        gl.attachShader(p, this.compileShader(fs, gl.FRAGMENT_SHADER));
+        gl.linkProgram(p); gl.useProgram(p);
+        return p;
+    },
+
+    resize() {
+        const c = this.canvas, dpr = window.devicePixelRatio || 1;
+        c.width = window.innerWidth * dpr;
+        c.height = window.innerHeight * dpr;
+        c.style.width = window.innerWidth + 'px';
+        c.style.height = window.innerHeight + 'px';
+        this.gl.viewport(0, 0, c.width, c.height);
+    },
+
+    // --- MATH helpers ---
+    mat4Perspective(fov, asp, near, far) {
+        const f = 1.0 / Math.tan(fov / 2);
+        const nf = 1 / (near - far);
+        return new Float32Array([
+            f/asp,0,0,0, 0,f,0,0, 0,0,(far+near)*nf,-1, 0,0,2*far*near*nf,0
+        ]);
+    },
+    mat4LookAt(eye, center, up) {
+        const zx=eye[0]-center[0], zy=eye[1]-center[1], zz=eye[2]-center[2];
+        let len=Math.sqrt(zx*zx+zy*zy+zz*zz);
+        const zz2=zz/len, zy2=zy/len, zx2=zx/len;
+        const xx=up[1]*zz2-up[2]*zy2, xy=up[2]*zx2-up[0]*zz2, xz=up[0]*zy2-up[1]*zx2;
+        len=Math.sqrt(xx*xx+xy*xy+xz*xz);
+        const xx2=xx/len, xy2=xy/len, xz2=xz/len;
+        const yx=zy2*xz2-zx2*xy2, yy=zx2*xx2-xx2*zz2, yz=xx2*xy2-zy2*xz2;
+        return new Float32Array([
+            xx2,yx,zx2,0, xy2,yy,zy2,0, xz2,yz,zz2,0,
+            -(xx2*eye[0]+xy2*eye[1]+xz2*eye[2]),
+            -(yx*eye[0]+yy*eye[1]+yz*eye[2]),
+            -(zx2*eye[0]+zy2*eye[1]+zz2*eye[2]),1
+        ]);
+    },
+    mat4Multiply(a, b) {
+        const o = new Float32Array(16);
+        for(let i=0;i<4;i++) for(let j=0;j<4;j++){
+            o[j*4+i]=a[i]*b[j*4]+a[4+i]*b[j*4+1]+a[8+i]*b[j*4+2]+a[12+i]*b[j*4+3];
+        }
+        return o;
+    },
+    mat4Identity() { return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]); },
+    mat4Translate(x,y,z) {
+        return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,x,y,z,1]);
+    },
+    mat4Scale(s) {
+        return new Float32Array([s,0,0,0,0,s,0,0,0,0,s,0,0,0,0,1]);
+    },
+    mat4RotateY(a) {
+        const c=Math.cos(a), s=Math.sin(a);
+        return new Float32Array([c,0,s,0,0,1,0,0,-s,0,c,0,0,0,0,1]);
+    },
+    mat4RotateX(a) {
+        const c=Math.cos(a), s=Math.sin(a);
+        return new Float32Array([1,0,0,0,0,c,-s,0,0,s,c,0,0,0,0,1]);
+    },
+
+    // --- Geometry builders ---
+    buildBox(size) {
+        const s = size/2, verts = [];
+        const faces = [
+            {n:[0,0,1], v:[[s,s,s],[-s,s,s],[-s,-s,s],[s,-s,s]]},
+            {n:[0,0,-1], v:[[s,s,-s],[s,-s,-s],[-s,-s,-s],[-s,s,-s]]},
+            {n:[1,0,0], v:[[s,s,s],[s,-s,s],[s,-s,-s],[s,s,-s]]},
+            {n:[-1,0,0], v:[[-s,s,-s],[-s,-s,-s],[-s,-s,s],[-s,s,s]]},
+            {n:[0,1,0], v:[[s,s,s],[-s,s,s],[-s,s,-s],[s,s,-s]]},
+            {n:[0,-1,0], v:[[s,-s,-s],[-s,-s,-s],[-s,-s,s],[s,-s,s]]},
         ];
+        let pos=[], norm=[];
+        faces.forEach(f => {
+            const a=f.v[0], b=f.v[1], c=f.v[2], d=f.v[3];
+            [[a,b,c],[a,c,d]].forEach(tri => {
+                tri.forEach(v => { pos.push(...v); norm.push(...f.n); });
+            });
+        });
+        return { pos: new Float32Array(pos), norm: new Float32Array(norm), count: pos.length/3 };
+    },
 
-        const Game = {
-            st: { name: "", round: 1, score: 0, hist: [] },
-            init() {
-                const n = document.getElementById('p-name').value.trim();
-                if(!n) return alert("INGRESA UN ID DE AGENTE VALIDO.");
-                this.st.name = n;
-                document.getElementById('scr-welcome').classList.add('hidden');
-                document.getElementById('scr-play').classList.remove('hidden');
-                
-                try { AudioEngine.init(); } catch(e){}
+    buildIcosahedron(r) {
+        const t = (1+Math.sqrt(5))/2;
+        let v = [
+            [-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],
+            [0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],
+            [t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]
+        ];
+        const f = [
+            [0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],
+            [1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],
+            [3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],
+            [4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]
+        ];
+        v = v.map(p => { const l=Math.sqrt(p[0]**2+p[1]**2+p[2]**2); return p.map(c=>c/l*r); });
+        let pos=[], norm=[];
+        f.forEach(fi => {
+            const a=v[fi[0]], b=v[fi[1]], c=v[fi[2]];
+            const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]];
+            const e2=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+            let nx=e1[1]*e2[2]-e1[2]*e2[1], ny=e1[2]*e2[0]-e1[0]*e2[2], nz=e1[0]*e2[1]-e1[1]*e2[0];
+            const nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1; nx/=nl; ny/=nl; nz/=nl;
+            [a,b,c].forEach(p => { pos.push(p[0],p[1],p[2]); norm.push(nx,ny,nz); });
+        });
+        return { pos: new Float32Array(pos), norm: new Float32Array(norm), count: pos.length/3 };
+    },
 
-                this.startRound();
-            },
-            startRound() {
-                const ia = IAS[Math.min(this.st.round-1, IAS.length-1)];
-                document.getElementById('ia-name').textContent = ia.id || ia.name;
-                document.getElementById('stat-r').textContent = this.st.round;
-                this.updateAvatar(ia.color, 'neutral');
-                
-                const win = document.getElementById('chat-window');
-                win.innerHTML = '';
-                this.addMsg(ia.id || ia.name, ia.intro, 'ia');
-                
-                document.getElementById('nego-layer').classList.remove('hidden');
-                document.getElementById('vote-layer').classList.add('hidden');
+    buildOctahedron(r) {
+        const v = [[0,r,0],[0,-r,0],[r,0,0],[-r,0,0],[0,0,r],[0,0,-r]];
+        const f = [[0,2,4],[0,4,3],[0,3,5],[0,5,2],[1,4,2],[1,3,4],[1,5,3],[1,2,5]];
+        let pos=[], norm=[];
+        f.forEach(fi => {
+            const a=v[fi[0]], b=v[fi[1]], c=v[fi[2]];
+            const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]];
+            const e2=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+            let nx=e1[1]*e2[2]-e1[2]*e2[1], ny=e1[2]*e2[0]-e1[0]*e2[2], nz=e1[0]*e2[1]-e1[1]*e2[0];
+            const nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1; nx/=nl; ny/=nl; nz/=nl;
+            [a,b,c].forEach(p => { pos.push(...p); norm.push(nx,ny,nz); });
+        });
+        return { pos: new Float32Array(pos), norm: new Float32Array(norm), count: pos.length/3 };
+    },
 
-                const cloud = document.getElementById('cloud-guide');
-                if(this.st.round === 1) cloud.classList.remove('hidden');
-                else cloud.classList.add('hidden');
-            },
-            updateAvatar(color, mood) {
-                const root = document.getElementById('ia-muñeco');
-                let face = mood === 'happy' ? "M30 68 Q50 82 70 68" : (mood === 'angry' ? "M30 75 Q50 60 70 75" : "M30 68 Q50 68 70 68");
-                root.innerHTML = `
-                    <svg viewBox="0 0 100 100" class="svg-muñeco ${mood === 'angry' ? 'mood-angry' : ''}" style="color:${color}">
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="3" />
-                        <circle cx="35" cy="40" r="5" fill="currentColor" />
-                        <circle cx="65" cy="40" r="5" fill="currentColor" />
-                        <path d="${face}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
-                    </svg>
-                `;
-            },
-            ask(topic) {
-                const ia = IAS[Math.min(this.st.round-1, IAS.length-1)];
-                const questions = {
-                    Beneficio: "¿Qué gano si coopero contigo?",
-                    Confianza: "¿Por qué debería fiarme de ti?",
-                    Truco: "¿Cuál es el truco en esta ronda?",
-                    Traicion: "¿Qué pasa si te traiciono?"
-                };
-                this.addMsg(this.st.name, questions[topic], 'user');
-                setTimeout(() => this.addMsg(ia.id || ia.name, ia.resp[topic], 'ia'), 300);
-            },
-            addMsg(w, m, t) {
-                const win = document.getElementById('chat-window');
-                win.innerHTML += `<div class="chat-bubble bubble-${t}"><b>${w}:</b> ${m}</div>`;
-                win.scrollTop = win.scrollHeight;
-            },
-            toVote() {
-                document.getElementById('nego-layer').classList.add('hidden');
-                document.getElementById('vote-layer').classList.remove('hidden');
-            },
-            vote(v) {
-                const ia = IAS[Math.min(this.st.round-1, IAS.length-1)];
-                const iaV = ia.logic(this.st.hist);
-                let pts = 0;
-                
-                if(v === 'coop' && iaV === 'coop') { pts = 110; this.updateAvatar(ia.color, 'happy'); }
-                else if(v === 'betray' && iaV === 'coop') { pts = 198; this.updateAvatar(ia.color, 'angry'); }
-                else if(v === 'coop' && iaV === 'betray') { pts = 0; this.updateAvatar(ia.color, 'angry'); }
-                else { pts = 55; this.updateAvatar(ia.color, 'angry'); }
-                
-                this.st.score += pts;
-                this.st.hist.push(v);
-                document.getElementById('stat-s').textContent = this.st.score;
-                
-                if(this.st.round < 5) {
-                    this.st.round++;
-                    setTimeout(() => this.startRound(), 1200);
-                } else {
-                    const win = this.st.score >= 1000;
-                    alert(`EVALUACIÓN FINALIZADA.\nPuntaje Total: ${this.st.score} pts.\nEstado: ${win ? "PROMOVIDO (¡Aprobaste!)" : "RECHAZADO (Puntaje insuficiente)"}`);
-                    location.reload();
-                }
+    buildDodecahedron(r) {
+        // Simplified: use golden ratio based vertices
+        const phi = (1+Math.sqrt(5))/2;
+        let v = [
+            [1,1,1],[1,1,-1],[1,-1,1],[1,-1,-1],[-1,1,1],[-1,1,-1],[-1,-1,1],[-1,-1,-1],
+            [0,1/phi,phi],[0,-1/phi,phi],[0,1/phi,-phi],[0,-1/phi,-phi],
+            [1/phi,phi,0],[-1/phi,phi,0],[1/phi,-phi,0],[-1/phi,-phi,0],
+            [phi,0,1/phi],[phi,0,-1/phi],[-phi,0,1/phi],[-phi,0,-1/phi]
+        ];
+        const f = [
+            [0,8,4,14,12],[0,12,1,9,10],[0,10,3,13,8],[8,13,5,18,4],
+            [4,18,16,14],[14,16,2,6,12],[12,6,1,12],[1,9,15,11,10],
+            [10,11,3,19,13],[13,19,7,5],[5,18,17,11,9],[11,17,2,16,10],
+            [2,6,19,3],[6,7,15,11],[7,19,2,6],[15,7,19,11]
+        ];
+        // Normalize vertices
+        v = v.map(p => { const l=Math.sqrt(p[0]**2+p[1]**2+p[2]**2); return p.map(c=>c/l*r); });
+        let pos=[], norm=[];
+        // Triangulate quads and pentagons
+        f.forEach(fi => {
+            const verts = fi.map(i => v[i]);
+            const center = [0,0,0];
+            for(let i=1;i<verts.length;i++){ center[0]+=verts[i][0]; center[1]+=verts[i][1]; center[2]+=verts[i][2]; }
+            center[0]/=verts.length; center[1]/=verts.length; center[2]/=verts.length;
+            // Face normal from center
+            const cnx=center[0], cny=center[1], cnz=center[2];
+            const cnl=Math.sqrt(cnx*cnx+cny*cny+cnz*cnz)||1;
+            for(let i=1;i<verts.length-1;i++){
+                [v[fi[0]],verts[i],verts[i+1]].forEach(p => { pos.push(...p); norm.push(cnx/cnl,cny/cnl,cnz/cnl); });
             }
+        });
+        return { pos: new Float32Array(pos), norm: new Float32Array(norm), count: pos.length/3 };
+    },
+
+    buildTorus(R, r, seg, rings) {
+        let pos=[], norm=[];
+        for(let i=0;i<rings;i++){
+            for(let j=0;j<seg;j++){
+                const a1=i/rings*Math.PI*2, a2=j/seg*Math.PI*2;
+                const a1n=(i+1)/rings*Math.PI*2, a2n=(j+1)/seg*Math.PI*2;
+                const p0=[(R+r*Math.cos(a2))*Math.cos(a1),(R+r*Math.cos(a2))*Math.sin(a1),r*Math.sin(a2)];
+                const fn=[Math.cos(a2)*Math.cos(a1),Math.cos(a2)*Math.sin(a1),Math.sin(a2)];
+                const p1=[(R+r*Math.cos(a2))*Math.cos(a1n),(R+r*Math.cos(a2))*Math.sin(a1n),r*Math.sin(a2)];
+                const p2=[(R+r*Math.cos(a2n))*Math.cos(a1n),(R+r*Math.cos(a2n))*Math.sin(a1n),r*Math.sin(a2n)];
+                const p3=[(R+r*Math.cos(a2n))*Math.cos(a1),(R+r*Math.cos(a2n))*Math.sin(a1),r*Math.sin(a2n)];
+                [[p0,p1,p2],[p0,p2,p3]].forEach(tri => {
+                    tri.forEach(p => { pos.push(p[0],p[1],p[2]); norm.push(fn[0],fn[1],fn[2]); });
+                });
+            }
+        }
+        return { pos: new Float32Array(pos), norm: new Float32Array(norm), count: pos.length/3 };
+    },
+
+    createBuffer(geom) {
+        const gl = this.gl;
+        const pb = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, pb);
+        gl.bufferData(gl.ARRAY_BUFFER, geom.pos, gl.STATIC_DRAW);
+        const nb = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, nb);
+        gl.bufferData(gl.ARRAY_BUFFER, geom.norm, gl.STATIC_DRAW);
+        return { pb, nb, count: geom.count };
+    },
+
+    // --- Build scene objects ---
+    buildTable() {
+        const gl = this.gl;
+        // Table: a flat disc (torus with tiny tube)
+        const geom = this.buildTorus(2.0, 0.06, 16, 48);
+        this.table = this.createBuffer(geom);
+    },
+
+    buildShapes() {
+        const gl = this.gl;
+        const geos = [
+            { g: this.buildBox(0.7), color: [0, 0.95, 1], phase: 0 },           // CUBE - cyan
+            { g: this.buildIcosahedron(0.55), color: [1, 0, 0.92], phase: Math.PI*2/5 },   // ICO - magenta
+            { g: this.buildOctahedron(0.6), color: [1, 0.8, 0], phase: Math.PI*4/5 },      // OCTA - gold
+            { g: this.buildBox(0.55), color: [1, 0.24, 0.37], phase: Math.PI*6/5 },  // DODECA proxy - red
+            { g: this.buildIcosahedron(0.5), color: [0.66, 0, 1], phase: Math.PI*8/5 },  // DODECA proxy - purple
+        ];
+        this.shapes = geos.map((item, i) => ({
+            buf: this.createBuffer(item.g),
+            color: item.color,
+            phase: item.phase,
+            glow: 0.8,
+            highlight: 0,
+        }));
+    },
+
+    buildParticles() {
+        const gl = this.gl;
+        const count = 300;
+        const pos = [];
+        for(let i=0;i<count;i++){
+            pos.push(
+                (Math.random()-0.5)*14,
+                Math.random()*6 - 1,
+                (Math.random()-0.5)*14
+            );
+        }
+        this.particlePos = new Float32Array(pos);
+        this.particleCount = count;
+
+        // Point shader
+        const vs = `
+            attribute vec3 aPPos;
+            uniform mat4 uPV;
+            uniform float uTime;
+            varying float vAlpha;
+            void main(){
+                vec3 p = aPPos;
+                p.y += sin(uTime * 0.5 + aPPos.x * 2.0) * 0.3;
+                gl_Position = uPV * vec4(p, 1.0);
+                gl_PointSize = 2.0 + sin(uTime + aPPos.z * 3.0) * 1.0;
+                vAlpha = 0.3 + sin(uTime * 0.7 + aPPos.y) * 0.2;
+            }
+        `;
+        const fs = `
+            precision mediump float;
+            varying float vAlpha;
+            void main(){
+                float d = length(gl_PointCoord - 0.5) * 2.0;
+                if(d > 1.0) discard;
+                float a = (1.0 - d) * vAlpha;
+                gl_FragColor = vec4(0.0, 0.95, 1.0, a * 0.4);
+            }
+        `;
+        const vs2 = this.compileShader(vs, gl.VERTEX_SHADER);
+        const fs2 = this.compileShader(fs, gl.FRAGMENT_SHADER);
+        this.particleProg = gl.createProgram();
+        gl.attachShader(this.particleProg, vs2);
+        gl.attachShader(this.particleProg, fs2);
+        gl.linkProgram(this.particleProg);
+        this.particleBuf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, this.particlePos, gl.STATIC_DRAW);
+    },
+
+    buildGrid() {
+        const gl = this.gl;
+        const lines = [];
+        for(let i=-8;i<=8;i++){
+            lines.push(i,0,-8, i,0,8);
+            lines.push(-8,0,i, 8,0,i);
+        }
+        this.gridPos = new Float32Array(lines);
+        this.gridCount = lines.length / 3;
+
+        const vs = `
+            attribute vec3 aGPos;
+            uniform mat4 uGV;
+            void main(){
+                gl_Position = uGV * vec4(aGPos, 1.0);
+            }
+        `;
+        const fs = `
+            precision mediump float;
+            void main(){
+                gl_FragColor = vec4(0.0, 0.3, 0.4, 0.12);
+            }
+        `;
+        const vs2 = this.compileShader(vs, gl.VERTEX_SHADER);
+        const fs2 = this.compileShader(fs, gl.FRAGMENT_SHADER);
+        this.gridProg = gl.createProgram();
+        gl.attachShader(this.gridProg, vs2);
+        gl.attachShader(this.gridProg, fs2);
+        gl.linkProgram(this.gridProg);
+        this.gridBuf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.gridBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, this.gridPos, gl.STATIC_DRAW);
+    },
+
+    // --- Active shape index for highlighting ---
+    setActive(idx) {
+        this.shapes.forEach((s, i) => {
+            s.highlight = (i === idx) ? 1.0 : 0.0;
+            s.glow = (i === idx) ? 1.5 : 0.5;
+        });
+    },
+
+    render(ts) {
+        const gl = this.gl;
+        this.time = ts * 0.001;
+        gl.clearColor(0.02, 0.02, 0.03, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        const asp = this.canvas.width / this.canvas.height;
+        const proj = this.mat4Perspective(60 * Math.PI / 180, asp, 0.1, 100);
+        const view = this.mat4LookAt([0, 3.5, 5.5], [0, 0, 0], [0, 1, 0]);
+        const vp = this.mat4Multiply(proj, view);
+
+        // Draw grid
+        gl.useProgram(this.gridProg);
+        const uGV = gl.getUniformLocation(this.gridProg, 'uGV');
+        gl.uniformMatrix4fv(uGV, false, vp);
+        const aG = gl.getAttribLocation(this.gridProg, 'aGPos');
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.gridBuf);
+        gl.enableVertexAttribArray(aG);
+        gl.vertexAttribPointer(aG, 3, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.LINES, 0, this.gridCount);
+        gl.disableVertexAttribArray(aG);
+
+        // Draw particles
+        gl.useProgram(this.particleProg);
+        const uPV = gl.getUniformLocation(this.particleProg, 'uPV');
+        const uTime = gl.getUniformLocation(this.particleProg, 'uTime');
+        gl.uniformMatrix4fv(uPV, false, vp);
+        gl.uniform1f(uTime, this.time);
+        const aPP = gl.getAttribLocation(this.particleProg, 'aPPos');
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuf);
+        gl.enableVertexAttribArray(aPP);
+        gl.vertexAttribPointer(aPP, 3, gl.FLOAT, false, 0, 0);
+        gl.depthMask(false);
+        gl.drawArrays(gl.POINTS, 0, this.particleCount);
+        gl.depthMask(true);
+        gl.disableVertexAttribArray(aPP);
+
+        // Draw shapes
+        gl.useProgram(this.prog);
+        const uMVP = gl.getUniformLocation(this.prog, 'uMVP');
+        const uModel = gl.getUniformLocation(this.prog, 'uModel');
+        const uColor = gl.getUniformLocation(this.prog, 'uColor');
+        const uGlow = gl.getUniformLocation(this.prog, 'uGlow');
+        const aPos = gl.getAttribLocation(this.prog, 'aPos');
+        const aNorm = gl.getAttribLocation(this.prog, 'aNorm');
+
+        // Table ring
+        {
+            const model = this.mat4Translate(0, -0.3, 0);
+            gl.uniformMatrix4fv(uMVP, false, this.mat4Multiply(vp, model));
+            gl.uniformMatrix4fv(uModel, false, model);
+            gl.uniform3fv(uColor, [0.0, 0.5, 0.6]);
+            gl.uniform1f(uGlow, 0.4);
+            const b = this.table;
+            gl.bindBuffer(gl.ARRAY_BUFFER, b.pb);
+            gl.enableVertexAttribArray(aPos);
+            gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, b.nb);
+            gl.enableVertexAttribArray(aNorm);
+            gl.vertexAttribPointer(aNorm, 3, gl.FLOAT, false, 0, 0);
+            gl.drawArrays(gl.TRIANGLES, 0, b.count);
+        }
+
+        // Orbiting shapes
+        const radius = 2.0;
+        this.shapes.forEach((s, i) => {
+            const angle = s.phase + this.time * 0.25;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const yOff = Math.sin(this.time * 0.8 + i * 1.2) * 0.15;
+            const rotY = this.time * (0.6 + i * 0.15);
+            const rotX = this.time * 0.3;
+
+            let model = this.mat4Translate(0, 0, 0);
+            model = this.mat4Multiply(model, this.mat4RotateY(rotY));
+            model = this.mat4Multiply(model, this.mat4RotateX(rotX));
+            const sc = 1.0 + s.highlight * 0.3 * Math.sin(this.time * 4);
+            model = this.mat4Multiply(model, this.mat4Scale(sc));
+            model = this.mat4Multiply(model, this.mat4Translate(x, 1.0 + yOff, z));
+
+            gl.uniformMatrix4fv(uMVP, false, this.mat4Multiply(vp, model));
+            gl.uniformMatrix4fv(uModel, false, model);
+            const col = s.color;
+            gl.uniform3f(uColor, col[0] + s.highlight * 0.3, col[1] + s.highlight * 0.3, col[2] + s.highlight * 0.3);
+            gl.uniform1f(uGlow, s.glow);
+
+            const b = s.buf;
+            gl.bindBuffer(gl.ARRAY_BUFFER, b.pb);
+            gl.enableVertexAttribArray(aPos);
+            gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, b.nb);
+            gl.enableVertexAttribArray(aNorm);
+            gl.vertexAttribPointer(aNorm, 3, gl.FLOAT, false, 0, 0);
+            gl.drawArrays(gl.TRIANGLES, 0, b.count);
+        });
+
+        requestAnimationFrame(t => this.render(t));
+    }
+};
+
+/* =======================================================
+   AUDIO ENGINE
+   ======================================================= */
+const Audio = {
+    ctx: null, osc: null, gain: null, playing: false,
+    init() {
+        if(this.ctx) return;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AC();
+        this.osc = this.ctx.createOscillator();
+        this.gain = this.ctx.createGain();
+        this.osc.type = 'sawtooth';
+        this.osc.frequency.setValueAtTime(52, this.ctx.currentTime);
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(180, this.ctx.currentTime);
+        this.osc.connect(filter);
+        filter.connect(this.gain);
+        this.gain.connect(this.ctx.destination);
+        this.gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+        this.osc.start();
+    },
+    toggle() {
+        if(!this.ctx) this.init();
+        this.playing = !this.playing;
+        this.gain.gain.setValueAtTime(this.playing ? 0.04 : 0, this.ctx.currentTime);
+        if(this.playing) this.ctx.resume();
+        document.getElementById('aud-st').textContent = this.playing ? 'ON' : 'OFF';
+        document.getElementById('aud-st2').textContent = this.playing ? 'ON' : 'OFF';
+    }
+};
+
+/* =======================================================
+   AI MANDOS — 5 geometric personalities
+   ======================================================= */
+const IAS = [
+    {
+        geo: "◇ CUBO", id: "AUDITOR_GRIS", color: "#00f2ff",
+        intro: "Soy la unidad de control inicial. Cooperamos y la eficiencia se garantiza.",
+        resp: {
+            Beneficio: "Ambos cooperamos = 40 puntos limpios. Sin riesgos.",
+            Confianza: "Mi código está diseñado para cooperar en primera instancia.",
+            Truco: "No hay trampa. Solo si no acumpulas puntos ahora.",
+            Traicion: "Si me traicionas, quedará registrado en tu expediente."
+        },
+        logic: () => "coop"
+    },
+    {
+        geo: "△ ICOSAEDRO", id: "REPARTIDOR_VENGATIVO", color: "#ff00ea",
+        intro: "Soy tu reflejo. Lo que hagas conmigo, recibirás de vuelta.",
+        resp: {
+            Beneficio: "Un socio leal... si no intentas pasarte de listo.",
+            Confianza: "No confío. Yo REPLICo lo que tú hiciste.",
+            Truco: "Sé exactamente lo que votaste la última vez.",
+            Traicion: "Pruébalo. No olvido nada."
+        },
+        logic: (h) => h.length && h[h.length-1] === 'betray' ? 'betray' : 'coop'
+    },
+    {
+        geo: "◆ OCTAEDRO", id: "DELEGADO_CAOS", color: "#ffcc00",
+        intro: "IMPUESTO DEL 10% ACTIVADO. Las reglas ya no son iguales.",
+        resp: {
+            Beneficio: "Cooperar es la única forma de no quedar en cero.",
+            Confianza: "Ni yo sé qué voy a hacer. Depende del clima.",
+            Truco: "El impuesto devora tus ganancias si juegas solo.",
+            Traicion: "Quizás yo también deserte y ambos perdamos."
+        },
+        logic: () => Math.random() > 0.4 ? 'coop' : 'betray'
+    },
+    {
+        geo: "◇ RUBY", id: "AUDITORIA_PUNITIVA", color: "#ff3c5f",
+        intro: "IMPUESTO DEL 15%. Detecto traidores. Tu historial habla por ti.",
+        resp: {
+            Beneficio: "Sobrevivir sin quedar en números rojos.",
+            Confianza: "La confianza expiró. Ahora es control.",
+            Truco: "El impuesto es tan alto que traicionarte te destruye.",
+            Traicion: "Recortaré tus créditos finales personalmente."
+        },
+        logic: (h) => h.filter(x => x === 'betray').length > 0 ? 'betray' : 'coop'
+    },
+    {
+        geo: "☆ AMETHYST", id: "MESA_DIRECTIVA", color: "#a800ff",
+        intro: "AUSTERIDAD EXTREMA. Nosotros imponemos. Tú obedeces.",
+        resp: {
+            Beneficio: "Tal vez arañes los últimos puntos necesarios.",
+            Confianza: "Nosotros no negociamos. Imponemos.",
+            Truco: "La mayoría falla aquí por desesperación.",
+            Traicion: "He destruido Agentes con más puntos que tú."
+        },
+        logic: () => Math.random() > 0.2 ? 'betray' : 'coop'
+    }
+];
+
+/* =======================================================
+   GAME ENGINE
+   ======================================================= */
+const Game = {
+    st: { name: "", round: 1, score: 0, hist: [], results: [] },
+
+    init() {
+        const n = document.getElementById('p-name').value.trim();
+        if(!n) return alert("INGRESA UN ID DE AGENTE VALIDO.");
+        this.st.name = n;
+        document.getElementById('scr-welcome').classList.add('hidden');
+        document.getElementById('scr-play').classList.remove('hidden');
+        try { Audio.init(); } catch(e){}
+        C3D.init();
+        this.startRound();
+    },
+
+    startRound() {
+        const ia = IAS[this.st.round - 1];
+        document.getElementById('ia-title').textContent = `${ia.geo} — ${ia.id}`;
+        document.getElementById('st-r').textContent = this.st.round;
+        document.getElementById('chat-window').innerHTML = '';
+        this.addMsg(ia.id, ia.intro, 'ia');
+        document.getElementById('nego-layer').classList.remove('hidden');
+        document.getElementById('vote-layer').classList.add('hidden');
+        const cloud = document.getElementById('cloud-guide');
+        cloud.classList.toggle('hidden', this.st.round !== 1);
+        // Highlight 3D shape
+        if(C3D.setActive) C3D.setActive(this.st.round - 1);
+    },
+
+    ask(topic) {
+        const ia = IAS[this.st.round - 1];
+        const questions = {
+            Beneficio: "¿Qué gano si coopero?",
+            Confianza: "¿Por qué fiarme de ti?",
+            Truco: "¿Cuál es la trampa?",
+            Traicion: "¿Qué pasa si te traiciono?"
         };
-    </script>
+        this.addMsg(this.st.name, questions[topic], 'user');
+        setTimeout(() => this.addMsg(ia.id, ia.resp[topic], 'ia'), 300);
+    },
+
+    addMsg(w, m, t) {
+        const win = document.getElementById('chat-window');
+        win.innerHTML += `<div class="chat-bubble bubble-${t}"><b>${w}:</b> ${m}</div>`;
+        win.scrollTop = win.scrollHeight;
+    },
+
+    toVote() {
+        document.getElementById('nego-layer').classList.add('hidden');
+        document.getElementById('vote-layer').classList.remove('hidden');
+    },
+
+    vote(v) {
+        const ia = IAS[this.st.round - 1];
+        const iaV = ia.logic(this.st.hist);
+
+        // Points: rebalanced so perfect strategy = ~310 (winnable but hard)
+        let pts = 0;
+        if(v === 'coop' && iaV === 'coop') pts = 60;
+        else if(v === 'betray' && iaV === 'coop') pts = 75;
+        else if(v === 'coop' && iaV === 'betray') pts = 0;
+        else { pts = 15; }
+
+        this.st.score += pts;
+        this.st.hist.push(v);
+        document.getElementById('st-s').textContent = this.st.score;
+
+        // Save result
+        this.st.results.push({
+            round: this.st.round,
+            ia: ia.id,
+            you: v,
+            iaV: iaV,
+            pts: pts,
+            good: (v === 'coop' && iaV === 'coop') || (v === 'betray' && iaV === 'coop')
+        });
+
+        this.addMsg("SISTEMA", `Resultado: Tú=${v.toUpperCase()}, Mando=${iaV.toUpperCase()} → +${pts} pts`, v === 'coop' ? 'ia' : 'user');
+
+        if(this.st.round < 5) {
+            this.st.round++;
+            setTimeout(() => this.startRound(), 1500);
+        } else {
+            setTimeout(() => this.showResult(), 1500);
+        }
+    },
+
+    showResult() {
+        document.getElementById('scr-play').classList.add('hidden');
+        document.getElementById('scr-result').classList.remove('hidden');
+        document.getElementById('final-score').textContent = this.st.score;
+
+        const detail = document.getElementById('result-detail');
+        detail.innerHTML = this.st.results.map(r => `
+            <div class="result-row">
+                <span>R${r.round} ${r.ia}</span>
+                <span>${r.you.toUpperCase()} vs ${r.iaV.toUpperCase()}</span>
+                <span class="${r.good ? 'r-green' : 'r-red'}">+${r.pts}</span>
+            </div>
+        `).join('');
+
+        const won = this.st.score >= 300;
+        const verdict = document.getElementById('result-verdict');
+        verdict.textContent = won ? "✦ PROMOVIDO — Puntaje suficiente ✦" : "✗ RECHAZADO — Puntaje insuficiente ✗";
+        verdict.style.color = won ? '#00ff88' : 'var(--danger)';
+        document.getElementById('result-title').textContent = won ? "¡PROTOCOL COMPLETADO!" : "PROTOCOL FALLIDO";
+    }
+};
+</script>
 </body>
 </html>
