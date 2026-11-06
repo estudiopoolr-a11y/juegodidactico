@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE PROTOCOL — Neon Edition</title>
+    <title>THE PROTOCOL — Dark Synth Edition</title>
     <style>
         :root {
             --bg: #0a0b10;
@@ -27,11 +27,10 @@
             overflow: hidden;
         }
 
-        /* --- UI GLASS PANEL --- */
         #main-frame {
             width: 100%;
             max-width: 420px;
-            height: 90vh;
+            height: 92vh;
             background: var(--card);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 32px;
@@ -42,16 +41,45 @@
             padding: 24px;
         }
 
-        .screen { flex: 1; display: flex; flex-direction: column; animation: fadeIn 0.5s ease; }
+        .screen { flex: 1; display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
         .hidden { display: none !important; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- AVATARS (THE "MUÑECOS") --- */
+        /* --- BURBUJA TUTORIAL REUTILIZABLE --- */
+        .tutorial-cloud {
+            background: linear-gradient(135deg, var(--secondary) 0%, #8000ff 100%);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.4;
+            box-shadow: 0 8px 25px rgba(255, 0, 234, 0.4);
+            margin-bottom: 12px;
+            position: relative;
+            animation: floatCloud 3s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .tutorial-cloud::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 24px;
+            border-width: 10px 10px 0 10px;
+            border-style: solid;
+            border-color: #8000ff transparent transparent transparent;
+        }
+
+        @keyframes floatCloud {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+
         .character-box {
-            width: 140px;
-            height: 140px;
-            margin: 20px auto;
+            width: 110px;
+            height: 110px;
+            margin: 5px auto 10px;
             position: relative;
             background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
             display: flex;
@@ -60,118 +88,103 @@
         }
 
         .svg-muñeco { width: 100%; height: 100%; filter: drop-shadow(0 0 10px var(--accent)); transition: all 0.3s; }
-        .mood-angry { filter: drop-shadow(0 0 15px var(--danger)); }
+        .mood-angry { filter: drop-shadow(0 0 15px var(--danger)); color: var(--danger) !important; }
 
-        /* --- TOOLTIP BUBBLES (EL MANUAL) --- */
-        .tutorial-bubble {
-            position: absolute;
-            background: var(--accent);
-            color: #000;
-            padding: 10px 15px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            z-index: 100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            pointer-events: none;
-            animation: bounce 2s infinite;
-        }
-        .tutorial-bubble::after {
-            content: ''; position: absolute; border: 8px solid transparent;
-        }
-        .bubble-bottom::after { bottom: -16px; left: 50%; margin-left: -8px; border-top-color: var(--accent); }
-
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-        /* --- STATS --- */
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .badge { background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 100px; font-size: 10px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
-        .score-val { color: var(--accent); font-size: 18px; }
+        .score-val { color: var(--accent); font-size: 16px; }
 
-        /* --- CHAT --- */
         #chat-window {
             flex: 1;
-            background: rgba(0,0,0,0.2);
-            border-radius: 20px;
-            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            padding: 12px;
             overflow-y: auto;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.03);
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .chat-bubble {
-            max-width: 80%;
+            max-width: 85%;
             padding: 10px 14px;
-            border-radius: 18px;
-            font-size: 12px;
-            margin-bottom: 10px;
+            border-radius: 16px;
+            font-size: 11px;
             line-height: 1.4;
         }
-        .bubble-ia { background: #252a35; color: #ccc; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .bubble-user { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; margin-left: auto; }
+        .bubble-ia { background: #252a35; color: #eee; align-self: flex-start; border-bottom-left-radius: 2px; border-left: 3px solid var(--secondary); }
+        .bubble-user { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 600; }
 
-        /* --- BUTTONS --- */
         .btn {
             width: 100%;
-            padding: 18px;
+            padding: 14px;
             border: none;
-            border-radius: 16px;
-            font-size: 14px;
+            border-radius: 14px;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.2s;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, #00a2ff 100%); color: #000; box-shadow: 0 10px 25px var(--accent-glow); }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px var(--accent-glow); }
-        .btn-secondary { background: #1e2430; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, #00a2ff 100%); color: #000; box-shadow: 0 8px 20px var(--accent-glow); }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-secondary { background: #1e2430; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 10px; font-size: 10px; }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        .audio-btn {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 10px; cursor: pointer;
+        }
+
+        .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .choice-card {
-            padding: 20px;
-            border-radius: 20px;
+            padding: 16px;
+            border-radius: 16px;
             border: 2px solid rgba(255,255,255,0.05);
             text-align: center;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s;
         }
         .choice-coop { background: rgba(0, 242, 255, 0.05); color: var(--accent); }
         .choice-coop:hover { border-color: var(--accent); background: rgba(0, 242, 255, 0.1); }
         .choice-betray { background: rgba(255, 60, 95, 0.05); color: var(--danger); }
         .choice-betray:hover { border-color: var(--danger); background: rgba(255, 60, 95, 0.1); }
-
     </style>
 </head>
 <body>
 
     <div id="main-frame">
         
-        <!-- TUTORIAL BUBBLES -->
-        <div id="tuto-1" class="tutorial-bubble bubble-bottom hidden" style="top: 100px; left: 140px;">¡Mírame! Cambio de humor según tu lealtad.</div>
-        <div id="tuto-2" class="tutorial-bubble bubble-bottom hidden" style="top: 25px; right: 20px;">Tu tiempo vuela, 15 min totales.</div>
-
         <!-- SCREEN: WELCOME -->
         <div id="scr-welcome" class="screen">
-            <h2 style="text-align:center; font-size:12px; color:var(--accent); letter-spacing:4px; margin-bottom:10px;">EL PROTOCOLO</h2>
-            <h1 style="text-align:center; font-size:28px; margin-bottom:10px;">Austeridad_v10</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span class="badge" style="color:var(--accent)">PROTOCOL // V12</span>
+                <button class="audio-btn" onclick="AudioEngine.toggle()">🎵 MÚSICA: <span id="music-status">OFF</span></button>
+            </div>
             
+            <h1 style="text-align:center; font-size:24px; margin-bottom:5px;">EL PROTOCOLO</h1>
+            <p style="text-align:center; font-size:11px; color:#666; margin-bottom:15px;">Simulación Burocrática de Alta Tensión</p>
+
             <div class="character-box">
                 <svg id="main-icon" viewBox="0 0 100 100" class="svg-muñeco">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3" />
-                    <rect x="30" y="35" width="10" height="10" fill="currentColor" />
-                    <rect x="60" y="35" width="10" height="10" fill="currentColor" />
-                    <path d="M30 70 Q50 80 70 70" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="3" />
+                    <circle cx="35" cy="40" r="5" fill="currentColor" />
+                    <circle cx="65" cy="40" r="5" fill="currentColor" />
+                    <path d="M30 68 Q50 78 70 68" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
                 </svg>
             </div>
 
-            <p style="text-align:center; font-size:12px; color:#666; margin-bottom:30px; line-height:1.6;">
-                Unidad detectada. Alcanza <b style="color:#fff;">1,000 PUNTOS</b> para la promoción.<br>
-                La IA es hostil. El lenguaje es rústico. La meta es difícil.
+            <p style="text-align:center; font-size:11px; color:#aaa; margin-bottom:20px; line-height:1.5;">
+                Sobrevive a 5 Mandos de Inteligencia.<br>
+                Alcanza <b style="color:var(--accent)">1,000 PUNTOS</b> para ser promovido.<br>
+                Cada decisión tiene consecuencias.
             </p>
 
-            <input type="text" id="p-name" placeholder="ID DEL AGENTE..." style="width:100%; padding:18px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); background:#000; color:#fff; text-align:center; margin-bottom:15px; font-family:inherit; outline:none;">
-            <button class="btn btn-primary" onclick="Game.init()">Inicializar Sistema</button>
+            <input type="text" id="p-name" placeholder="INGRESA ID DE AGENTE..." style="width:100%; padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:#000; color:#fff; text-align:center; margin-bottom:12px; font-family:inherit; outline:none; font-size:12px;">
+            <button class="btn btn-primary" onclick="Game.init()">Iniciar Simulación</button>
         </div>
 
         <!-- SCREEN: GAMEPLAY -->
@@ -179,38 +192,45 @@
             <div class="top-nav">
                 <div class="badge">RONDA <span id="stat-r">1</span>/5</div>
                 <div class="badge score-val"><span id="stat-s">0</span> pts</div>
-                <div class="badge" id="stat-t">15:00</div>
+                <button class="audio-btn" onclick="AudioEngine.toggle()">🎵 <span id="music-status-2">OFF</span></button>
             </div>
 
-            <div id="ia-header" style="text-align:center; margin-bottom:15px;">
-                <h3 id="ia-name" style="font-size:14px; color:var(--secondary); text-transform:uppercase;">MANDO_ID: GRIS</h3>
+            <div id="ia-header" style="text-align:center; margin-bottom:5px;">
+                <h3 id="ia-name" style="font-size:13px; color:var(--secondary); text-transform:uppercase;">MANDO: AUDITOR_GRIS</h3>
             </div>
 
-            <div class="character-box" style="width:100px; height:100px;">
+            <div class="character-box">
                 <div id="ia-muñeco"></div>
             </div>
 
             <div id="chat-window"></div>
 
             <div id="action-layer">
-                <div id="nego-layer" class="controls">
-                    <p style="font-size:10px; color:#555; text-align:center; margin-bottom:10px;">CUESTIONAR MANDO:</p>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
-                        <button class="btn btn-secondary" style="padding:10px; font-size:10px;" onclick="Game.ask('Confianza')">¿CONFIAR?</button>
-                        <button class="btn btn-secondary" style="padding:10px; font-size:10px;" onclick="Game.ask('Meta')">¿META?</button>
+                <!-- BURBUJA TUTORIAL / NUBE GUÍA EXPLICATIVA DE CUESTIONES -->
+                <div class="tutorial-cloud" id="cloud-guide">
+                    💬 <b>Nube del Sistema:</b> Interroga al Mando con los botones de abajo para descubrir su personalidad antes de votar. ¡Descubre si miente o si cooperará contigo!
+                </div>
+
+                <div id="nego-layer">
+                    <p style="font-size:9px; color:#666; text-align:center; margin-bottom:8px; font-weight:bold;">INTERROGAR AL MANDO:</p>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px;">
+                        <button class="btn btn-secondary" onclick="Game.ask('Beneficio')">¿Qué gano cooperando?</button>
+                        <button class="btn btn-secondary" onclick="Game.ask('Confianza')">¿Por qué confiar en ti?</button>
+                        <button class="btn btn-secondary" onclick="Game.ask('Truco')">¿Cuál es la trampa?</button>
+                        <button class="btn btn-secondary" onclick="Game.ask('Traicion')">¿Y si te traiciono?</button>
                     </div>
-                    <button class="btn btn-primary" onclick="Game.toVote()">Cerrar Negociación &rarr;</button>
+                    <button class="btn btn-primary" onclick="Game.toVote()">Proceder a la Decisión &rarr;</button>
                 </div>
 
                 <div id="vote-layer" class="hidden">
                     <div class="grid-choices">
                         <div class="choice-card choice-coop" onclick="Game.vote('coop')">
-                            <div style="font-weight:bold;">COOPERAR</div>
-                            <div style="font-size:9px;">+10 pts</div>
+                            <div style="font-weight:bold; font-size:13px;">COOPERAR</div>
+                            <div style="font-size:9px; opacity:0.8;">+10 pts Colectivo</div>
                         </div>
                         <div class="choice-card choice-betray" onclick="Game.vote('betray')">
-                            <div style="font-weight:bold;">DESERTAR</div>
-                            <div style="font-size:9px;">+18 pts</div>
+                            <div style="font-weight:bold; font-size:13px;">DESERTAR</div>
+                            <div style="font-size:9px; opacity:0.8;">+18 pts Individual</div>
                         </div>
                     </div>
                 </div>
@@ -220,50 +240,150 @@
     </div>
 
     <script>
+        // --- AMBIENT SYNTH AUDIO ENGINE (Web Audio API - No External Files) ---
+        const AudioEngine = {
+            ctx: null,
+            osc: null,
+            gain: null,
+            isPlaying: false,
+
+            init() {
+                if(this.ctx) return;
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioCtx();
+                
+                this.osc = this.ctx.createOscillator();
+                this.gain = this.ctx.createGain();
+                
+                this.osc.type = 'sawtooth';
+                this.osc.frequency.setValueAtTime(55, this.ctx.currentTime); // Low A drone
+                
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(200, this.ctx.currentTime);
+
+                this.osc.connect(filter);
+                filter.connect(this.gain);
+                this.gain.connect(this.ctx.destination);
+                
+                this.gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                this.osc.start();
+            },
+
+            toggle() {
+                if(!this.ctx) this.init();
+                
+                if(this.isPlaying) {
+                    this.gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                    this.isPlaying = false;
+                } else {
+                    this.ctx.resume();
+                    this.gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                    this.isPlaying = true;
+                }
+                document.getElementById('music-status').textContent = this.isPlaying ? 'ON' : 'OFF';
+                document.getElementById('music-status-2').textContent = this.isPlaying ? 'ON' : 'OFF';
+            }
+        };
+
         const IAS = [
-            { id: "AUDITOR_GRIS", color: "#00f2ff", intro: "No me hagas perder el tiempo, novato. ¿Cooperas o estorbas?", 
-              resp: { Confianza: "La confianza es para débiles. Solo audito números.", Meta: "Tu meta es mi basura. Sigue intentando." },
-              logic: () => "coop" },
-            { id: "REPARTIDOR_V", color: "#ff00ea", intro: "Te vigilo. Si traicionas, te quedas en la calle. ¿Entendido?", 
-              resp: { Confianza: "¿Confiar en ti? Ni que fueras mi algoritmo de pago.", Meta: "Gana si puedes, rata de oficina." },
-              logic: (h) => h.length && h[h.length-1] === 'betray' ? 'betray' : 'coop' }
+            { 
+                id: "AUDITOR_GRIS", color: "#00f2ff", 
+                intro: "Atención Agente. Soy la unidad de control inicial. La cooperación genera eficiencia comprobada.",
+                resp: {
+                    Beneficio: "Si ambos cooperamos, la base suma 20 puntos limpios. Sin sorpresas ni penalizaciones.",
+                    Confianza: "Mis algoritmos están programados para mantener la estabilidad en la primera ronda.",
+                    Truco: "No hay trampa aquí. La trampa vendrá después si no acumulas puntos ahora.",
+                    Traicion: "Si me traicionas, me obligarás a registrar un informe negativo en tu expediente."
+                },
+                logic: () => "coop" 
+            },
+            { 
+                id: "REPARTIDOR_VENGATIVO", color: "#ff00ea", 
+                intro: "Soy el reflejo de tus actos. Si juegas limpio conmigo, seré tu mejor aliado. Si me vendes, te arrepentirás.",
+                resp: {
+                    Beneficio: "Ganas un socio leal para esta ronda... siempre que no intentes pasarte de listo.",
+                    Confianza: "Yo no confío, yo REPLICO. Lo que tú hagas ahora definirá mi respuesta exacta.",
+                    Truco: "El truco es que sé perfectamente lo que hiciste en la ronda anterior.",
+                    Traicion: "Pruébalo y verás cómo respondo en el siguiente periodo. No olvido."
+                },
+                logic: (h) => h.length && h[h.length-1] === 'betray' ? 'betray' : 'coop' 
+            },
+            { 
+                id: "DELEGADO_CAOS", color: "#ffcc00", 
+                intro: "El sistema aplicó un IMPUESTO DEL 10%. Las cosas se están complicando, Agente.",
+                resp: {
+                    Beneficio: "Ganamos menos por culpa del impuesto. Cooperar es la única forma de no quedar en cero.",
+                    Confianza: "¿Confiar en mí? Ni yo sé qué voy a votar hoy. Depende del clima institucional.",
+                    Truco: "La trampa es que el impuesto se come tus ganancias si intentas jugar solo.",
+                    Traicion: "Hazlo. Quizás yo también deserte y ambos perdamos todo."
+                },
+                logic: () => Math.random() > 0.4 ? 'coop' : 'betray' 
+            },
+            { 
+                id: "AUDITORIA_PUNITIVA", color: "#ff3c5f", 
+                intro: "IMPUESTO DEL 15% ACTIVADO. Detecto que la clase está perdiendo puntos por culpa de traidores.",
+                resp: {
+                    Beneficio: "El beneficio es sobrevivir a esta ronda sin quedar en números rojos.",
+                    Confianza: "La confianza expiró en la ronda 2. Ahora todo es control y auditoría.",
+                    Truco: "Que el impuesto es tan alto que una traición mutua destruirá tu puntaje.",
+                    Traicion: "Si me traicionas, me aseguraré de recortar tus créditos finales."
+                },
+                logic: (h) => h.filter(x => x === 'betray').length > 0 ? 'betray' : 'coop' 
+            },
+            { 
+                name: "MESA_DIRECTIVA", color: "#a800ff", 
+                intro: "AUSTERIDAD EXTREMA. LIMITADOR 0.9x ACTIVADO. Los recursos son casi nulos.",
+                resp: {
+                    Beneficio: "Si cooperas, tal vez arañes los últimos puntos para llegar a los 1,000.",
+                    Confianza: "Estás hablando con la cúpula. Nosotros no negociamos, nosotros imponemos.",
+                    Truco: "Que la mayoría falla en esta ronda por desesperación.",
+                    Traicion: "Inténtalo. He destruido a Agentes con más puntos que tú."
+                },
+                logic: () => Math.random() > 0.2 ? 'betray' : 'coop' 
+            }
         ];
 
         const Game = {
-            st: { name: "", round: 1, score: 0, time: 900, hist: [] },
+            st: { name: "", round: 1, score: 0, hist: [] },
             init() {
-                const n = document.getElementById('p-name').value;
-                if(!n) return alert("IDENTIFICATE.");
+                const n = document.getElementById('p-name').value.trim();
+                if(!n) return alert("INGRESA UN ID DE AGENTE VALIDO.");
                 this.st.name = n;
                 document.getElementById('scr-welcome').classList.add('hidden');
                 document.getElementById('scr-play').classList.remove('hidden');
                 
-                // Mostrar tutorial por 4 segundos
-                document.getElementById('tuto-1').classList.remove('hidden');
-                document.getElementById('tuto-2').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('tuto-1').classList.add('hidden');
-                    document.getElementById('tuto-2').classList.add('hidden');
-                }, 4000);
+                try { AudioEngine.init(); } catch(e){}
 
                 this.startRound();
-                setInterval(() => { if(this.st.time > 0) { this.st.time--; this.updateTime(); } }, 1000);
             },
             startRound() {
                 const ia = IAS[Math.min(this.st.round-1, IAS.length-1)];
-                document.getElementById('ia-name').textContent = ia.id;
+                document.getElementById('ia-name').textContent = ia.id || ia.name;
                 document.getElementById('stat-r').textContent = this.st.round;
                 this.updateAvatar(ia.color, 'neutral');
-                this.addMsg(ia.id, ia.intro, 'ia');
+                
+                const win = document.getElementById('chat-window');
+                win.innerHTML = '';
+                this.addMsg(ia.id || ia.name, ia.intro, 'ia');
+                
                 document.getElementById('nego-layer').classList.remove('hidden');
                 document.getElementById('vote-layer').classList.add('hidden');
+
+                // Mostrar nube de explicación de cuestiones solo en la Ronda 1
+                const cloud = document.getElementById('cloud-guide');
+                if(this.st.round === 1) {
+                    cloud.classList.remove('hidden');
+                } else {
+                    cloud.classList.add('hidden');
+                }
             },
             updateAvatar(color, mood) {
                 const root = document.getElementById('ia-muñeco');
-                let face = mood === 'happy' ? "M30 70 Q50 85 70 70" : (mood === 'angry' ? "M30 75 Q50 60 70 75" : "M30 70 Q50 70 70 70");
+                let face = mood === 'happy' ? "M30 68 Q50 82 70 68" : (mood === 'angry' ? "M30 75 Q50 60 70 75" : "M30 68 Q50 68 70 68");
                 root.innerHTML = `
                     <svg viewBox="0 0 100 100" class="svg-muñeco ${mood === 'angry' ? 'mood-angry' : ''}" style="color:${color}">
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="3" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="3" />
                         <circle cx="35" cy="40" r="5" fill="currentColor" />
                         <circle cx="65" cy="40" r="5" fill="currentColor" />
                         <path d="${face}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
@@ -272,8 +392,14 @@
             },
             ask(topic) {
                 const ia = IAS[Math.min(this.st.round-1, IAS.length-1)];
-                this.addMsg(this.st.name, topic + "?", 'user');
-                setTimeout(() => this.addMsg(ia.id, ia.resp[topic], 'ia'), 400);
+                const questions = {
+                    Beneficio: "¿Qué gano si coopero contigo?",
+                    Confianza: "¿Por qué debería fiarme de ti?",
+                    Truco: "¿Cuál es el truco en esta ronda?",
+                    Traicion: "¿Qué pasa si te traiciono?"
+                };
+                this.addMsg(this.st.name, questions[topic], 'user');
+                setTimeout(() => this.addMsg(ia.id || ia.name, ia.resp[topic], 'ia'), 350);
             },
             addMsg(w, m, t) {
                 const win = document.getElementById('chat-window');
@@ -288,9 +414,11 @@
                 const ia = IAS[Math.min(this.st.round-1, IAS.length-1)];
                 const iaV = ia.logic(this.st.hist);
                 let pts = 0;
+                
                 if(v === 'coop' && iaV === 'coop') { pts = 110; this.updateAvatar(ia.color, 'happy'); }
                 else if(v === 'betray' && iaV === 'coop') { pts = 198; this.updateAvatar(ia.color, 'angry'); }
-                else { pts = 0; this.updateAvatar(ia.color, 'angry'); }
+                else if(v === 'coop' && iaV === 'betray') { pts = 0; this.updateAvatar(ia.color, 'angry'); }
+                else { pts = 55; this.updateAvatar(ia.color, 'angry'); }
                 
                 this.st.score += pts;
                 this.st.hist.push(v);
@@ -298,16 +426,12 @@
                 
                 if(this.st.round < 5) {
                     this.st.round++;
-                    setTimeout(() => this.startRound(), 1500);
+                    setTimeout(() => this.startRound(), 1200);
                 } else {
-                    alert("EVALUACION FINALIZADA. SCORE: " + this.st.score);
+                    const win = this.st.score >= 1000;
+                    alert(`EVALUACIÓN FINALIZADA.\nPuntaje Total: ${this.st.score} pts.\nEstado: ${win ? "PROMOVIDO (¡Aprobaste!)" : "RECHAZADO (Puntaje insuficiente)"}`);
                     location.reload();
                 }
-            },
-            updateTime() {
-                const m = Math.floor(this.st.time / 60);
-                const s = this.st.time % 60;
-                document.getElementById('stat-t').textContent = `${m}:${s.toString().padStart(2,'0')}`;
             }
         };
     </script>
