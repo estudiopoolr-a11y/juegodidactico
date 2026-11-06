@@ -3,237 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Protocolo de Austeridad — Monitor del Instructor</title>
+<title>El Protocolo — Panel Instructor</title>
 <style>
-  :root {
-    --bg: #111;
-    --card: #1c1c1c;
-    --border: #333;
-    --text: #ccc;
-    --accent: #007acc;
-    --success: #37b24d;
-    --danger: #f14c4c;
-    --font: 'Courier New', Courier, monospace;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    padding: 16px;
-  }
-  .wrap { max-width: 1100px; margin: 0 auto; }
-  h1 { font-size: 18px; text-transform: uppercase; color: #fff; margin-bottom: 4px; }
-  .subtitle { font-size: 12px; color: #777; margin-bottom: 16px; }
-  .panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 14px;
-    margin-bottom: 14px;
-    border-radius: 2px;
-  }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px; }
-  .stat-card {
-    background: #181818;
-    border: 1px solid var(--border);
-    padding: 12px;
-    text-align: center;
-  }
-  .stat-card .val { font-size: 28px; font-weight: bold; color: #fff; margin-top: 4px; }
-  .stat-card .lbl { font-size: 11px; color: #777; text-transform: uppercase; }
-  input[type="text"] {
-    padding: 8px 12px;
-    background: #111;
-    border: 1px solid var(--border);
-    color: #fff;
-    font-family: var(--font);
-    font-size: 14px;
-    border-radius: 2px;
-  }
-  .btn {
-    padding: 8px 16px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    font-family: var(--font);
-    font-size: 13px;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 2px;
-  }
-  .btn:hover { background: #1c97ea; }
-  .btn-danger { background: #8c2626; }
-  .table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-  .table th, .table td { border: 1px solid var(--border); padding: 8px; text-align: left; }
-  .table th { background: #222; color: #fff; }
-  .badge { font-size: 10px; padding: 2px 6px; border-radius: 2px; text-transform: uppercase; }
-  .badge.play { background: #1e3a5f; color: #75beff; }
-  .badge.fin { background: #1b3a21; color: #37b24d; }
-  .badge.out { background: #401515; color: #f14c4c; }
+  :root { --bg: #1e1e1e; --card: #252526; --border: #3c3c3c; --text: #d4d4d4; --accent: #007acc; --danger: #f14c4c; --success: #37b24d; --font: 'Courier New', monospace; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 20px; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 18px; text-transform: uppercase; color: #fff; margin-bottom: 20px; text-align: center; }
+  .panel { background: var(--card); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; border-radius: 4px; }
+  input { width: 100%; padding: 12px; margin-bottom: 15px; background: #333; border: 1px solid var(--border); color: #fff; font-family: var(--font); font-size: 14px; box-sizing: border-box; }
+  input:focus { outline: none; border-color: var(--accent); }
+  .btn { width: 100%; padding: 14px; background: var(--accent); border: none; color: #fff; font-family: var(--font); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 14px; transition: background 0.2s; margin-top: 5px; }
+  .btn:hover { background: #0062a3; }
+  .btn:disabled { background: #555; cursor: not-allowed; }
+  .btn-danger { background: var(--danger); }
+  .btn-danger:hover { background: #c53b3b; }
   .hidden { display: none !important; }
-  .progress-bg { background: #222; border: 1px solid var(--border); height: 16px; margin-top: 8px; position: relative; }
-  .progress-bar { background: var(--success); height: 100%; width: 0%; transition: width 0.3s ease; }
-  .progress-text { position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; font-weight:bold; }
-  .debrief { background: #151515; border: 1px dashed var(--border); padding: 12px; font-size: 12px; line-height: 1.5; }
+  .error { color: var(--danger); font-size: 12px; margin-top: 10px; text-align: center; }
+  .status-box { font-size: 14px; padding: 10px; background: #111; border: 1px solid var(--border); margin-bottom: 15px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+  th, td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+  th { background: #333; color: #fff; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>El Protocolo de Austeridad &bull; Monitor del Instructor</h1>
-  <div class="subtitle">Sala Asíncrona (Método A) &bull; Cero bloqueos &bull; Monitoreo en tiempo real</div>
+<div class="panel">
+  <h1>Panel de Control — Instructor</h1>
 
-  <!-- SECCIÓN 1: VINCULAR SESIÓN -->
-  <div class="panel" id="panelSetup">
-    <h2>Vincular con la Sesión de Clase</h2>
-    <p>Introduce el código que los estudiantes usarán (ej: <b>CLASE-01</b>). El panel escuchará los reportes de inmediato.</p>
-    <div style="display:flex; gap:8px; margin-top:10px;">
-      <input type="text" id="txtSession" placeholder="CLASE-01" style="text-transform:uppercase; flex:1;" />
-      <button class="btn" id="btnConnect">Conectar Monitor</button>
-    </div>
+  <!-- PASO 1: CREAR SESIÓN -->
+  <div id="createSection">
+    <p style="font-size:13px; color:#888; margin-bottom:15px;">Crea un código de sesión para que los 30 estudiantes puedan unirse.</p>
+    <input type="text" id="sessionInput" placeholder="Código de Sesión (ej: CLASE1)" maxlength="20" />
+    <button id="btnCreate" class="btn">Crear y Activar Sesión</button>
+    <div id="createError" class="error"></div>
   </div>
 
-  <!-- SECCIÓN 2: DASHBOARD -->
-  <div id="panelDashboard" class="hidden">
+  <!-- PASO 2: CONTROL DE LA SESIÓN -->
+  <div id="controlSection" class="hidden">
+    <div class="status-box">
+      <strong>Sesión Activa: <span id="lblSession" style="color:var(--accent)">-</span></strong><br>
+      Estado: <span id="lblStatus">Inactivo</span> | Ronda: <span id="lblRound">0</span>/5 | Fase: <span id="lblPhase">-</span> | Tiempo: <span id="lblTimer">00:00</span>
+    </div>
+
     <div class="grid">
-      <div class="stat-card">
-        <div class="lbl">Sesión Activa</div>
-        <div class="val" id="statSession" style="font-size:20px;">--</div>
-      </div>
-      <div class="stat-card">
-        <div class="lbl">Pool Colectivo (Clase)</div>
-        <div class="val" id="statPool">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="lbl">Umbral Dinámico</div>
-        <div class="val" id="statThreshold">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="lbl">Estudiantes</div>
-        <div class="val" id="statCount">0</div>
-      </div>
+      <button id="btnStart" class="btn">Iniciar Simulación</button>
+      <button id="btnNext" class="btn" disabled>Avanzar de Fase</button>
     </div>
 
-    <!-- META BAR -->
-    <div class="panel">
-      <h2>Progreso Hacia el Objetivo Colectivo (<span id="metaPct">0%</span>)</h2>
-      <div class="progress-bg">
-        <div class="progress-bar" id="metaBar" style="width: 0%"></div>
-        <div class="progress-text" id="metaText">0 / 0 pts necesarios</div>
-      </div>
-      <p style="font-size:11px; color:#777; margin-top:6px;" id="metaSub">Calculado con los jugadores que han terminado de verdad.</p>
+    <div style="margin-top: 20px; font-size: 16px;">
+      Pool Colectivo de la Clase: <strong id="lblPool" style="color:var(--success)">0</strong> / 1000
     </div>
 
-    <!-- TABLA DE ESTUDIANTES -->
-    <div class="panel">
-      <h2>Estado Individual en Directo</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Estado</th>
-            <th>Ronda</th>
-            <th>Puntos</th>
-            <th>Tasa Coop</th>
-            <th>Uso IA</th>
-          </tr>
-        </thead>
-        <tbody id="tblRunners">
-          <tr><td colspan="7" style="text-align:center; color:#777;">Esperando conexiones en la sesión...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- DEBRIEFING / APUNTES PARA EL INSTRUCTOR -->
-    <div class="panel">
-      <h2>Guión de Debriefing (SENA)</h2>
-      <div class="debrief" id="debriefContent">
-        Conectando para generar la analítica del grupo...
-      </div>
-    </div>
+    <h3 style="margin-top: 25px; font-size: 14px; text-transform: uppercase;">Estudiantes Conectados (<span id="lblCount">0</span>/30)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Puntos</th>
+          <th>Voto Actual</th>
+          <th>Pareja Asignada</th>
+        </tr>
+      </thead>
+      <tbody id="playersTableBody">
+        <tr><td colspan="5" style="text-align:center; color:#777;">Esperando conexiones...</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
 <script type="module">
-  import { online, observeSession, createSession, closeSession } from './cloud.js';
-  import { computeThreshold, maxPerPlayer } from './engine.js';
+  import { GameDB } from './firebase.js';
 
   let currentSession = null;
-  let unsub = null;
+  let unsubscribe = null;
 
-  $('btnConnect').onclick = async () => {
-    const s = $('txtSession').value.trim().toUpperCase();
-    if (!s) return alert('Introduce un código de sesión.');
-    currentSession = s;
-    $('statSession').textContent = s;
+  const btnCreate = document.getElementById('btnCreate');
+  const sessionInput = document.getElementById('sessionInput');
+  const createError = document.getElementById('createError');
+  
+  const createSection = document.getElementById('createSection');
+  const controlSection = document.getElementById('controlSection');
+  
+  const btnStart = document.getElementById('btnStart');
+  const btnNext = document.getElementById('btnNext');
 
-    await createSession(s, 'Instructor');
-
-    $('panelSetup').classList.add('hidden');
-    $('panelDashboard').classList.remove('hidden');
-
-    unsub = observeSession(s, (data) => {
-      renderDashboard(data);
-    }, (err) => {
-      console.warn('Error observando sesión:', err);
-    });
-  };
-
-  function renderDashboard(data) {
-    const sum = data.summary;
-    $('statPool').textContent = sum.pool;
-    $('statThreshold').textContent = sum.threshold;
-    $('statCount').textContent = sum.total;
-
-    const pct = sum.threshold ? Math.min(100, (sum.pool / sum.threshold) * 100) : 0;
-    $('metaBar').style.width = `${pct}%`;
-    $('metaPct.textContent` || ($('metaPct').textContent = `${pct.toFixed(1)}%`);
-    $('metaText').textContent = `${sum.pool} / ${sum.threshold} pts requeridos (máx teórico: ${sum.poolMax})`;
-    $('metaSub').textContent = `Terminados: ${sum.finished} | Jugando: ${sum.playing} | Margen de traiciones toleradas: ~${sum.betrayalsLeft}`;
-
-    const docs = data.docs || {};
-    const keys = Object.keys(docs).sort();
-    if (!keys.length) {
-      $('tblRunners').innerHTML = `<tr><td colspan="7" style="text-align:center; color:#777;">Sin actividad registrada aún en la sesión "${currentSession}".</td></tr>`;
+  // CREAR JUEGO
+  btnCreate.addEventListener('click', async () => {
+    const sess = sessionInput.value.trim().toUpperCase();
+    if (!sess) {
+      createError.textContent = "Introduce un código de sesión válido.";
       return;
     }
 
-    $('tblRunners').innerHTML = keys.map((k) => {
-      const r = docs[k];
-      let badge = '<span class="badge play">Jugando</span>';
-      if (r.state === 'finished') badge = '<span class="badge fin">Terminado</span>';
-      else if (Date.now() - (r.beat || 0) > 45000) badge = '<span class="badge out">Inactivo</span>';
+    btnCreate.disabled = true;
+    btnCreate.textContent = "Creando...";
+    createError.textContent = "";
 
-      const history = r.history || [];
-      const coops = history.filter(h => h.vote === 'coop').length;
-      const coopRate = history.length ? Math.round((coops / history.length) * 100) : 0;
-      const subs = history.filter(h => h.kind === 'substitute').length;
+    try {
+      await GameDB.createGame(sess);
+      currentSession = sess;
 
+      createSection.classList.add('hidden');
+      controlSection.classList.remove('hidden');
+      document.getElementById('lblSession').textContent = sess;
+
+      // Suscribirse a cambios en tiempo real
+      unsubscribe = GameDB.subscribeToGame(sess, (data) => {
+        updateAdminView(data);
+      });
+
+    } catch (e) {
+      console.error(e);
+      createError.textContent = e.message || "Error al crear la sesión. Quizá ya existe.";
+      btnCreate.disabled = false;
+      btnCreate.textContent = "Crear y Activar Sesión";
+    }
+  });
+
+  // ACTUALIZAR VISTA DEL ADMIN
+  function updateAdminView(data) {
+    if (!data) return;
+
+    document.getElementById('lblStatus').textContent = data.running ? "En curso" : "Detenido";
+    document.getElementById('lblRound').textContent = data.round || 0;
+    
+    const phases = ["NEGOCIACIÓN", "VOTACIÓN", "AUDITORÍA", "RESULTADOS"];
+    document.getElementById('lblPhase').textContent = data.phase >= 0 && data.phase < 4 ? phases[data.phase] : "Esperando";
+
+    const m = Math.floor((data.timeLeft || 0) / 60).toString().padStart(2, '0');
+    const s = ((data.timeLeft || 0) % 60).toString().padStart(2, '0');
+    document.getElementById('lblTimer').textContent = `${m}:${s}`;
+
+    document.getElementById('lblPool').textContent = data.poolScore || 0;
+
+    // Habilitar / Deshabilitar botones de control
+    btnStart.disabled = data.running || data.round >= 5;
+    btnNext.disabled = !data.running;
+
+    // Tabla de jugadores
+    const players = data.players || {};
+    const keys = Object.keys(players).sort();
+    document.getElementById('lblCount').textContent = keys.length;
+
+    const tbody = document.getElementById('playersTableBody');
+    if (keys.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#777;">Esperando conexiones...</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = keys.map(k => {
+      const p = players[k];
+      const partner = data.pairs ? data.pairs.find(pair => pair.p1 === p.code || pair.p2 === pair.p1)?.[pair.p1 === p.code ? 'p2' : 'p1'] || '-' : '-';
       return `
         <tr>
-          <td><b>${r.code || k}</b></td>
-          <td>${r.name || 'Anónimo'}</td>
-          <td>${badge}</td>
-          <td>${r.round || 1}/5</td>
-          <td><b>${r.score || 0}</b></td>
-          <td>${coopRate}%</td>
-          <td>${subs} veces</td>
+          <td><b>${p.code}</b></td>
+          <td>${p.name}</td>
+          <td>${p.score || 0}</td>
+          <td>${p.vote ? p.vote.toUpperCase() : '-'}</td>
+          <td>${partner}</td>
         </tr>
       `;
     }).join('');
-
-    // Debrief dinámico
-    const won = sum.won;
-    $('debriefContent').innerHTML = `
-      <b>Estado del umbral:</b> ${won ? '¡La clase superó la meta colectiva!' : 'La clase no alcanzó el umbral de supervivencia.'}<br>
-      <b>Cooperación global:</b> ${(sum.coopRate * 100).toFixed(1)}% &bull; <b>Uso de respaldo IA:</b> ${(sum.subRate * 100).toFixed(1)}%<br>
-      <b>Puntos perdidos por deserciones:</b> ${sum.betrayed} pts.<br><br>
-      <b>Pregunta para el aula:</b> <i>"Si la meta dependía de que todos mantuvieran una tasa de cooperación del 98.5%, ¿en qué ronda comenzó el colapso de la confianza y por qué el emparejamiento aleatorio castiga incluso a los que querían cooperar?"</i>
-    `;
   }
 
-  const $ = (id) => document.getElementById(id);
+  // INICIAR JUEGO
+  btnStart.addEventListener('click', async () => {
+    if (!currentSession) return;
+    try {
+      btnStart.disabled = true;
+      await GameDB.startGame(currentSession);
+    } catch (e) {
+      alert("Error al iniciar: " + e.message);
+      btnStart.disabled = false;
+    }
+  });
+
+  // AVANZAR FASE
+  btnNext.addEventListener('click', async () => {
+    if (!currentSession) return;
+    try {
+      btnNext.disabled = true;
+      await GameDB.nextPhase(currentSession);
+    } catch (e) {
+      alert("Error al avanzar fase: " + e.message);
+      btnNext.disabled = false;
+    }
+  });
 </script>
 </body>
 </html>
